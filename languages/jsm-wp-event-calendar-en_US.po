@@ -1,0 +1,303 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: JSM WordPress Event Calendar 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jsm-wp-event-calendar\n"
+"POT-Creation-Date: 2023-07-01T12:00:00+00:00\n"
+"PO-Revision-Date: 2023-07-01T12:00:00+00:00\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.0\n"
+"X-Domain: jsm-wp-event-calendar\n"
+
+#: includes/class-event-post-type.php:30
+msgid "Události"
+msgstr "Events"
+
+#: includes/class-event-post-type.php:31
+msgid "Událost"
+msgstr "Event"
+
+#: includes/class-event-post-type.php:32
+msgid "Události"
+msgstr "Events"
+
+#: includes/class-event-post-type.php:33
+msgid "Událost"
+msgstr "Event"
+
+#: includes/class-event-post-type.php:34
+msgid "Přidat novou"
+msgstr "Add New"
+
+#: includes/class-event-post-type.php:35
+msgid "Přidat novou událost"
+msgstr "Add New Event"
+
+#: includes/class-event-post-type.php:36
+msgid "Nová událost"
+msgstr "New Event"
+
+#: includes/class-event-post-type.php:37
+msgid "Upravit událost"
+msgstr "Edit Event"
+
+#: includes/class-event-post-type.php:38
+msgid "Zobrazit událost"
+msgstr "View Event"
+
+#: includes/class-event-post-type.php:39
+msgid "Všechny události"
+msgstr "All Events"
+
+#: includes/class-event-post-type.php:40
+msgid "Hledat události"
+msgstr "Search Events"
+
+#: includes/class-event-post-type.php:41
+msgid "Nadřazené události:"
+msgstr "Parent Events:"
+
+#: includes/class-event-post-type.php:42
+msgid "Žádné události nenalezeny."
+msgstr "No events found."
+
+#: includes/class-event-post-type.php:43
+msgid "Žádné události v koši."
+msgstr "No events in trash."
+
+#: includes/class-event-post-type.php:54
+msgid "Události pro kalendář"
+msgstr "Events for calendar"
+
+#: includes/class-event-post-type.php:83
+msgid "Detaily události"
+msgstr "Event Details"
+
+#: admin/views/event-metabox.php:31
+msgid "Datum začátku"
+msgstr "Start Date"
+
+#: admin/views/event-metabox.php:36
+msgid "Čas začátku"
+msgstr "Start Time"
+
+#: admin/views/event-metabox.php:42
+msgid "Celodenní událost"
+msgstr "All Day Event"
+
+#: admin/views/event-metabox.php:48
+msgid "Datum konce"
+msgstr "End Date"
+
+#: admin/views/event-metabox.php:50
+msgid "Volitelné. Ponechte prázdné, pokud událost končí ve stejný den jako začíná."
+msgstr "Optional. Leave empty if the event ends on the same day it starts."
+
+#: admin/views/event-metabox.php:54
+msgid "Čas konce"
+msgstr "End Time"
+
+#: admin/views/event-metabox.php:56
+msgid "Volitelné."
+msgstr "Optional."
+
+#: admin/views/event-metabox.php:60
+msgid "URL adresa"
+msgstr "URL Address"
+
+#: admin/views/event-metabox.php:65
+msgid "Text tlačítka"
+msgstr "Button Text"
+
+#: admin/views/event-metabox.php:66
+msgid "Více informací"
+msgstr "More Information"
+
+#: admin/class-event-admin.php:56
+msgid "Datum události"
+msgstr "Event Date"
+
+#: admin/class-event-admin.php:57
+msgid "Čas"
+msgstr "Time"
+
+#: admin/class-event-admin.php:82
+msgid "Celý den"
+msgstr "All Day"
+
+#: includes/class-event-calendar.php:52
+msgid "Načítání událostí..."
+msgstr "Loading events..."
+
+#: includes/class-event-calendar.php:53
+msgid "Žádné události k zobrazení"
+msgstr "No events to display"
+
+#: includes/class-event-calendar.php:129
+msgid "Celý den"
+msgstr "All Day"
+
+#: templates/calendar.php:77
+msgid "Předchozí"
+msgstr "Previous"
+
+#: templates/calendar.php:80
+msgid "Dnes"
+msgstr "Today"
+
+#: templates/calendar.php:83
+msgid "Další"
+msgstr "Next"
+
+#: templates/event-list.php:17
+msgid "Žádné události k zobrazení."
+msgstr "No events to display."
+
+#: templates/event-list.php:24
+msgid "Proběhlé události"
+msgstr "Past Events"
+
+#: templates/event-list.php:25
+msgid "Nadcházející události"
+msgstr "Upcoming Events"
+
+#: templates/event-list.php:86 templates/event-detail.php:32
+msgid "Celý den"
+msgstr "All Day"
+
+#: templates/event-detail.php:13
+msgid "Událost nebyla nalezena."
+msgstr "Event not found."
+
+#: templates/event-detail.php:62
+msgid "Více informací"
+msgstr "More Information"
+
+#: admin/views/admin-page.php:13
+msgid "Jak používat plugin"
+msgstr "How to Use the Plugin"
+
+#: admin/views/admin-page.php:16
+msgid "Přidání nové události"
+msgstr "Adding a New Event"
+
+#: admin/views/admin-page.php:17
+msgid "Pro přidání nové události přejděte do sekce <strong>Události</strong> v menu administrace a klikněte na <strong>Přidat novou</strong>."
+msgstr "To add a new event, go to the <strong>Events</strong> section in the admin menu and click <strong>Add New</strong>."
+
+#: admin/views/admin-page.php:18
+msgid "Vyplňte název, popis a nastavte datum a čas události. Můžete také nastavit vlastní URL adresu, na kterou bude odkazovat tlačítko."
+msgstr "Fill in the title, description, and set the date and time of the event. You can also set a custom URL for the button to link to."
+
+#: admin/views/admin-page.php:22
+msgid "Vložení kalendáře do stránky"
+msgstr "Inserting Calendar into a Page"
+
+#: admin/views/admin-page.php:23
+msgid "Pro zobrazení kalendáře na stránce použijte shortcode:"
+msgstr "To display the calendar on a page, use the shortcode:"
+
+#: admin/views/admin-page.php:26
+msgid "Můžete použít následující atributy pro přizpůsobení kalendáře:"
+msgstr "You can use the following attributes to customize the calendar:"
+
+#: admin/views/admin-page.php:28
+msgid "Číslo měsíce (1-12)"
+msgstr "Month number (1-12)"
+
+#: admin/views/admin-page.php:29
+msgid "Rok (např. 2023)"
+msgstr "Year (e.g. 2023)"
+
+#: admin/views/admin-page.php:30
+msgid "Zobrazit seznam událostí pod kalendářem (yes/no)"
+msgstr "Show event list below the calendar (yes/no)"
+
+#: admin/views/admin-page.php:31
+msgid "ID nebo slug kategorie pro filtrování událostí"
+msgstr "Category ID or slug for filtering events"
+
+#: admin/views/admin-page.php:34
+msgid "Příklad s parametry:"
+msgstr "Example with parameters:"
+
+#: admin/views/admin-page.php:39
+msgid "Vložení seznamu událostí do stránky"
+msgstr "Inserting Event List into a Page"
+
+#: admin/views/admin-page.php:40
+msgid "Pro zobrazení seznamu událostí na stránce použijte shortcode:"
+msgstr "To display the event list on a page, use the shortcode:"
+
+#: admin/views/admin-page.php:43
+msgid "Můžete použít následující atributy pro přizpůsobení seznamu:"
+msgstr "You can use the following attributes to customize the list:"
+
+#: admin/views/admin-page.php:45
+msgid "Počet zobrazených událostí"
+msgstr "Number of events to display"
+
+#: admin/views/admin-page.php:46
+msgid "ID nebo slug kategorie pro filtrování událostí"
+msgstr "Category ID or slug for filtering events"
+
+#: admin/views/admin-page.php:47
+msgid "Zobrazit proběhlé události (yes/no)"
+msgstr "Show past events (yes/no)"
+
+#: admin/views/admin-page.php:48
+msgid "Způsob zobrazení (list/grid)"
+msgstr "Display type (list/grid)"
+
+#: admin/views/admin-page.php:51
+msgid "Příklad s parametry:"
+msgstr "Example with parameters:"
+
+#: admin/views/admin-page.php:56
+msgid "Vložení detailu události do stránky"
+msgstr "Inserting Event Detail into a Page"
+
+#: admin/views/admin-page.php:57
+msgid "Pro zobrazení detailu konkrétní události na stránce použijte shortcode:"
+msgstr "To display the detail of a specific event on a page, use the shortcode:"
+
+#: admin/views/admin-page.php:60
+msgid "Kde <code>id</code> je ID události, kterou chcete zobrazit."
+msgstr "Where <code>id</code> is the ID of the event you want to display."
+
+#: admin/views/admin-page.php:68
+msgid "O pluginu"
+msgstr "About the Plugin"
+
+#: admin/views/admin-page.php:69
+msgid "Event Calendar je jednoduchý plugin pro správu a zobrazení kalendáře událostí na vašem webu."
+msgstr "Event Calendar is a simple plugin for managing and displaying an event calendar on your website."
+
+#: admin/views/admin-page.php:70
+msgid "Verze:"
+msgstr "Version:"
+
+#: admin/views/admin-page.php:74
+msgid "Výchozí nastavení"
+msgstr "Default Settings"
+
+#: admin/views/admin-page.php:75
+msgid "Celý plugin je navržen tak, aby fungoval ihned po aktivaci."
+msgstr "The entire plugin is designed to work immediately after activation."
+
+#: admin/views/admin-page.php:77
+msgid "Responzivní design"
+msgstr "Responsive design"
+
+#: admin/views/admin-page.php:78
+msgid "Podpora češtiny a angličtiny"
+msgstr "Czech and English language support"
+
+#: admin/views/admin-page.php:79
+msgid "Snadné použití shortcodů"
+msgstr "Easy to use shortcodes"

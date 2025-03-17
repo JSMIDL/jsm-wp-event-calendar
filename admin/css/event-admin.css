@@ -1,0 +1,41 @@
+/**
+ * CSS pro administrační rozhraní události
+ */
+
+/* Metabox styling */
+.event-meta-box-wrapper {
+    padding: 10px;
+}
+
+.event-meta-field {
+    margin-bottom: 20px;
+}
+
+.event-meta-field label {
+    font-weight: 600;
+}
+
+.event-meta-field .description {
+    font-style: italic;
+    color: #666;
+    margin-top: 3px;
+}
+
+.event-meta-field input[type="date"],
+.event-meta-field input[type="time"],
+.event-meta-field input[type="text"],
+.event-meta-field input[type="url"] {
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Admin columns */
+.column-event_date,
+.column-event_time {
+    width: 15%;
+}
+
+/* Admin menu icon */
+#adminmenu .menu-icon-wp_event div.wp-menu-image:before {
+    color: #dd823b;
+}
