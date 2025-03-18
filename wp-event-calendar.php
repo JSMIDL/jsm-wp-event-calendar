@@ -10,6 +10,7 @@
  * Domain Path: /languages
  * Requires at least: 5.0
  * Requires PHP: 7.2
+ * License: Proprietary
  */
 
 // Zabránění přímému přístupu k souboru
