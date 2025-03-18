@@ -1,185 +1,343 @@
 /**
- * Responzivní styly pro mobilní zařízení - 2025 design
+ * Responzivní styly pro mobilní zařízení - Vylepšený minimalistický design 2025
  */
 
 @media screen and (max-width: 768px) {
-    /* Hlavní kontejner */
-    .jsm-event-calendar-wrapper {
-        margin-bottom: 30px;
-        border-radius: 16px;
-    }
+  /* Hlavní kontejner */
+  .jsm-event-calendar-wrapper {
+    border-radius: var(--border-radius-md);
+    margin-bottom: 1.5rem;
+  }
 
-    /* Navigace kalendáře */
-    .jsm-event-calendar-nav {
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-        padding: 20px 15px;
-    }
+  /* Navigace kalendáře */
+  .jsm-event-calendar-nav {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1rem;
+  }
 
-    .jsm-event-calendar-title {
-        font-size: 1.5em;
-        text-align: center;
-    }
+  .jsm-event-calendar-title {
+    font-size: 1.25rem;
+    text-align: center;
+  }
 
-    .jsm-event-calendar-nav-buttons {
-        width: 100%;
-        justify-content: center;
-    }
+  .jsm-event-calendar-nav-buttons {
+    width: 100%;
+    justify-content: space-between;
+  }
 
-    .jsm-event-calendar-nav-button {
-        padding: 8px 16px;
-        font-size: 13px;
-    }
+  .jsm-event-calendar-nav-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: var(--button-radius);
+  }
 
-    /* Tabulka kalendáře */
-    .jsm-event-calendar-table-wrapper {
-        padding: 10px 10px 20px;
-        overflow-x: auto;
-    }
+  /* Alternativní zobrazení kalendáře pro mobilní zařízení */
+  .jsm-mobile-view .jsm-event-calendar-table {
+    display: none;
+  }
 
-    /* Mobilní zobrazení kalendáře jako seznam */
-    .jsm-mobile-view .jsm-event-calendar-table {
-        display: none;
-    }
+  .jsm-event-calendar-list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
 
-    .jsm-event-calendar-list-view {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
+  .jsm-event-calendar-list-view .jsm-event-calendar-day {
+    padding: 1rem;
+    border-radius: var(--border-radius-md);
+    min-height: auto;
+    height: auto;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 0.5rem;
+  }
 
-    .jsm-event-calendar-list-view .jsm-event-calendar-day {
-        padding: 12px;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
+  .jsm-event-calendar-list-view .jsm-event-calendar-day:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
 
-    .jsm-event-calendar-list-view .jsm-event-calendar-day-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    }
+  .jsm-event-calendar-list-view .jsm-event-calendar-day.empty {
+    display: none;
+  }
 
-    .jsm-event-calendar-list-view .jsm-event-calendar-day-number {
-        font-size: 18px;
-        margin: 0;
-        background: none;
-        padding: 0;
-    }
+  .jsm-event-calendar-list-view .jsm-event-calendar-day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
 
-    .jsm-event-calendar-list-view .jsm-event-calendar-day-name {
-        font-weight: normal;
-        color: #666;
-    }
+  .jsm-event-calendar-list-view .jsm-event-calendar-day-number {
+    margin: 0;
+    width: auto;
+    height: auto;
+    text-align: left;
+    font-size: 1rem;
+    background: none;
+  }
 
-    /* Seznam událostí */
-    .jsm-event-list {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
+  .jsm-event-calendar-list-view .jsm-event-calendar-day.today .jsm-event-calendar-day-number {
+    background: none;
+    color: var(--primary-color);
+    font-weight: 700;
+  }
 
-    .jsm-event-list-item-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  .jsm-event-calendar-list-view .jsm-event-calendar-day-name {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
 
-    .jsm-event-list-item-date {
-        margin-bottom: 10px;
-    }
+  .jsm-event-calendar-list-view .jsm-event-calendar-event {
+    margin-bottom: 0.5rem;
+    white-space: normal;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    border-radius: var(--border-radius-sm);
+  }
 
-    .jsm-event-list-item-footer {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
+  /* Tabulkový kalendář na malých obrazovkách - skrýt většinu prvků */
+  .jsm-event-calendar-table-wrapper {
+    padding: 0.75rem;
+  }
 
-    /* Detail události */
-    .jsm-event-modal-content {
-        margin: 50px auto;
-        padding: 20px;
-        width: 95%;
-        border-radius: 16px;
-    }
+  .jsm-event-calendar-table {
+    border-spacing: 0.375rem;
+  }
 
-    .jsm-event-detail-title {
-        font-size: 1.6em;
-    }
+  .jsm-event-calendar-table th {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
 
-    .jsm-event-detail-meta {
-        flex-direction: column;
-        gap: 10px;
-        align-items: flex-start;
-    }
+  .jsm-event-calendar-table td {
+    height: auto;
+  }
 
-    .jsm-event-detail-date,
-    .jsm-event-detail-time {
-        width: 100%;
-    }
+  .jsm-event-calendar-day {
+    min-height: 5rem;
+    height: auto;
+    padding: 0.375rem;
+  }
 
-    .jsm-event-detail-footer {
-        justify-content: center;
-    }
+  .jsm-event-calendar-day.empty {
+    min-height: auto;
+  }
 
-    .jsm-event-button {
-        width: 100%;
-        text-align: center;
-        justify-content: center;
-    }
+  .jsm-event-calendar-day-number {
+    font-size: 0.75rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    line-height: 1.5rem;
+  }
 
-    /* Optimalizace pro malé obrazovky */
-    @media screen and (max-width: 480px) {
-        .jsm-event-calendar-nav-buttons {
-            flex-wrap: wrap;
-        }
+  .jsm-event-calendar-event {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6875rem;
+  }
 
-        .jsm-event-calendar-nav-button {
-            flex: 1;
-            min-width: 0;
-            padding: 8px 10px;
-            font-size: 12px;
-        }
+  .jsm-event-calendar-event:hover {
+    white-space: normal;
+    z-index: 10;
+  }
 
-        .jsm-event-list-item-title {
-            font-size: 1.2em;
-        }
+  /* Seznam událostí */
+  .jsm-event-list {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 0 0.75rem 0.75rem;
+  }
 
-        .jsm-event-modal-close {
-            top: 10px;
-            right: 10px;
-        }
-    }
+  .jsm-event-list-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .jsm-event-list-item-header {
+    padding: 1rem 1rem 0.5rem;
+  }
+
+  .jsm-event-list-item-title {
+    font-size: 1.125rem;
+  }
+
+  .jsm-event-list-item-date {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--button-radius);
+  }
+
+  .jsm-event-list-item-content {
+    padding: 0 1rem;
+    font-size: 0.875rem;
+  }
+
+  .jsm-event-list-item-footer {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .jsm-event-button {
+    width: 100%;
+    justify-content: center;
+    border-radius: var(--button-radius);
+  }
+
+  /* Modální okno pro detail události - opravené na centrování a plnou obrazovku */
+  .jsm-event-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+  }
+
+  .jsm-event-modal-content {
+    margin: 0 auto;
+    padding: 1.5rem;
+    width: 92%;
+    max-width: 100%;
+    border-radius: var(--border-radius-md);
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .jsm-event-detail-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .jsm-event-detail-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .jsm-event-detail-date,
+  .jsm-event-detail-time {
+    width: 100%;
+    border-radius: var(--button-radius);
+  }
+
+  .jsm-event-loading {
+    padding: 2rem 1rem;
+  }
+
+  .jsm-event-loading-spinner {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  /* Mřížkový layout pro seznam událostí */
+  .jsm-event-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 0.75rem 0.75rem;
+  }
+
+  .jsm-event-grid-item-thumbnail {
+    height: 8rem;
+  }
 }
 
-/* Optimalizace pro tablety */
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-    .jsm-event-list {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .jsm-event-calendar-table td {
-        height: 100px;
-    }
-
-    .jsm-event-calendar-day {
-        min-height: 80px;
-    }
-}
-
-/* Vylepšené dotyková plocha pro mobilní zařízení */
+/* Dotykové plochy pro mobilní zařízení */
 @media (hover: none) {
-    .jsm-event-calendar-event {
-        padding: 10px;
-    }
+  .jsm-event-calendar-event,
+  .jsm-event-button,
+  .jsm-event-calendar-nav-button {
+    cursor: default;
+  }
 
-    .jsm-event-calendar-nav-button {
-        padding: 12px 20px;
-    }
+  .jsm-event-calendar-event {
+    white-space: normal;
+    line-height: 1.4;
+  }
 
-    .jsm-event-button {
-        padding: 14px 24px;
-    }
+  .jsm-event-calendar-nav-button,
+  .jsm-event-button {
+    -webkit-tap-highlight-color: transparent;
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+  }
+
+  .jsm-event-list-item:active,
+  .jsm-event-grid-item:active,
+  .jsm-event-calendar-event:active,
+  .jsm-event-button:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Střední obrazovky (tablety) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .jsm-event-list {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0 1rem 1rem;
+  }
+
+  .jsm-event-calendar-day {
+    min-height: 6.5rem;
+    padding: 0.625rem;
+  }
+
+  .jsm-event-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0 1rem 1rem;
+  }
+
+  /* Vylepšení pro čitelnost událostí i na tabletech */
+  .jsm-event-calendar-event:hover {
+    position: absolute;
+    width: auto;
+    max-width: 250px;
+    z-index: 50;
+    border-radius: var(--border-radius-sm);
+  }
+
+  /* Modální okno pro tablety */
+  .jsm-event-modal-content {
+    max-width: 80%;
+    padding: 2rem;
+    max-height: 80vh;
+  }
+}
+
+/* Úpravy pro větší čitelnost událostí v kalendáři */
+@media screen and (min-width: 1025px) {
+  /* Pokud je více událostí v jednom dni, zvětšíme buňku */
+  .jsm-event-calendar-day:has(.jsm-event-calendar-event:nth-child(3)) {
+    min-height: 9.5rem;
+  }
+
+  .jsm-event-calendar-day:has(.jsm-event-calendar-event:nth-child(4)) {
+    min-height: 11rem;
+  }
+
+  /* Vylepšení pro čitelnost událostí při hover */
+  .jsm-event-calendar-event:hover {
+    position: absolute;
+    width: auto;
+    min-width: 200px;
+    max-width: 300px;
+    z-index: 50;
+    border-radius: var(--border-radius-sm);
+  }
+
+  /* Vzdušnější design pro desktop */
+  .jsm-event-calendar-table-wrapper {
+    padding: 1.5rem;
+  }
+
+  .jsm-event-calendar-table {
+    border-spacing: 0.5rem;
+  }
 }

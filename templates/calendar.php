@@ -32,18 +32,22 @@ if ($year < $current_year || ($year == $current_year && $month < $current_month)
 // Získání názvů měsíců a dnů v týdnu
 $month_name = date_i18n('F', strtotime("$year-$month-01"));
 $weekdays = array(
-    __('Ne', 'jsm-wp-event-calendar'),
     __('Po', 'jsm-wp-event-calendar'),
     __('Út', 'jsm-wp-event-calendar'),
     __('St', 'jsm-wp-event-calendar'),
     __('Čt', 'jsm-wp-event-calendar'),
     __('Pá', 'jsm-wp-event-calendar'),
-    __('So', 'jsm-wp-event-calendar')
+    __('So', 'jsm-wp-event-calendar'),
+    __('Ne', 'jsm-wp-event-calendar'),
 );
 
-// Počet dní v měsíci a první den v měsíci
+// Počet dní v měsíci
 $days_in_month = date('t', strtotime("$year-$month-01"));
-$first_day_of_month = date('w', strtotime("$year-$month-01"));
+
+// OPRAVENO: Získání prvního dne měsíce (0 = pondělí, 6 = neděle - evropský formát)
+$first_day_timestamp = strtotime("$year-$month-01");
+$first_day_of_week = date('N', $first_day_timestamp); // 1 (pondělí) až 7 (neděle)
+$first_day_of_month = $first_day_of_week - 1; // Konverze na 0-6, kde 0 je pondělí
 
 // Dnes
 $today = date('Y-m-d');

@@ -141,9 +141,11 @@ $section_title = 'yes' === $atts['past']
                             <?php echo wpautop(wp_trim_words($event['excerpt'], 15)); ?>
                         </div>
 
-                        <a href="<?php echo esc_url(!empty($event['custom_url']) ? $event['custom_url'] : $event['permalink']); ?>" class="jsm-event-button">
-                            <?php echo esc_html($event['button_text']); ?>
-                        </a>
+                        <?php if (!empty($event['custom_url']) && !empty($event['button_text'])): ?>
+                            <a href="<?php echo esc_url($event['custom_url']); ?>" class="jsm-event-button">
+                                <?php echo esc_html($event['button_text']); ?>
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </div>
             <?php endif; ?>

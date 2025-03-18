@@ -75,22 +75,24 @@ class WP_Event_Calendar {
                     __('Prosinec', 'jsm-wp-event-calendar')
                 ),
                 'weekdays' => array(
-                    __('Neděle', 'jsm-wp-event-calendar'),
+
                     __('Pondělí', 'jsm-wp-event-calendar'),
                     __('Úterý', 'jsm-wp-event-calendar'),
                     __('Středa', 'jsm-wp-event-calendar'),
                     __('Čtvrtek', 'jsm-wp-event-calendar'),
                     __('Pátek', 'jsm-wp-event-calendar'),
-                    __('Sobota', 'jsm-wp-event-calendar')
+                    __('Sobota', 'jsm-wp-event-calendar'),
+                     __('Neděle', 'jsm-wp-event-calendar'),
                 ),
                 'weekdaysShort' => array(
-                    __('Ne', 'jsm-wp-event-calendar'),
+
                     __('Po', 'jsm-wp-event-calendar'),
                     __('Út', 'jsm-wp-event-calendar'),
                     __('St', 'jsm-wp-event-calendar'),
                     __('Čt', 'jsm-wp-event-calendar'),
                     __('Pá', 'jsm-wp-event-calendar'),
-                    __('So', 'jsm-wp-event-calendar')
+                    __('So', 'jsm-wp-event-calendar'),
+                       __('Ne', 'jsm-wp-event-calendar'),
                 )
             )
         ));
