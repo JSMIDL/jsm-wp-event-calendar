@@ -27,6 +27,7 @@ define('WP_EVENT_CALENDAR_PLUGIN_BASENAME', plugin_basename(__FILE__));
 require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-post-type.php';
 require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-calendar.php';
 require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-shortcodes.php';
+require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-settings.php';
 
 // Admin soubory
 // Načítáme tyto soubory později v admin_init

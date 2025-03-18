@@ -301,3 +301,170 @@ msgstr "Podpora češtiny a angličtiny"
 #: admin/views/admin-page.php:79
 msgid "Snadné použití shortcodů"
 msgstr "Snadné použití shortcodů"
+
+# Nastavení kalendáře
+msgid "Nastavení kalendáře"
+msgstr "Nastavení kalendáře"
+
+msgid "Nastavení"
+msgstr "Nastavení"
+
+msgid "Uložit nastavení"
+msgstr "Uložit nastavení"
+
+msgid "Obnovit výchozí nastavení"
+msgstr "Obnovit výchozí nastavení"
+
+msgid "Opravdu chcete obnovit výchozí nastavení? Tato akce nelze vrátit zpět."
+msgstr "Opravdu chcete obnovit výchozí nastavení? Tato akce nelze vrátit zpět."
+
+# Skupiny nastavení
+msgid "Barevné schéma"
+msgstr "Barevné schéma"
+
+msgid "Nastavte barevné schéma kalendáře událostí."
+msgstr "Nastavte barevné schéma kalendáře událostí."
+
+msgid "Rozměry a efekty"
+msgstr "Rozměry a efekty"
+
+msgid "Nastavte rozměry, stíny a zaoblení prvků kalendáře."
+msgstr "Nastavte rozměry, stíny a zaoblení prvků kalendáře."
+
+msgid "Náhled nastavení"
+msgstr "Náhled nastavení"
+
+msgid "Náhled aktuálního nastavení barev."
+msgstr "Náhled aktuálního nastavení barev."
+
+# Barvy
+msgid "Primární barva"
+msgstr "Primární barva"
+
+msgid "Hlavní barva pluginu používaná pro tlačítka, kalendář, atd."
+msgstr "Hlavní barva pluginu používaná pro tlačítka, kalendář, atd."
+
+msgid "Primární barva (hover)"
+msgstr "Primární barva (hover)"
+
+msgid "Barva při najetí myší na prvky s primární barvou."
+msgstr "Barva při najetí myší na prvky s primární barvou."
+
+msgid "Sekundární barva"
+msgstr "Sekundární barva"
+
+msgid "Doplňková barva pro zvýraznění."
+msgstr "Doplňková barva pro zvýraznění."
+
+msgid "Sekundární barva (hover)"
+msgstr "Sekundární barva (hover)"
+
+msgid "Barva při najetí myší na prvky se sekundární barvou."
+msgstr "Barva při najetí myší na prvky se sekundární barvou."
+
+msgid "Barva textu tlačítek"
+msgstr "Barva textu tlačítek"
+
+msgid "Barva textu na tlačítkách."
+msgstr "Barva textu na tlačítkách."
+
+msgid "Barva pozadí"
+msgstr "Barva pozadí"
+
+msgid "Základní barva pozadí kalendáře."
+msgstr "Základní barva pozadí kalendáře."
+
+msgid "Barva povrchu"
+msgstr "Barva povrchu"
+
+msgid "Barva povrchu prvků (buňky kalendáře, karty)."
+msgstr "Barva povrchu prvků (buňky kalendáře, karty)."
+
+msgid "Barva povrchu (hover)"
+msgstr "Barva povrchu (hover)"
+
+msgid "Barva povrchu prvků při najetí myší."
+msgstr "Barva povrchu prvků při najetí myší."
+
+msgid "Barva ohraničení"
+msgstr "Barva ohraničení"
+
+msgid "Barva okrajů a ohraničení."
+msgstr "Barva okrajů a ohraničení."
+
+msgid "Primární barva textu"
+msgstr "Primární barva textu"
+
+msgid "Hlavní barva textu."
+msgstr "Hlavní barva textu."
+
+msgid "Sekundární barva textu"
+msgstr "Sekundární barva textu"
+
+msgid "Barva méně důležitého textu."
+msgstr "Barva méně důležitého textu."
+
+# Stíny a rozměry
+msgid "Malý stín"
+msgstr "Malý stín"
+
+msgid "CSS hodnota pro malý stín."
+msgstr "CSS hodnota pro malý stín."
+
+msgid "Střední stín"
+msgstr "Střední stín"
+
+msgid "CSS hodnota pro střední stín."
+msgstr "CSS hodnota pro střední stín."
+
+msgid "Velký stín"
+msgstr "Velký stín"
+
+msgid "CSS hodnota pro velký stín."
+msgstr "CSS hodnota pro velký stín."
+
+msgid "Malý rádius"
+msgstr "Malý rádius"
+
+msgid "Hodnota pro malé zaoblení rohů."
+msgstr "Hodnota pro malé zaoblení rohů."
+
+msgid "Střední rádius"
+msgstr "Střední rádius"
+
+msgid "Hodnota pro střední zaoblení rohů."
+msgstr "Hodnota pro střední zaoblení rohů."
+
+msgid "Velký rádius"
+msgstr "Velký rádius"
+
+msgid "Hodnota pro velké zaoblení rohů."
+msgstr "Hodnota pro velké zaoblení rohů."
+
+msgid "Rádius tlačítek"
+msgstr "Rádius tlačítek"
+
+msgid "Hodnota zaoblení rohů pro tlačítka."
+msgstr "Hodnota zaoblení rohů pro tlačítka."
+
+msgid "Mezery v kalendáři"
+msgstr "Mezery v kalendáři"
+
+msgid "Velikost mezer mezi buňkami kalendáře."
+msgstr "Velikost mezer mezi buňkami kalendáře."
+
+# Náhled
+msgid "Primární barvy"
+msgstr "Primární barvy"
+
+msgid "Barvy pozadí"
+msgstr "Barvy pozadí"
+
+msgid "Barvy textu"
+msgstr "Barvy textu"
+
+msgid "Ukázka tlačítka"
+msgstr "Ukázka tlačítka"
+
+msgid "Ukázkové tlačítko"
+msgstr "Ukázkové tlačítko"

@@ -1,0 +1,69 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+*.tmproj
+*.esproj
+nbproject/
+*.swp
+*.swo
+
+# WordPress & PHP specific
+/vendor/
+/node_modules/
+composer.lock
+package-lock.json
+wp-config.php
+*.log
+*.sql
+*.sqlite
+*.zip
+*.tar.gz
+.env
+.htaccess
+
+# Plugin specific
+build/
+dist/
+.phpunit.result.cache
+phpunit.xml
+phpcs.xml
+.phpcs.xml
+
+# Development tools
+coverage/
+/tests/coverage/
+/tests/report/
+
+# Dependency directories
+bower_components/
+
+# Build files
+.sass-cache/
+*.css.map
+*.js.map
+
+# Misc
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+Desktop.ini
+$RECYCLE.BIN/
