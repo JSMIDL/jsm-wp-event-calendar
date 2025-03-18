@@ -258,17 +258,26 @@
                     html += '</tr><tr>';
                 }
 
-                // Třída pro dnešní den
-                let classToday = '';
+                // Třídy pro den
+                let dayClasses = 'jsm-event-calendar-day';
+
+                // Kontrola, zda je den dnešní
                 if (i === todayDate && month === todayMonth && year === todayYear) {
-                    classToday = ' today';
+                    dayClasses += ' today';
+                }
+
+                // Kontrola, zda den již proběhl (je to minulý den v aktuálním měsíci)
+                if ((year === todayYear && month === todayMonth && i < todayDate) ||
+                    (year === todayYear && month < todayMonth) ||
+                    (year < todayYear)) {
+                    dayClasses += ' past-day';
                 }
 
                 // Datum pro tento den
                 const dateStr = year + '-' + this.pad(month) + '-' + this.pad(i);
 
                 html += '<td>';
-                html += '<div class="jsm-event-calendar-day' + classToday + '" data-date="' + dateStr + '">';
+                html += '<div class="' + dayClasses + '" data-date="' + dateStr + '">';
                 html += '<span class="jsm-event-calendar-day-number">' + i + '</span>';
 
                 // Události pro tento den
@@ -364,62 +373,72 @@
             console.log('All calendar cell heights equalized to ' + maxHeight + 'px');
         },
 
-        /**
-         * Vykreslení kalendáře pro mobilní zařízení - pouze dny s událostmi
-         */
-        renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDay, events, todayDate, todayMonth, todayYear) {
-            let html = '<div class="jsm-event-calendar-list-view">';
-            let hasEvents = false;
 
-            // Procházení dnů v měsíci
-            for (let i = 1; i <= daysInMonth; i++) {
-                // Události pro tento den
-                const dayEvents = this.getEventsForDay(events, year, month, i);
+/**
+ * Vykreslení kalendáře pro mobilní zařízení - pouze dny s událostmi
+ */
+renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDay, events, todayDate, todayMonth, todayYear) {
+    let html = '<div class="jsm-event-calendar-list-view">';
+    let hasEvents = false;
 
-                // Přeskočíme dny bez událostí
-                if (dayEvents.length === 0) {
-                    continue;
-                }
+    // Procházení dnů v měsíci
+    for (let i = 1; i <= daysInMonth; i++) {
+        // Události pro tento den
+        const dayEvents = this.getEventsForDay(events, year, month, i);
 
-                hasEvents = true;
+        // Přeskočíme dny bez událostí
+        if (dayEvents.length === 0) {
+            continue;
+        }
 
-                // Třída pro dnešní den
-                let classToday = '';
-                if (i === todayDate && month === todayMonth && year === todayYear) {
-                    classToday = ' today';
-                }
+        hasEvents = true;
 
-                // Výpočet dne v týdnu pro evropský formát
-                const dayDate = new Date(year, month - 1, i);
-                let dayOfWeek = dayDate.getDay(); // 0=neděle, 1=pondělí, ..., 6=sobota
-                dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Konverze na 0=pondělí, ..., 6=neděle
+        // Třídy pro den
+        let dayClasses = 'jsm-event-calendar-day';
 
-                const dayName = jsmEventCalendar.i18n.weekdays[dayOfWeek];
-                const formattedDate = dayDate.toLocaleDateString('cs-CZ', { weekday: 'long', day: 'numeric', month: 'long' });
+        // Kontrola, zda je den dnešní
+        if (i === todayDate && month === todayMonth && year === todayYear) {
+            dayClasses += ' today';
+        }
 
-                html += '<div class="jsm-event-calendar-day' + classToday + '" data-date="' + year + '-' + this.pad(month) + '-' + this.pad(i) + '">';
-                html += '<div class="jsm-event-calendar-day-header">';
-                html += '<span class="jsm-event-calendar-day-number">' + i + '</span>';
-                html += '<span class="jsm-event-calendar-day-name">' + dayName + '</span>';
-                html += '</div>';
+        // Kontrola, zda den již proběhl (je to minulý den v aktuálním měsíci)
+        if ((year === todayYear && month === todayMonth && i < todayDate) ||
+            (year === todayYear && month < todayMonth) ||
+            (year < todayYear)) {
+            dayClasses += ' past-day';
+        }
 
-                // Události pro tento den
-                for (let j = 0; j < dayEvents.length; j++) {
-                    html += this.renderEventInCell(dayEvents[j]);
-                }
+        // Výpočet dne v týdnu pro evropský formát
+        const dayDate = new Date(year, month - 1, i);
+        let dayOfWeek = dayDate.getDay(); // 0=neděle, 1=pondělí, ..., 6=sobota
+        dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Konverze na 0=pondělí, ..., 6=neděle
 
-                html += '</div>';
-            }
+        const dayName = jsmEventCalendar.i18n.weekdays[dayOfWeek];
+        const formattedDate = dayDate.toLocaleDateString('cs-CZ', { weekday: 'long', day: 'numeric', month: 'long' });
 
-            html += '</div>';
+        html += '<div class="' + dayClasses + '" data-date="' + year + '-' + this.pad(month) + '-' + this.pad(i) + '">';
+        html += '<div class="jsm-event-calendar-day-header">';
+        html += '<span class="jsm-event-calendar-day-number">' + i + '</span>';
+        html += '<span class="jsm-event-calendar-day-name">' + dayName + '</span>';
+        html += '</div>';
 
-            // Pokud nejsou žádné události, zobrazíme oznámení
-            if (!hasEvents) {
-                html = '<div class="jsm-event-no-events">' + jsmEventCalendar.i18n.noEventsText + '</div>';
-            }
+        // Události pro tento den
+        for (let j = 0; j < dayEvents.length; j++) {
+            html += this.renderEventInCell(dayEvents[j]);
+        }
 
-            $calendarTable.html(html);
-        },
+        html += '</div>';
+    }
+
+    html += '</div>';
+
+    // Pokud nejsou žádné události, zobrazíme oznámení
+    if (!hasEvents) {
+        html = '<div class="jsm-event-no-events">' + jsmEventCalendar.i18n.noEventsText + '</div>';
+    }
+
+    $calendarTable.html(html);
+},
 
         /**
          * Získání událostí pro daný den
@@ -519,107 +538,113 @@
             $listContainer.html(html);
         },
 
-        /**
-         * Nastavení modálních oken pro události
-         */
-        setupEventModals: function() {
-            // Použijeme delegaci událostí pro lepší výkon
-            $(document).off('click', '.jsm-event-calendar-event').on('click', '.jsm-event-calendar-event', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                const eventId = $(this).data('event-id');
-                JSMEventCalendar.openEventModal(eventId);
-            });
+       /**
+        * Nastavení modálních oken pro události
+        */
+       setupEventModals: function() {
+           // Použijeme delegaci událostí pro lepší výkon
+           $(document).off('click', '.jsm-event-calendar-event').on('click', '.jsm-event-calendar-event', function(e) {
+               e.preventDefault();
+               e.stopPropagation();
+               const eventId = $(this).data('event-id');
+               console.log('Event clicked, ID:', eventId); // Debugging
+               if (eventId) {
+                   JSMEventCalendar.openEventModal(eventId);
+               }
+           });
 
-            // Zavření modálního okna
-            $(document).off('click', '.jsm-event-modal-close').on('click', '.jsm-event-modal-close', function() {
-                JSMEventCalendar.closeEventModal();
-            });
+           // Zavření modálního okna - delegace událostí pro dynamicky vytvořené prvky
+           $(document).off('click', '.jsm-event-modal-close').on('click', '.jsm-event-modal-close', function(e) {
+               e.preventDefault();
+               e.stopPropagation(); // Zabránit propagaci události do rodičů
+               JSMEventCalendar.closeEventModal();
+           });
 
-            // Zavření modálního okna po kliknutí mimo obsah
-            $(document).off('click', '.jsm-event-modal').on('click', '.jsm-event-modal', function(e) {
-                if ($(e.target).hasClass('jsm-event-modal')) {
-                    JSMEventCalendar.closeEventModal();
-                }
-            });
+           // Zavření modálního okna po kliknutí mimo obsah
+           $(document).off('click', '.jsm-event-modal').on('click', '.jsm-event-modal', function(e) {
+               if ($(e.target).hasClass('jsm-event-modal')) {
+                   JSMEventCalendar.closeEventModal();
+               }
+           });
 
-            // Zavření modálního okna po stisknutí klávesy Escape
-            $(document).off('keyup.modal').on('keyup.modal', function(e) {
-                if (e.key === 'Escape' && $('.jsm-event-modal').is(':visible')) {
-                    JSMEventCalendar.closeEventModal();
-                }
-            });
-        },
+           // Zavření modálního okna po stisknutí klávesy Escape
+           $(document).off('keyup.modal').on('keyup.modal', function(e) {
+               if (e.key === 'Escape' && $('.jsm-event-modal.active').length) {
+                   JSMEventCalendar.closeEventModal();
+               }
+           });
+       },
 
-        /**
-         * Otevření modálního okna s detailem události - vylepšená implementace
-         */
-        openEventModal: function(eventId) {
-            if (!eventId) {
-                console.error('No event ID provided for modal');
-                return;
-            }
+       /**
+        * Otevření modálního okna s detailem události - upravená implementace
+        */
+       openEventModal: function(eventId) {
+           if (!eventId) {
+               console.error('No event ID provided for modal');
+               return;
+           }
 
-            const $modal = $('#jsm-event-modal');
-            const $modalContent = $('#jsm-event-modal-content');
+           const $modal = $('#jsm-event-modal');
+           const $modalContent = $('#jsm-event-modal-content');
 
-            // Ujistíme se, že výchozí styl display je "flex", ne "none"
-            // Toto zajistí centrování obsahu
-            $modal.css('display', 'flex');
+           // Použijeme CSS třídu pro aktivaci modálu
+           $modal.addClass('active');
 
-            // Přidání třídy pro omezení scrollování na stránce pod modálem
-            $('body').addClass('modal-open');
+           console.log('Opening modal for event ID:', eventId); // Debugging
 
-            // Načítací animace
-            $modalContent.html('<div class="jsm-event-loading"><div class="jsm-event-loading-spinner"></div><p>' + jsmEventCalendar.i18n.loadingText + '</p></div>');
+           // Přidání třídy pro omezení scrollování na stránce pod modálem
+           $('body').addClass('modal-open');
 
-            // AJAX požadavek pro načtení detailu události - s cachingem pro lepší výkon
-            const cacheKey = 'event_' + eventId;
+           // Načítací animace
+           $modalContent.html('<div class="jsm-event-loading"><div class="jsm-event-loading-spinner"></div><p>' + jsmEventCalendar.i18n.loadingText + '</p></div>');
 
-            // Zkusíme načíst z cache
-            if (this.eventCache && this.eventCache[cacheKey]) {
-                $modalContent.html(this.eventCache[cacheKey]);
-                return;
-            }
+           // AJAX požadavek pro načtení detailu události - s cachingem pro lepší výkon
+           const cacheKey = 'event_' + eventId;
 
-            // Pokud není v cache, načteme ze serveru
-            $.ajax({
-                url: jsmEventCalendar.ajaxurl,
-                type: 'GET',
-                data: {
-                    action: 'get_event_detail',
-                    event_id: eventId,
-                    nonce: jsmEventCalendar.nonce
-                },
-                success: function(response) {
-                    if (response && response.success) {
-                        // Vykreslení detailu události
-                        $modalContent.html(response.data);
+           // Zkusíme načíst z cache
+           if (this.eventCache && this.eventCache[cacheKey]) {
+               $modalContent.html(this.eventCache[cacheKey]);
+               return;
+           }
 
-                        // Uložení do cache
-                        if (!JSMEventCalendar.eventCache) JSMEventCalendar.eventCache = {};
-                        JSMEventCalendar.eventCache[cacheKey] = response.data;
-                    } else {
-                        $modalContent.html('<div class="jsm-event-no-events">Událost nebyla nalezena.</div>');
-                    }
-                },
-                error: function() {
-                    $modalContent.html('<div class="jsm-event-no-events">Chyba při načítání události.</div>');
-                }
-            });
-        },
+          // Pokud není v cache, načteme ze serveru
+          $.ajax({
+              url: jsmEventCalendar.ajaxurl,
+              type: 'GET',
+              data: {
+                  action: 'get_event_detail',
+                  event_id: eventId,
+                  nonce: jsmEventCalendar.nonce
+              },
+              success: function(response) {
+                  if (response && response.success) {
+                      // Vykreslení detailu události s křížkem
+                      $modalContent.html(response.data + '<span class="jsm-event-modal-close">&times;</span>');
 
-        /**
-         * Zavření modálního okna - upravená implementace
-         */
-        closeEventModal: function() {
-            const $modal = $('#jsm-event-modal');
-            $modal.fadeOut(200, function() {
-                // Reset stylu display na "none" po dokončení animace
-                $(this).css('display', 'none');
-            });
-            $('body').removeClass('modal-open');
-        },
+                      // Uložení do cache (včetně křížku)
+                      if (!JSMEventCalendar.eventCache) JSMEventCalendar.eventCache = {};
+                      JSMEventCalendar.eventCache[cacheKey] = response.data + '<span class="jsm-event-modal-close">&times;</span>';
+                  } else {
+                      $modalContent.html('<div class="jsm-event-no-events">Událost nebyla nalezena.</div><span class="jsm-event-modal-close">&times;</span>');
+                  }
+              },
+              error: function(xhr, status, error) {
+                  console.error('Error loading event:', error); // Debugging
+                  $modalContent.html('<div class="jsm-event-no-events">Chyba při načítání události.</div><span class="jsm-event-modal-close">&times;</span>');
+              }
+          });
+       },
+
+       /**
+        * Zavření modálního okna - upravená implementace
+        */
+       closeEventModal: function() {
+           const $modal = $('#jsm-event-modal');
+           // Odstraníme třídu active
+           $modal.removeClass('active');
+           $('body').removeClass('modal-open');
+           console.log('Modal closed'); // Debugging
+       },
 
         /**
          * Detekce mobilního zobrazení a přepnutí na responzivní layout

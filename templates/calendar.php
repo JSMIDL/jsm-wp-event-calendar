@@ -152,9 +152,11 @@ $show_list = ($atts['show_list'] === 'yes');
 </div>
 
 <!-- Modální okno pro detail události -->
-<div id="jsm-event-modal" class="jsm-event-modal" style="display: none;">
+<div id="jsm-event-modal" class="jsm-event-modal">
+
     <div id="jsm-event-modal-content" class="jsm-event-modal-content">
         <!-- Obsah modálního okna bude naplněn dynamicky -->
+
     </div>
-    <span class="jsm-event-modal-close">&times;</span>
+
 </div>

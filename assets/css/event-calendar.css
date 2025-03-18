@@ -490,9 +490,9 @@
   display: block;
 }
 
-/* Modální okno pro detail události - opravené na celou obrazovku a vycentrované */
+/* Modální okno pro detail události - opravené na centrování a překrytí celé obrazovky */
 .jsm-event-modal {
-  display: none;
+  display: none; /* Výchozí stav je skrytý */
   position: fixed;
   top: 0;
   left: 0;
@@ -502,10 +502,13 @@
   z-index: 9999;
   overflow-y: auto;
   backdrop-filter: blur(4px);
+}
+
+.jsm-event-modal.active {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  max-width: 100%;
 }
 
 .jsm-event-modal-content {
@@ -517,7 +520,7 @@
   position: relative;
   box-shadow: var(--shadow-lg);
   animation: modal-slide-up 0.3s ease-out;
-  margin: 0 auto;
+  margin: auto; /* Auto margin pro centrování */
   padding: 2.5rem;
   overflow-y: auto;
 }
@@ -535,25 +538,27 @@
 
 .jsm-event-modal-close {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 2rem;
-  height: 2rem;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background-color: var(--surface-color);
+  background-color: #f1f5f9;
   border: 1px solid var(--border-color);
-  font-size: 1.25rem;
+  font-size: 1.75rem;
+  font-weight: bold;
   cursor: pointer;
-  color: var(--text-secondary);
+  color: #333;
   transition: var(--transition);
+  z-index: 1001;
 }
 
 .jsm-event-modal-close:hover {
-  background-color: var(--surface-hover);
-  color: var(--text-primary);
+  background-color: #e2e8f0;
+  color: #000;
   transform: rotate(90deg);
 }
 
@@ -674,4 +679,26 @@
 
 .jsm-event-list-item:hover .jsm-event-list-item-thumbnail img {
   transform: scale(1.05);
+}
+/* Styl pro již proběhlé dny v aktuálním měsíci */
+.jsm-event-calendar-day.past-day {
+  background-color: rgba(0, 0, 0, 0.05);  /* Mírně ztmavené pozadí */
+  opacity: 0.8;  /* Snížená neprůhlednost */
+  color: var(--text-secondary);  /* Světlejší text */
+}
+
+.jsm-event-calendar-day.past-day .jsm-event-calendar-day-number {
+  color: var(--text-secondary);  /* Světlejší čísla dnů */
+}
+
+/* Ztmavení událostí v již proběhlých dnech */
+.jsm-event-calendar-day.past-day .jsm-event-calendar-event {
+  opacity: 0.8;  /* Lehce ztmavit události v minulých dnech */
+  background-color: rgba(37, 99, 235, 0.7);  /* Ztlumená barva události */
+}
+
+/* Pro mobilní seznam dnů */
+.jsm-event-calendar-list-view .jsm-event-calendar-day.past-day {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: var(--border-color);
 }

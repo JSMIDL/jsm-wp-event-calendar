@@ -195,14 +195,11 @@
 
   /* Modální okno pro detail události - opravené na centrování a plnou obrazovku */
   .jsm-event-modal {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     padding: 0.5rem;
   }
 
   .jsm-event-modal-content {
-    margin: 0 auto;
+    margin: auto;
     padding: 1.5rem;
     width: 92%;
     max-width: 100%;
