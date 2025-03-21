@@ -2,7 +2,7 @@
 /**
  * Plugin Name: JSM WP Event Calendar
  * Description: Plugin pro správu nastavení kalendáře událostí.
- * Version: 1.0
+ * Version: 1.0.0
  * Author: JSM
  */
 
@@ -61,8 +61,8 @@ class WP_Event_Settings {
         add_action('admin_init', array($instance, 'register_settings'));
         add_action('admin_enqueue_scripts', array($instance, 'enqueue_admin_scripts'));
 
-        // Přidáme filter pro načtení CSS a dynamických hodnot
-        add_action('wp_head', array($instance, 'output_custom_css'), 999); // Vysoká priorita, aby přepsala statické hodnoty
+        // Přidáme akci pro načtení CSS a dynamických stylů
+        add_action('wp_enqueue_scripts', array($instance, 'enqueue_custom_styles'), 99);
 
         // Přidáme akci pro načtení základního CSS
         add_action('wp_enqueue_scripts', array($instance, 'enqueue_frontend_styles'));
@@ -116,6 +116,81 @@ class WP_Event_Settings {
             defined('WP_EVENT_CALENDAR_VERSION') ? WP_EVENT_CALENDAR_VERSION : '1.0',
             'only screen and (max-width: 768px)'
         );
+    }
+
+    /**
+     * Načtení vlastních dynamických stylů
+     */
+    public function enqueue_custom_styles() {
+        $options = get_option('wp_event_calendar_settings', array());
+        $options = wp_parse_args($options, self::$defaults);
+
+        // Debug log
+        error_log('Event Calendar Options: ' . print_r($options, true));
+
+        $custom_css = $this->generate_custom_css($options);
+
+        wp_add_inline_style('jsm-wp-event-calendar', $custom_css);
+    }
+
+    /**
+     * Generování dynamického CSS
+     */
+    private function generate_custom_css($options) {
+        // Rozšíření pro více variant s průhledností
+        $primary_color_rgba = $this->hex_to_rgba($options['primary_color'], 0.1);
+        $primary_past_rgba = $this->hex_to_rgba($options['primary_color'], 0.7);
+        $primary_today_rgba = $this->hex_to_rgba($options['primary_color'], 0.05);
+
+        // Přidáme debug log pro kontrolu použitých barev
+        error_log('Generating Custom CSS with Options: ' . print_r($options, true));
+
+        return "
+        :root {
+            --primary-color: {$options['primary_color']} !important;
+            --primary-hover: {$options['primary_hover']} !important;
+            --secondary-color: {$options['secondary_color']} !important;
+            --secondary-hover: {$options['secondary_hover']} !important;
+            --button-text: {$options['button_text']} !important;
+            --background-color: {$options['background_color']} !important;
+            --surface-color: {$options['surface_color']} !important;
+            --surface-hover: {$options['surface_hover']} !important;
+            --border-color: {$options['border_color']} !important;
+            --text-primary: {$options['text_primary']} !important;
+            --text-secondary: {$options['text_secondary']} !important;
+            --shadow-sm: {$options['shadow_sm']} !important;
+            --shadow-md: {$options['shadow_md']} !important;
+            --shadow-lg: {$options['shadow_lg']} !important;
+            --border-radius-sm: {$options['border_radius_sm']} !important;
+            --border-radius-md: {$options['border_radius_md']} !important;
+            --border-radius-lg: {$options['border_radius_lg']} !important;
+            --button-radius: {$options['button_radius']} !important;
+            --calendar-spacing: {$options['calendar_spacing']} !important;
+        }
+
+        ";
+    }
+
+    /**
+     * Pomocná funkce pro převod HEX barvy na RGBA
+     */
+    private function hex_to_rgba($hex, $alpha = 1) {
+        // Odstranění # pokud existuje
+        $hex = str_replace('#', '', $hex);
+
+        // Zpracování 3 nebo 6 znakové hex barvy
+        if (strlen($hex) == 3) {
+            $r = hexdec(substr($hex, 0, 1) . substr($hex, 0, 1));
+            $g = hexdec(substr($hex, 1, 1) . substr($hex, 1, 1));
+            $b = hexdec(substr($hex, 2, 1) . substr($hex, 2, 1));
+        } else {
+            $r = hexdec(substr($hex, 0, 2));
+            $g = hexdec(substr($hex, 2, 2));
+            $b = hexdec(substr($hex, 4, 2));
+        }
+
+        // Vrácení RGBA hodnoty
+        return "rgba($r, $g, $b, $alpha)";
     }
 
     /**
@@ -229,185 +304,87 @@ class WP_Event_Settings {
             'surface_color' => __('Barva povrchu', 'jsm-wp-event-calendar'),
             'surface_hover' => __('Barva povrchu (hover)', 'jsm-wp-event-calendar'),
             'border_color' => __('Barva ohraničení', 'jsm-wp-event-calendar'),
-            'text_primary' => __('Primární barva textu', 'jsm-wp-event-calendar'),
-            'text_secondary' => __('Sekundární barva textu', 'jsm-wp-event-calendar'),
-        );
+                        'text_primary' => __('Primární barva textu', 'jsm-wp-event-calendar'),
+                        'text_secondary' => __('Sekundární barva textu', 'jsm-wp-event-calendar'),
+                    );
 
-        foreach ($color_fields as $id => $label) {
-            add_settings_field(
-                $id,
-                $label,
-                array($this, 'color_field_callback'),
-                'wp_event_settings',
-                'colors_section',
-                array('id' => $id, 'label' => $label)
-            );
-        }
-    }
+                    foreach ($color_fields as $id => $label) {
+                        add_settings_field(
+                            $id,
+                            $label,
+                            array($this, 'color_field_callback'),
+                            'wp_event_settings',
+                            'colors_section',
+                            array('id' => $id, 'label' => $label)
+                        );
+                    }
+                }
 
-    /**
-     * Přidání polí pro rozměry
-     */
-    private function add_dimension_fields() {
-        $dimension_fields = array(
-            'shadow_sm' => __('Malý stín', 'jsm-wp-event-calendar'),
-            'shadow_md' => __('Střední stín', 'jsm-wp-event-calendar'),
-            'shadow_lg' => __('Velký stín', 'jsm-wp-event-calendar'),
-            'border_radius_sm' => __('Malý rádius', 'jsm-wp-event-calendar'),
-            'border_radius_md' => __('Střední rádius', 'jsm-wp-event-calendar'),
-            'border_radius_lg' => __('Velký rádius', 'jsm-wp-event-calendar'),
-            'button_radius' => __('Rádius tlačítek', 'jsm-wp-event-calendar'),
-            'calendar_spacing' => __('Mezery v kalendáři', 'jsm-wp-event-calendar'),
-        );
+                /**
+                 * Přidání polí pro rozměry
+                 */
+                private function add_dimension_fields() {
+                    $dimension_fields = array(
+                        'shadow_sm' => __('Malý stín', 'jsm-wp-event-calendar'),
+                        'shadow_md' => __('Střední stín', 'jsm-wp-event-calendar'),
+                        'shadow_lg' => __('Velký stín', 'jsm-wp-event-calendar'),
+                        'border_radius_sm' => __('Malý rádius', 'jsm-wp-event-calendar'),
+                        'border_radius_md' => __('Střední rádius', 'jsm-wp-event-calendar'),
+                        'border_radius_lg' => __('Velký rádius', 'jsm-wp-event-calendar'),
+                        'button_radius' => __('Rádius tlačítek', 'jsm-wp-event-calendar'),
+                        'calendar_spacing' => __('Mezery v kalendáři', 'jsm-wp-event-calendar'),
+                    );
 
-        foreach ($dimension_fields as $id => $label) {
-            add_settings_field(
-                $id,
-                $label,
-                array($this, 'text_field_callback'),
-                'wp_event_settings',
-                'dimensions_section',
-                array('id' => $id, 'label' => $label)
-            );
-        }
-    }
+                    foreach ($dimension_fields as $id => $label) {
+                        add_settings_field(
+                            $id,
+                            $label,
+                            array($this, 'text_field_callback'),
+                            'wp_event_settings',
+                            'dimensions_section',
+                            array('id' => $id, 'label' => $label)
+                        );
+                    }
+                }
 
-    /**
-     * Callback pro barevné pole
-     */
-    public function color_field_callback($args) {
-        $id = $args['id'];
-        $options = get_option('wp_event_calendar_settings', array());
-        $options = wp_parse_args($options, self::$defaults);
+                /**
+                 * Callback pro barevné pole
+                 */
+                public function color_field_callback($args) {
+                    $id = $args['id'];
+                    $options = get_option('wp_event_calendar_settings', array());
+                    $options = wp_parse_args($options, self::$defaults);
 
-        echo '<input type="text" id="' . esc_attr($id) . '" name="wp_event_calendar_settings[' . esc_attr($id) . ']" value="' . esc_attr($options[$id]) . '" class="jsm-color-picker" data-default-color="' . esc_attr(self::$defaults[$id]) . '" />';
+                    echo '<input type="text" id="' . esc_attr($id) . '" name="wp_event_calendar_settings[' . esc_attr($id) . ']" value="' . esc_attr($options[$id]) . '" class="jsm-color-picker" data-default-color="' . esc_attr(self::$defaults[$id]) . '" />';
 
-        if (isset($args['description'])) {
-            echo '<p class="description">' . esc_html($args['description']) . '</p>';
-        }
-    }
+                    if (isset($args['description'])) {
+                        echo '<p class="description">' . esc_html($args['description']) . '</p>';
+                    }
+                }
 
-    /**
-     * Callback pro textové pole
-     */
-    public function text_field_callback($args) {
-        $id = $args['id'];
-        $options = get_option('wp_event_calendar_settings', array());
-        $options = wp_parse_args($options, self::$defaults);
+                /**
+                 * Callback pro textové pole
+                 */
+                public function text_field_callback($args) {
+                    $id = $args['id'];
+                    $options = get_option('wp_event_calendar_settings', array());
+                    $options = wp_parse_args($options, self::$defaults);
 
-        echo '<input type="text" id="' . esc_attr($id) . '" name="wp_event_calendar_settings[' . esc_attr($id) . ']" value="' . esc_attr($options[$id]) . '" class="regular-text" data-default="' . esc_attr(self::$defaults[$id]) . '" />';
+                    echo '<input type="text" id="' . esc_attr($id) . '" name="wp_event_calendar_settings[' . esc_attr($id) . ']" value="' . esc_attr($options[$id]) . '" class="regular-text" data-default="' . esc_attr(self::$defaults[$id]) . '" />';
 
-        if (isset($args['description'])) {
-            echo '<p class="description">' . esc_html($args['description']) . '</p>';
-        }
-    }
+                    if (isset($args['description'])) {
+                        echo '<p class="description">' . esc_html($args['description']) . '</p>';
+                    }
+                }
 
-    /**
-     * Sanitace nastavení
-     */
-    public function sanitize_settings($input) {
-        $sanitized_input = array();
-        foreach (self::$defaults as $key => $default_value) {
-            $sanitized_input[$key] = isset($input[$key]) ? sanitize_text_field($input[$key]) : $default_value;
-        }
-        return $sanitized_input;
-    }
-
-    /**
-     * Výstup vlastních CSS stylů
-     *
-     * Používáme vysokou prioritu (999), aby naše vlastní CSS přepsalo
-     * výchozí hodnoty ze statického CSS souboru
-     */
-    public function output_custom_css() {
-        $options = get_option('wp_event_calendar_settings', array());
-        $options = wp_parse_args($options, self::$defaults);
-        ?>
-        <style id="jsm-event-calendar-custom-css">
-            :root {
-                --primary-color: <?php echo esc_attr($options['primary_color']); ?> !important;
-                --primary-hover: <?php echo esc_attr($options['primary_hover']); ?> !important;
-                --secondary-color: <?php echo esc_attr($options['secondary_color']); ?> !important;
-                --secondary-hover: <?php echo esc_attr($options['secondary_hover']); ?> !important;
-                --button-text: <?php echo esc_attr($options['button_text']); ?> !important;
-                --background-color: <?php echo esc_attr($options['background_color']); ?> !important;
-                --surface-color: <?php echo esc_attr($options['surface_color']); ?> !important;
-                --surface-hover: <?php echo esc_attr($options['surface_hover']); ?> !important;
-                --border-color: <?php echo esc_attr($options['border_color']); ?> !important;
-                --text-primary: <?php echo esc_attr($options['text_primary']); ?> !important;
-                --text-secondary: <?php echo esc_attr($options['text_secondary']); ?> !important;
-                --shadow-sm: <?php echo esc_attr($options['shadow_sm']); ?> !important;
-                --shadow-md: <?php echo esc_attr($options['shadow_md']); ?> !important;
-                --shadow-lg: <?php echo esc_attr($options['shadow_lg']); ?> !important;
-                --border-radius-sm: <?php echo esc_attr($options['border_radius_sm']); ?> !important;
-                --border-radius-md: <?php echo esc_attr($options['border_radius_md']); ?> !important;
-                --border-radius-lg: <?php echo esc_attr($options['border_radius_lg']); ?> !important;
-                --button-radius: <?php echo esc_attr($options['button_radius']); ?> !important;
-                --calendar-spacing: <?php echo esc_attr($options['calendar_spacing']); ?> !important;
-                --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                /**
+                 * Sanitace nastavení
+                 */
+                public function sanitize_settings($input) {
+                    $sanitized_input = array();
+                    foreach (self::$defaults as $key => $default_value) {
+                        $sanitized_input[$key] = isset($input[$key]) ? sanitize_text_field($input[$key]) : $default_value;
+                    }
+                    return $sanitized_input;
+                }
             }
-
-            /* Opravená specifická barva pro kalendář - počítá s alfa kanálem */
-            .jsm-event-list-item-date {
-                background-color: <?php echo esc_attr($this->hex_to_rgba($options['primary_color'], 0.1)); ?> !important;
-                color: <?php echo esc_attr($options['primary_color']); ?> !important;
-            }
-
-            .jsm-event-calendar-day.past-day .jsm-event-calendar-event {
-                background-color: <?php echo esc_attr($this->hex_to_rgba($options['primary_color'], 0.7)); ?> !important;
-            }
-
-            /* Speciální vzhled pro dnešní den */
-            .jsm-event-calendar-day.today {
-                background-color: <?php echo esc_attr($this->hex_to_rgba($options['primary_color'], 0.05)); ?> !important;
-                border-color: <?php echo esc_attr($options['primary_color']); ?> !important;
-            }
-
-            /* Barva pro tlačítka a prvky s interakcí */
-            .jsm-event-button,
-            .jsm-event-calendar-event,
-            .jsm-event-calendar-day.today .jsm-event-calendar-day-number {
-                background-color: <?php echo esc_attr($options['primary_color']); ?> !important;
-                color: <?php echo esc_attr($options['button_text']); ?> !important;
-            }
-
-            .jsm-event-button:hover,
-            .jsm-event-calendar-event:hover {
-                background-color: <?php echo esc_attr($options['primary_hover']); ?> !important;
-            }
-
-            /* Barva pro navigační panel kalendáře */
-            .jsm-event-calendar-nav {
-                background: linear-gradient(135deg, <?php echo esc_attr($options['primary_color']); ?>, <?php echo esc_attr($options['secondary_color']); ?>) !important;
-            }
-
-            /* Barva pro záhlaví seznamu událostí */
-            .jsm-event-list-title:after {
-                background-color: <?php echo esc_attr($options['primary_color']); ?> !important;
-            }
-        </style>
-        <?php
-    }
-
-    /**
-     * Pomocná funkce pro převod HEX barvy na RGBA
-     */
-    private function hex_to_rgba($hex, $alpha = 1) {
-        // Odstranění # pokud existuje
-        $hex = str_replace('#', '', $hex);
-
-        // Zpracování 3 nebo 6 znakové hex barvy
-        if (strlen($hex) == 3) {
-            $r = hexdec(substr($hex, 0, 1) . substr($hex, 0, 1));
-            $g = hexdec(substr($hex, 1, 1) . substr($hex, 1, 1));
-            $b = hexdec(substr($hex, 2, 1) . substr($hex, 2, 1));
-        } else {
-            $r = hexdec(substr($hex, 0, 2));
-            $g = hexdec(substr($hex, 2, 2));
-            $b = hexdec(substr($hex, 4, 2));
-        }
-
-        // Vrácení RGBA hodnoty
-        return "rgba($r, $g, $b, $alpha)";
-    }
-}
