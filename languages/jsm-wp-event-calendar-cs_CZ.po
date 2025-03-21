@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: JSM WordPress Event Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jsm-wp-event-calendar\n"
 "POT-Creation-Date: 2023-07-01T12:00:00+00:00\n"
-"PO-Revision-Date: 2023-07-01T12:00:00+00:00\n"
+"PO-Revision-Date: 2025-03-21 14:06+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: cs_CZ\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.2.2\n"
 "X-Domain: jsm-wp-event-calendar\n"
 
 #: includes/class-event-post-type.php:30
@@ -118,10 +118,6 @@ msgstr "Datum události"
 msgid "Time"
 msgstr "Čas"
 
-#: admin/class-event-admin.php:82
-msgid "All Day"
-msgstr "Celý den"
-
 #: includes/class-event-calendar.php:52
 msgid "Loading events..."
 msgstr "Načítání událostí..."
@@ -130,9 +126,113 @@ msgstr "Načítání událostí..."
 msgid "No events to display"
 msgstr "Žádné události k zobrazení"
 
-#: includes/class-event-calendar.php:129
-msgid "All Day"
-msgstr "Celý den"
+#: includes/class-event-calendar.php:55
+msgid "Events List"
+msgstr "Seznam událostí"
+
+#: includes/class-event-calendar.php:57
+msgid "January"
+msgstr "Leden"
+
+#: includes/class-event-calendar.php:58
+msgid "February"
+msgstr "Únor"
+
+#: includes/class-event-calendar.php:59
+msgid "March"
+msgstr "Březen"
+
+#: includes/class-event-calendar.php:60
+msgid "April"
+msgstr "Duben"
+
+#: includes/class-event-calendar.php:61
+msgid "May"
+msgstr "Květen"
+
+#: includes/class-event-calendar.php:62
+msgid "June"
+msgstr "Červen"
+
+#: includes/class-event-calendar.php:63
+msgid "July"
+msgstr "Červenec"
+
+#: includes/class-event-calendar.php:64
+msgid "August"
+msgstr "Srpen"
+
+#: includes/class-event-calendar.php:65
+msgid "September"
+msgstr "Září"
+
+#: includes/class-event-calendar.php:66
+msgid "October"
+msgstr "Říjen"
+
+#: includes/class-event-calendar.php:67
+msgid "November"
+msgstr "Listopad"
+
+#: includes/class-event-calendar.php:68
+msgid "December"
+msgstr "Prosinec"
+
+#: includes/class-event-calendar.php:70
+msgid "Monday"
+msgstr "Pondělí"
+
+#: includes/class-event-calendar.php:71
+msgid "Tuesday"
+msgstr "Úterý"
+
+#: includes/class-event-calendar.php:72
+msgid "Wednesday"
+msgstr "Středa"
+
+#: includes/class-event-calendar.php:73
+msgid "Thursday"
+msgstr "Čtvrtek"
+
+#: includes/class-event-calendar.php:74
+msgid "Friday"
+msgstr "Pátek"
+
+#: includes/class-event-calendar.php:75
+msgid "Saturday"
+msgstr "Sobota"
+
+#: includes/class-event-calendar.php:76
+msgid "Sunday"
+msgstr "Neděle"
+
+#: includes/class-event-calendar.php:79
+msgid "Mo"
+msgstr "Po"
+
+#: includes/class-event-calendar.php:80
+msgid "Tu"
+msgstr "Út"
+
+#: includes/class-event-calendar.php:81
+msgid "We"
+msgstr "St"
+
+#: includes/class-event-calendar.php:82
+msgid "Th"
+msgstr "Čt"
+
+#: includes/class-event-calendar.php:83
+msgid "Fr"
+msgstr "Pá"
+
+#: includes/class-event-calendar.php:84
+msgid "Sa"
+msgstr "So"
+
+#: includes/class-event-calendar.php:85
+msgid "Su"
+msgstr "Ne"
 
 #: templates/calendar.php:77
 msgid "Previous"
@@ -158,13 +258,12 @@ msgstr "Proběhlé události"
 msgid "Upcoming Events"
 msgstr "Nadcházející události"
 
-#: templates/event-list.php:86 templates/event-detail.php:32
-msgid "All Day"
-msgstr "Celý den"
-
 #: templates/event-detail.php:13
 msgid "Event not found."
 msgstr "Událost nebyla nalezena."
+
+msgid "All Day"
+msgstr "Celý den"
 
 #: includes/class-event-taxonomy.php:25
 msgid "Event Categories"
@@ -353,3 +452,191 @@ msgstr "Rádius tlačítek"
 #: admin/class-event-settings.php:166
 msgid "Calendar Spacing"
 msgstr "Mezery v kalendáři"
+
+#: admin/class-event-settings.php:248
+msgid "Calendar settings have been reset to defaults."
+msgstr "Nastavení kalendáře bylo obnoveno na výchozí hodnoty."
+
+#: admin/views/admin-documentation.php:16
+msgid "Plugin Settings"
+msgstr "Nastavení pluginu"
+
+#: admin/views/admin-documentation.php:26
+msgid "How to Use the Plugin"
+msgstr "Jak používat plugin"
+
+#: admin/views/admin-documentation.php:29
+msgid "Adding a New Event"
+msgstr "Přidání nové události"
+
+#: admin/views/admin-documentation.php:30
+msgid "To add a new event, go to the <strong>Events</strong> section in the admin menu and click <strong>Add New</strong>."
+msgstr "Pro přidání nové události přejděte do sekce <strong>Události</strong> v admin menu a klikněte na <strong>Přidat novou</strong>."
+
+#: admin/views/admin-documentation.php:31
+msgid "Fill in the title, description, and set the date and time of the event. You can also set a custom URL for the button to link to."
+msgstr "Vyplňte název, popis a nastavte datum a čas události. Můžete také nastavit vlastní URL adresu pro tlačítko."
+
+#: admin/views/admin-documentation.php:35
+msgid "Managing Event Categories"
+msgstr "Správa kategorií událostí"
+
+#: admin/views/admin-documentation.php:36
+msgid "To create and manage event categories, go to the <strong>Events</strong> > <strong>Categories</strong> section in the admin menu."
+msgstr "Pro vytvoření a správu kategorií událostí přejděte do sekce <strong>Události</strong> > <strong>Kategorie</strong> v admin menu."
+
+#: admin/views/admin-documentation.php:37
+msgid "Categories help you better organize events and allow visitors to filter events by their interests."
+msgstr "Kategorie vám pomáhají lépe organizovat události a umožňují návštěvníkům filtrovat události podle jejich zájmů."
+
+#: admin/views/admin-documentation.php:41
+msgid "Adding Calendar to a Page"
+msgstr "Přidání kalendáře na stránku"
+
+#: admin/views/admin-documentation.php:42
+msgid "To display the calendar on a page, use this shortcode:"
+msgstr "Pro zobrazení kalendáře na stránce použijte tento shortcode:"
+
+#: admin/views/admin-documentation.php:45
+msgid "You can use the following attributes to customize the calendar:"
+msgstr "Můžete použít následující atributy pro přizpůsobení kalendáře:"
+
+#: admin/views/admin-documentation.php:47
+msgid "Month number (1-12)"
+msgstr "Číslo měsíce (1-12)"
+
+#: admin/views/admin-documentation.php:48
+msgid "Year (e.g. 2023)"
+msgstr "Rok (např. 2023)"
+
+#: admin/views/admin-documentation.php:49
+msgid "Show event list below the calendar (yes/no)"
+msgstr "Zobrazit seznam událostí pod kalendářem (yes/no)"
+
+#: admin/views/admin-documentation.php:53
+msgid "Example with parameters:"
+msgstr "Příklad s parametry:"
+
+#: admin/views/admin-documentation.php:58
+msgid "Adding Event List to a Page"
+msgstr "Přidání seznamu událostí na stránku"
+
+#: admin/views/admin-documentation.php:59
+msgid "To display an event list on a page, use this shortcode:"
+msgstr "Pro zobrazení seznamu událostí na stránce použijte tento shortcode:"
+
+#: admin/views/admin-documentation.php:62
+msgid "You can use the following attributes to customize the list:"
+msgstr "Můžete použít následující atributy pro přizpůsobení seznamu:"
+
+#: admin/views/admin-documentation.php:64
+msgid "Number of events to display"
+msgstr "Počet událostí k zobrazení"
+
+#: admin/views/admin-documentation.php:65
+msgid "Category ID or slug for filtering events"
+msgstr "ID kategorie nebo slug pro filtrování událostí"
+
+#: admin/views/admin-documentation.php:66
+msgid "Show past events (yes/no)"
+msgstr "Zobrazit minulé události (yes/no)"
+
+#: admin/views/admin-documentation.php:67
+msgid "Display type (list/grid)"
+msgstr "Typ zobrazení (list/grid)"
+
+#: admin/views/admin-documentation.php:75
+msgid "Adding Event Detail to a Page"
+msgstr "Přidání detailu události na stránku"
+
+#: admin/views/admin-documentation.php:76
+msgid "To display the detail of a specific event on a page, use this shortcode:"
+msgstr "Pro zobrazení detailu konkrétní události na stránce použijte tento shortcode:"
+
+#: admin/views/admin-documentation.php:79
+msgid "Where <code>id</code> is the ID of the event you want to display."
+msgstr "Kde <code>id</code> je ID události, kterou chcete zobrazit."
+
+#: admin/views/admin-documentation.php:83
+msgid "Creating External Events Add-on"
+msgstr "Vytvoření doplňku pro externí události"
+
+#: admin/views/admin-documentation.php:84
+msgid "The plugin supports external event sources through add-ons. You can create your own add-on using the <code>jsm_event_calendar_external_events</code> filter:"
+msgstr "Plugin podporuje externí zdroje událostí prostřednictvím doplňků. Můžete vytvořit vlastní doplněk pomocí filtru <code>jsm_event_calendar_external_events</code>:"
+
+#: admin/views/admin-documentation.php:111
+msgid "This allows integration with external event sources, APIs, or other plugins."
+msgstr "To umožňuje integraci s externími zdroji událostí, API nebo jinými pluginy."
+
+#: admin/views/admin-documentation.php:117
+msgid "About the Plugin"
+msgstr "O pluginu"
+
+#: admin/views/admin-documentation.php:118
+msgid "JSM WP Event Calendar is a simple plugin for managing and displaying event calendars on your website with category support and filtering."
+msgstr "JSM WP Event Calendar je jednoduchý plugin pro správu a zobrazení kalendářů událostí na vašem webu s podporou kategorií a filtrováním."
+
+#: admin/views/admin-documentation.php:119
+msgid "Version:"
+msgstr "Verze:"
+
+#: admin/views/admin-documentation.php:123
+msgid "Default Features"
+msgstr "Výchozí funkce"
+
+#: admin/views/admin-documentation.php:124
+msgid "The entire plugin is designed to work immediately after activation."
+msgstr "Celý plugin je navržen tak, aby fungoval okamžitě po aktivaci."
+
+#: admin/views/admin-documentation.php:126
+msgid "Responsive design"
+msgstr "Responzivní design"
+
+#: admin/views/admin-documentation.php:127
+msgid "English and Czech language support"
+msgstr "Podpora pro angličtinu a češtinu"
+
+#: admin/views/admin-documentation.php:128
+msgid "Event categories with filtering"
+msgstr "Kategorie událostí s filtrováním"
+
+#: admin/views/admin-documentation.php:129
+msgid "Easy to use shortcodes"
+msgstr "Snadno použitelné shortcody"
+
+#: admin/views/admin-documentation.php:130
+msgid "Add-on support"
+msgstr "Podpora pro doplňky"
+
+#: admin/views/admin-settings.php:135
+msgid "Primary Colors"
+msgstr "Primární barvy"
+
+#: admin/views/admin-settings.php:146
+msgid "Background Colors"
+msgstr "Barvy pozadí"
+
+#: admin/views/admin-settings.php:157
+msgid "Text Colors"
+msgstr "Barvy textu"
+
+#: admin/views/admin-settings.php:169
+msgid "Calendar Example"
+msgstr "Příklad kalendáře"
+
+#: admin/views/admin-settings.php:224
+msgid "Button Example"
+msgstr "Příklad tlačítka"
+
+#: admin/views/admin-settings.php:236
+msgid "Example Button"
+msgstr "Ukázkové tlačítko"
+
+#: admin/views/admin-settings.php:171
+msgid "March 2025"
+msgstr "Březen 2025"
+
+#: admin/views/admin-settings.php:20
+msgid "Settings Preview"
+msgstr "Náhled nastavení"
