@@ -1,28 +1,28 @@
 /**
- * JavaScript pro frontend kalendáře událostí - Minimalistický design 2025
+ * JavaScript for frontend event calendar - Minimalist design 2025
  */
 (function($) {
     'use strict';
 
-    // Globální objekt pro naše funkce
+    // Global object for our functions
     window.JSMEventCalendar = {
         init: function() {
             console.log('Initializing JSM Event Calendar 2025 - Minimalist Edition');
 
-            // Nastavení navigace a modálů
+            // Set up navigation and modals
             this.setupCalendarNavigation();
             this.setupEventModals();
             this.detectMobileView();
 
-            // Okamžité načtení dat při prvním zobrazení - důležité pro správné první načtení
+            // Immediate data loading on first display - important for correct initial load
             this.initializeCalendars();
 
-            // Sledování změny velikosti okna pro responzivní vzhled
+            // Watch for window resize for responsive layout
             $(window).on('resize', this.handleResize.bind(this));
         },
 
         /**
-         * Inicializace všech kalendářů na stránce
+         * Initialize all calendars on the page
          */
         initializeCalendars: function() {
             $('.jsm-event-calendar-wrapper').each(function() {
@@ -32,7 +32,7 @@
 
                 if (calendarId && month && year) {
                     console.log('Loading initial calendar data:', calendarId, month, year);
-                    // Přidání mírného zpoždění pro správné vykreslení DOM
+                    // Add slight delay for proper DOM rendering
                     setTimeout(function() {
                         JSMEventCalendar.updateCalendar(calendarId, month, year);
                     }, 50);
@@ -41,22 +41,22 @@
         },
 
         /**
-         * Zpracování změny velikosti okna s omezením počtu volání (debounce)
+         * Handle window resize with debounce to limit the number of calls
          */
         handleResize: function() {
             clearTimeout(this.resizeTimer);
             this.resizeTimer = setTimeout(function() {
                 JSMEventCalendar.detectMobileView();
-                // Sjednocení výšek po změně velikosti okna
+                // Equalize heights after resize
                 JSMEventCalendar.equalizeCalendarCellHeights();
             }, 250);
         },
 
         /**
-         * Nastavení navigace kalendáře
+         * Set up calendar navigation
          */
         setupCalendarNavigation: function() {
-            // Delegace událostí pro lepší výkon a kompatibilitu s dynamicky vytvořenými prvky
+            // Event delegation for better performance and compatibility with dynamically created elements
             $(document).off('click', '.jsm-event-calendar-prev').on('click', '.jsm-event-calendar-prev', function() {
                 JSMEventCalendar.changeMonth($(this).data('calendar-id'), -1);
             });
@@ -71,7 +71,7 @@
         },
 
         /**
-         * Změna měsíce v kalendáři - pouze dopředu
+         * Change month in calendar - forward only
          */
         changeMonth: function(calendarId, direction) {
             const $calendar = $('#' + calendarId);
@@ -83,31 +83,31 @@
             const currentMonth = parseInt($calendar.data('month'));
             const currentYear = parseInt($calendar.data('year'));
 
-            // Získání aktuálního data pro omezení
+            // Get current date for limitation
             const today = new Date();
-            const currentRealMonth = today.getMonth() + 1; // +1 protože getMonth() vrací 0-11
+            const currentRealMonth = today.getMonth() + 1; // +1 because getMonth() returns 0-11
             const currentRealYear = today.getFullYear();
 
-            // Pokud jde o navigaci zpět, kontrolujeme, zda nejdeme do minulosti
+            // If going back, check if we're not going into the past
             if (direction < 0) {
-                // Pokud jsme v aktuálním měsíci nebo chceme jít do minulosti, zastavíme
+                // If we're in the current month or trying to go to the past, stop
                 if ((currentYear < currentRealYear) ||
                     (currentYear === currentRealYear && currentMonth <= currentRealMonth)) {
-                    console.log("Nelze navigovat do minulosti");
-                    // Přidání efektu "zakázaného" tlačítka
+                    console.log("Cannot navigate to the past");
+                    // Add "disabled" button effect
                     const $prevButton = $('.jsm-event-calendar-prev[data-calendar-id="' + calendarId + '"]');
                     $prevButton.addClass('disabled').delay(300).queue(function(next) {
                         $(this).removeClass('disabled');
                         next();
                     });
-                    return; // Nedovolíme navigaci do minulosti
+                    return; // Don't allow navigation to the past
                 }
             }
 
             let newMonth = currentMonth + direction;
             let newYear = currentYear;
 
-            // Ošetření přechodů mezi roky
+            // Handle year transitions
             if (newMonth > 12) {
                 newMonth = 1;
                 newYear++;
@@ -116,23 +116,23 @@
                 newYear--;
             }
 
-            // Aktualizace kalendáře
+            // Update calendar
             this.updateCalendar(calendarId, newMonth, newYear);
         },
 
         /**
-         * Přechod na aktuální měsíc
+         * Go to current month
          */
         goToToday: function(calendarId) {
             const today = new Date();
-            const month = today.getMonth() + 1; // JavaScript počítá měsíce od 0
+            const month = today.getMonth() + 1; // JavaScript counts months from 0
             const year = today.getFullYear();
 
             this.updateCalendar(calendarId, month, year);
         },
 
         /**
-         * Aktualizace kalendáře pomocí AJAX - optimalizováno pro rychlost
+         * Update calendar via AJAX - optimized for speed
          */
         updateCalendar: function(calendarId, month, year) {
             const $calendar = $('#' + calendarId);
@@ -146,10 +146,10 @@
             const showList = $calendar.data('show-list');
             const category = $calendar.data('category');
 
-            // Zobrazení načítací animace
+            // Show loading animation
             $calendarTable.html('<div class="jsm-event-loading"><div class="jsm-event-loading-spinner"></div><p>' + jsmEventCalendar.i18n.loadingText + '</p></div>');
 
-            // AJAX požadavek na backend - optimalizace pro rychlejší načítání
+            // AJAX request to backend - optimized for faster loading
             $.ajax({
                 url: jsmEventCalendar.ajaxurl,
                 type: 'GET',
@@ -159,21 +159,21 @@
                     year: year,
                     category: category,
                     nonce: jsmEventCalendar.nonce,
-                    cache: false // Vynucení obejití vyrovnávací paměti prohlížeče
+                    cache: false // Force bypass browser cache
                 },
                 success: function(response) {
                     if (response && response.success) {
                         const events = response.data;
 
-                        // Aktualizace měsíce a roku v datových atributech
+                        // Update month and year in data attributes
                         $calendar.data('month', month);
                         $calendar.data('year', year);
 
-                        // Aktualizace nadpisu kalendáře
+                        // Update calendar title
                         const monthName = jsmEventCalendar.i18n.months[month - 1];
                         $calendarTitle.text(monthName + ' ' + year);
 
-                        // Zobrazit/Skrýt tlačítko Předchozí měsíc podle aktuálního měsíce
+                        // Show/Hide Previous month button based on current month
                         const today = new Date();
                         const currentRealMonth = today.getMonth() + 1;
                         const currentRealYear = today.getFullYear();
@@ -185,49 +185,49 @@
                             $prevButton.css('visibility', 'visible');
                         }
 
-                        // Vykreslení kalendáře
+                        // Render calendar
                         JSMEventCalendar.renderCalendar($calendarTable, month, year, events);
 
-                        // Přidat timeout pro zajištění, že všechny obrázky a obsah se stihnou načíst
+                        // Add timeout to ensure all images and content have loaded
                         setTimeout(function() {
                             JSMEventCalendar.equalizeCalendarCellHeights();
                         }, 100);
 
-                        // Aktualizace seznamu událostí, pokud je zobrazen
+                        // Update event list if displayed
                         if (showList === 'yes') {
                             JSMEventCalendar.renderEventList($('#' + calendarId + '-list'), events);
                         }
 
-                        // Znovu nastavení event handlers pro modální okna událostí
+                        // Re-setup event handlers for event modals
                         JSMEventCalendar.setupEventModals();
                     } else {
-                        $calendarTable.html('<div class="jsm-event-no-events">Chyba při načítání kalendáře: ' + (response ? response.data : 'Neplatná odpověď') + '</div>');
+                        $calendarTable.html('<div class="jsm-event-no-events">Error loading calendar: ' + (response ? response.data : 'Invalid response') + '</div>');
                     }
                 },
                 error: function(xhr, status, error) {
                     console.error('AJAX error:', error);
-                    $calendarTable.html('<div class="jsm-event-no-events">Chyba při načítání kalendáře. Zkuste to prosím znovu.</div>');
+                    $calendarTable.html('<div class="jsm-event-no-events">Error loading calendar. Please try again.</div>');
                 }
             });
         },
 
         /**
-         * Vykreslení kalendáře - evropský formát (pondělí jako první den)
+         * Render calendar - European format (Monday as first day)
          */
         renderCalendar: function($calendarTable, month, year, events) {
             const daysInMonth = new Date(year, month, 0).getDate();
 
-            // Výpočet prvního dne v měsíci pro evropský formát (pondělí=0, neděle=6)
+            // Calculate first day of month for European format (Monday=0, Sunday=6)
             const firstDayDate = new Date(year, month - 1, 1);
-            let firstDay = firstDayDate.getDay(); // 0=neděle, 1=pondělí, ..., 6=sobota
-            firstDay = firstDay === 0 ? 6 : firstDay - 1; // Konverze na 0=pondělí, ..., 6=neděle
+            let firstDay = firstDayDate.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+            firstDay = firstDay === 0 ? 6 : firstDay - 1; // Convert to 0=Monday, ..., 6=Sunday
 
             const today = new Date();
             const todayDate = today.getDate();
             const todayMonth = today.getMonth() + 1;
             const todayYear = today.getFullYear();
 
-            // Pokud jsme na mobilním zařízení, zobrazíme seznam dnů místo tabulky
+            // If on mobile device, display day list instead of table
             if (window.innerWidth <= 768) {
                 this.renderMobileCalendar($calendarTable, month, year, daysInMonth, firstDay, events, todayDate, todayMonth, todayYear);
                 return;
@@ -236,51 +236,51 @@
             let html = '<table class="jsm-event-calendar-table">';
             html += '<thead><tr>';
 
-            // Názvy dnů v týdnu - začínáme pondělkem (evropský formát)
-            const weekDaysOrder = [0, 1, 2, 3, 4, 5, 6]; // 0=pondělí, 6=neděle
+            // Weekday names - start with Monday (European format)
+            const weekDaysOrder = [0, 1, 2, 3, 4, 5, 6]; // 0=Monday, 6=Sunday
             for (let i = 0; i < 7; i++) {
                 html += '<th>' + jsmEventCalendar.i18n.weekdaysShort[weekDaysOrder[i]] + '</th>';
             }
 
             html += '</tr></thead><tbody><tr>';
 
-            // Prázdné buňky před prvním dnem měsíce
+            // Empty cells before first day of month
             let dayCount = 0;
             for (let i = 0; i < firstDay; i++) {
                 html += '<td><div class="jsm-event-calendar-day empty other-month"></div></td>';
                 dayCount++;
             }
 
-            // Dny v měsíci
+            // Days in month
             for (let i = 1; i <= daysInMonth; i++) {
-                // Nový řádek po 7 dnech
+                // New row after 7 days
                 if (dayCount % 7 === 0 && dayCount > 0) {
                     html += '</tr><tr>';
                 }
 
-                // Třídy pro den
+                // Classes for day
                 let dayClasses = 'jsm-event-calendar-day';
 
-                // Kontrola, zda je den dnešní
+                // Check if day is today
                 if (i === todayDate && month === todayMonth && year === todayYear) {
                     dayClasses += ' today';
                 }
 
-                // Kontrola, zda den již proběhl (je to minulý den v aktuálním měsíci)
+                // Check if day is past (already occurred in current month)
                 if ((year === todayYear && month === todayMonth && i < todayDate) ||
                     (year === todayYear && month < todayMonth) ||
                     (year < todayYear)) {
                     dayClasses += ' past-day';
                 }
 
-                // Datum pro tento den
+                // Date for this day
                 const dateStr = year + '-' + this.pad(month) + '-' + this.pad(i);
 
                 html += '<td>';
                 html += '<div class="' + dayClasses + '" data-date="' + dateStr + '">';
                 html += '<span class="jsm-event-calendar-day-number">' + i + '</span>';
 
-                // Události pro tento den
+                // Events for this day
                 const dayEvents = this.getEventsForDay(events, year, month, i);
                 for (let j = 0; j < dayEvents.length; j++) {
                     html += this.renderEventInCell(dayEvents[j]);
@@ -292,7 +292,7 @@
                 dayCount++;
             }
 
-            // Prázdné buňky na konci měsíce
+            // Empty cells at end of month
             while (dayCount % 7 !== 0) {
                 html += '<td><div class="jsm-event-calendar-day empty other-month"></div></td>';
                 dayCount++;
@@ -302,28 +302,28 @@
 
             $calendarTable.html(html);
 
-            // Volání funkce pro sjednocení výšky buněk po vykreslení
+            // Call function to equalize cell heights after rendering
             this.equalizeCalendarCellHeights();
         },
 
         /**
-         * Funkce pro sjednocení výšky buněk v kalendáři
+         * Function to equalize calendar cell heights
          */
         equalizeCalendarCellHeights: function() {
-            // Pokud jsme na mobilním zařízení, nebudeme výšku sjednocovat
+            // Skip on mobile devices
             if (window.innerWidth <= 768) {
                 return;
             }
 
-            // Sjednocení výšky po řádcích
+            // Equalize heights by row
             $('.jsm-event-calendar-table tbody tr').each(function() {
                 const $cells = $(this).find('.jsm-event-calendar-day');
                 if ($cells.length === 0) return;
 
-                // Reset výšky pro správné měření
+                // Reset height for accurate measurement
                 $cells.css('height', 'auto');
 
-                // Najít největší výšku v řádku
+                // Find maximum height in row
                 let maxHeight = 0;
                 $cells.each(function() {
                     const height = $(this).outerHeight();
@@ -332,7 +332,7 @@
                     }
                 });
 
-                // Aplikovat stejnou výšku na všechny buňky v řádku
+                // Apply same height to all cells in row
                 if (maxHeight > 0) {
                     $cells.css('height', maxHeight + 'px');
                 }
@@ -342,10 +342,10 @@
         },
 
         /**
-         * Alternativní přístup - sjednocení výšky všech buněk v kalendáři
+         * Alternative approach - equalize heights of all cells in calendar
          */
         equalizeAllCalendarCellHeights: function() {
-            // Pokud jsme na mobilním zařízení, nebudeme výšku sjednocovat
+            // Skip on mobile devices
             if (window.innerWidth <= 768) {
                 return;
             }
@@ -353,10 +353,10 @@
             const $cells = $('.jsm-event-calendar-day:not(.empty)');
             if ($cells.length === 0) return;
 
-            // Reset výšky pro správné měření
+            // Reset height for accurate measurement
             $cells.css('height', 'auto');
 
-            // Najít největší výšku ve všech buňkách
+            // Find maximum height across all cells
             let maxHeight = 0;
             $cells.each(function() {
                 const height = $(this).outerHeight();
@@ -365,7 +365,7 @@
                 }
             });
 
-            // Aplikovat stejnou výšku na všechny buňky
+            // Apply same height to all cells
             if (maxHeight > 0) {
                 $cells.css('height', maxHeight + 'px');
             }
@@ -375,46 +375,46 @@
 
 
 /**
- * Vykreslení kalendáře pro mobilní zařízení - pouze dny s událostmi
+ * Render calendar for mobile devices - only days with events
  */
 renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDay, events, todayDate, todayMonth, todayYear) {
     let html = '<div class="jsm-event-calendar-list-view">';
     let hasEvents = false;
 
-    // Procházení dnů v měsíci
+    // Loop through days in month
     for (let i = 1; i <= daysInMonth; i++) {
-        // Události pro tento den
+        // Events for this day
         const dayEvents = this.getEventsForDay(events, year, month, i);
 
-        // Přeskočíme dny bez událostí
+        // Skip days without events
         if (dayEvents.length === 0) {
             continue;
         }
 
         hasEvents = true;
 
-        // Třídy pro den
+        // Classes for day
         let dayClasses = 'jsm-event-calendar-day';
 
-        // Kontrola, zda je den dnešní
+        // Check if day is today
         if (i === todayDate && month === todayMonth && year === todayYear) {
             dayClasses += ' today';
         }
 
-        // Kontrola, zda den již proběhl (je to minulý den v aktuálním měsíci)
+        // Check if day is past (already occurred in current month)
         if ((year === todayYear && month === todayMonth && i < todayDate) ||
             (year === todayYear && month < todayMonth) ||
             (year < todayYear)) {
             dayClasses += ' past-day';
         }
 
-        // Výpočet dne v týdnu pro evropský formát
+        // Calculate day of week for European format
         const dayDate = new Date(year, month - 1, i);
-        let dayOfWeek = dayDate.getDay(); // 0=neděle, 1=pondělí, ..., 6=sobota
-        dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Konverze na 0=pondělí, ..., 6=neděle
+        let dayOfWeek = dayDate.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+        dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to 0=Monday, ..., 6=Sunday
 
         const dayName = jsmEventCalendar.i18n.weekdays[dayOfWeek];
-        const formattedDate = dayDate.toLocaleDateString('cs-CZ', { weekday: 'long', day: 'numeric', month: 'long' });
+        const formattedDate = dayDate.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' });
 
         html += '<div class="' + dayClasses + '" data-date="' + year + '-' + this.pad(month) + '-' + this.pad(i) + '">';
         html += '<div class="jsm-event-calendar-day-header">';
@@ -422,7 +422,7 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
         html += '<span class="jsm-event-calendar-day-name">' + dayName + '</span>';
         html += '</div>';
 
-        // Události pro tento den
+        // Events for this day
         for (let j = 0; j < dayEvents.length; j++) {
             html += this.renderEventInCell(dayEvents[j]);
         }
@@ -432,7 +432,7 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
 
     html += '</div>';
 
-    // Pokud nejsou žádné události, zobrazíme oznámení
+    // If no events, show message
     if (!hasEvents) {
         html = '<div class="jsm-event-no-events">' + jsmEventCalendar.i18n.noEventsText + '</div>';
     }
@@ -441,7 +441,7 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
 },
 
         /**
-         * Získání událostí pro daný den
+         * Get events for given day
          */
         getEventsForDay: function(events, year, month, day) {
             if (!events || !Array.isArray(events)) {
@@ -458,7 +458,7 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
                 const startDate = event.startDate;
                 const endDate = event.endDate || event.startDate;
 
-                // Kontrola, zda událost patří do daného dne
+                // Check if event belongs to this day
                 if (dateString >= startDate && dateString <= endDate) {
                     dayEvents.push(event);
                 }
@@ -468,7 +468,7 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
         },
 
         /**
-         * Vykreslení události v buňce kalendáře - minimalistický design
+         * Render event in calendar cell - minimalist design
          */
         renderEventInCell: function(event) {
             if (!event || !event.id || !event.title) {
@@ -488,7 +488,7 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
         },
 
         /**
-         * Vykreslení seznamu událostí - moderní design
+         * Render event list - modern design
          */
         renderEventList: function($listContainer, events) {
             if (!events || !Array.isArray(events) || events.length === 0) {
@@ -505,7 +505,7 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
 
                 html += '<div class="jsm-event-list-item">';
 
-                // Náhledový obrázek, pokud existuje
+                // Thumbnail if exists
                 if (event.thumbnail) {
                     html += '<div class="jsm-event-list-item-thumbnail">';
                     html += '<img src="' + event.thumbnail + '" alt="' + event.title + '">';
@@ -539,10 +539,10 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
         },
 
        /**
-        * Nastavení modálních oken pro události
+        * Set up modal windows for events
         */
        setupEventModals: function() {
-           // Použijeme delegaci událostí pro lepší výkon
+           // Use event delegation for better performance
            $(document).off('click', '.jsm-event-calendar-event').on('click', '.jsm-event-calendar-event', function(e) {
                e.preventDefault();
                e.stopPropagation();
@@ -553,21 +553,21 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
                }
            });
 
-           // Zavření modálního okna - delegace událostí pro dynamicky vytvořené prvky
+           // Close modal - event delegation for dynamically created elements
            $(document).off('click', '.jsm-event-modal-close').on('click', '.jsm-event-modal-close', function(e) {
                e.preventDefault();
-               e.stopPropagation(); // Zabránit propagaci události do rodičů
+               e.stopPropagation(); // Prevent event propagation to parents
                JSMEventCalendar.closeEventModal();
            });
 
-           // Zavření modálního okna po kliknutí mimo obsah
+           // Close modal when clicking outside content
            $(document).off('click', '.jsm-event-modal').on('click', '.jsm-event-modal', function(e) {
                if ($(e.target).hasClass('jsm-event-modal')) {
                    JSMEventCalendar.closeEventModal();
                }
            });
 
-           // Zavření modálního okna po stisknutí klávesy Escape
+           // Close modal when pressing Escape key
            $(document).off('keyup.modal').on('keyup.modal', function(e) {
                if (e.key === 'Escape' && $('.jsm-event-modal.active').length) {
                    JSMEventCalendar.closeEventModal();
@@ -576,7 +576,7 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
        },
 
        /**
-        * Otevření modálního okna s detailem události - upravená implementace
+        * Open modal with event details - improved implementation
         */
        openEventModal: function(eventId) {
            if (!eventId) {
@@ -587,27 +587,27 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
            const $modal = $('#jsm-event-modal');
            const $modalContent = $('#jsm-event-modal-content');
 
-           // Použijeme CSS třídu pro aktivaci modálu
+           // Use CSS class to activate modal
            $modal.addClass('active');
 
            console.log('Opening modal for event ID:', eventId); // Debugging
 
-           // Přidání třídy pro omezení scrollování na stránce pod modálem
+           // Add class to restrict scrolling on page under modal
            $('body').addClass('modal-open');
 
-           // Načítací animace
+           // Loading animation
            $modalContent.html('<div class="jsm-event-loading"><div class="jsm-event-loading-spinner"></div><p>' + jsmEventCalendar.i18n.loadingText + '</p></div>');
 
-           // AJAX požadavek pro načtení detailu události - s cachingem pro lepší výkon
+           // AJAX request to load event details - with caching for better performance
            const cacheKey = 'event_' + eventId;
 
-           // Zkusíme načíst z cache
+           // Try to load from cache
            if (this.eventCache && this.eventCache[cacheKey]) {
                $modalContent.html(this.eventCache[cacheKey]);
                return;
            }
 
-          // Pokud není v cache, načteme ze serveru
+          // If not in cache, load from server
           $.ajax({
               url: jsmEventCalendar.ajaxurl,
               type: 'GET',
@@ -618,43 +618,43 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
               },
               success: function(response) {
                   if (response && response.success) {
-                      // Vykreslení detailu události s křížkem
+                      // Render event detail with close button
                       $modalContent.html(response.data + '<span class="jsm-event-modal-close">&times;</span>');
 
-                      // Uložení do cache (včetně křížku)
+                      // Save to cache (including close button)
                       if (!JSMEventCalendar.eventCache) JSMEventCalendar.eventCache = {};
                       JSMEventCalendar.eventCache[cacheKey] = response.data + '<span class="jsm-event-modal-close">&times;</span>';
                   } else {
-                      $modalContent.html('<div class="jsm-event-no-events">Událost nebyla nalezena.</div><span class="jsm-event-modal-close">&times;</span>');
+                      $modalContent.html('<div class="jsm-event-no-events">Event not found.</div><span class="jsm-event-modal-close">&times;</span>');
                   }
               },
               error: function(xhr, status, error) {
                   console.error('Error loading event:', error); // Debugging
-                  $modalContent.html('<div class="jsm-event-no-events">Chyba při načítání události.</div><span class="jsm-event-modal-close">&times;</span>');
+                  $modalContent.html('<div class="jsm-event-no-events">Error loading event.</div><span class="jsm-event-modal-close">&times;</span>');
               }
           });
        },
 
        /**
-        * Zavření modálního okna - upravená implementace
+        * Close modal window - improved implementation
         */
        closeEventModal: function() {
            const $modal = $('#jsm-event-modal');
-           // Odstraníme třídu active
+           // Remove active class
            $modal.removeClass('active');
            $('body').removeClass('modal-open');
            console.log('Modal closed'); // Debugging
        },
 
         /**
-         * Detekce mobilního zobrazení a přepnutí na responzivní layout
+         * Detect mobile view and switch to responsive layout
          */
         detectMobileView: function() {
             const isMobile = window.innerWidth <= 768;
 
             $('.jsm-event-calendar-wrapper').toggleClass('jsm-mobile-view', isMobile);
 
-            // Překreslení jen pokud je potřeba
+            // Redraw only if needed
             if (isMobile && $('.jsm-event-calendar-table').is(':visible')) {
                 $('.jsm-event-calendar-wrapper').each(function() {
                     const calendarId = $(this).attr('id');
@@ -679,14 +679,14 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
         },
 
         /**
-         * Pomocná funkce pro doplnění nuly před jednomístné číslo
+         * Helper function to pad single-digit numbers with leading zero
          */
         pad: function(num) {
             return (num < 10 ? '0' : '') + num;
         }
     };
 
-    // Inicializace po načtení dokumentu
+    // Initialize after document loads
     $(document).ready(function() {
         JSMEventCalendar.init();
     });

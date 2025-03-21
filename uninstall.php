@@ -1,19 +1,19 @@
 <?php
 /**
- * Odinstalace pluginu
+ * Plugin uninstallation
  *
- * Tento soubor se spustí, když je plugin odinstalován (ne pouze deaktivován).
- * Odstraní všechna data spojená s pluginem, aby po sobě nezanechal nepořádek.
+ * This file runs when the plugin is uninstalled (not just deactivated).
+ * It removes all data associated with the plugin to leave no trace.
  */
 
-// Pokud tento soubor není volán z WordPressu, ukončit
+// If this file is not called from WordPress, exit
 if (!defined('WP_UNINSTALL_PLUGIN')) {
     exit;
 }
 
-// Odstranění všech událostí
+// Remove all events
 $events = get_posts(array(
-    'post_type' => 'wp_event',
+    'post_type' => 'jsm_wp_event',
     'numberposts' => -1,
     'post_status' => 'any'
 ));
@@ -22,9 +22,12 @@ foreach ($events as $event) {
     wp_delete_post($event->ID, true);
 }
 
-// Odstranění všech meta dat spojených s událostmi
+// Remove all meta data associated with events
 global $wpdb;
 $wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE meta_key LIKE '_event_%'");
 
-// Propláchnutí pravidel přesměrování
+// Remove plugin settings
+delete_option('wp_event_calendar_settings');
+
+// Flush rewrite rules
 flush_rewrite_rules();

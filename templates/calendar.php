@@ -1,21 +1,21 @@
 <?php
 /**
- * Šablona pro vykreslení kalendáře událostí
+ * Template for displaying the event calendar
  *
- * @var array $atts Atributy shortcodu
+ * @var array $atts Shortcode attributes
  */
 
-// Generování unikátního ID pro kalendář
+// Generate unique ID for the calendar
 $calendar_id = 'jsm-event-calendar-' . uniqid();
 
-// Aktuální měsíc a rok - zajistíme, že nikdy nezobrazíme minulé měsíce
+// Current month and year - ensure we never display past months
 $current_month = date('m');
 $current_year = date('Y');
 
 $month = absint($atts['month']);
 $year = absint($atts['year']);
 
-// Kontrola platnosti měsíce a roku
+// Check for valid month and year
 if ($month < 1 || $month > 12) {
     $month = $current_month;
 }
@@ -23,70 +23,70 @@ if ($year < 1970 || $year > 2100) {
     $year = $current_year;
 }
 
-// Zajistíme, že nepůjdeme do minulosti
+// Ensure we don't go into the past
 if ($year < $current_year || ($year == $current_year && $month < $current_month)) {
     $month = $current_month;
     $year = $current_year;
 }
 
-// Získání názvů měsíců a dnů v týdnu
+// Get month names and weekdays
 $month_name = date_i18n('F', strtotime("$year-$month-01"));
 $weekdays = array(
-    __('Po', 'jsm-wp-event-calendar'),
-    __('Út', 'jsm-wp-event-calendar'),
-    __('St', 'jsm-wp-event-calendar'),
-    __('Čt', 'jsm-wp-event-calendar'),
-    __('Pá', 'jsm-wp-event-calendar'),
-    __('So', 'jsm-wp-event-calendar'),
-    __('Ne', 'jsm-wp-event-calendar'),
+    __('Mo', 'jsm-wp-event-calendar'),
+    __('Tu', 'jsm-wp-event-calendar'),
+    __('We', 'jsm-wp-event-calendar'),
+    __('Th', 'jsm-wp-event-calendar'),
+    __('Fr', 'jsm-wp-event-calendar'),
+    __('Sa', 'jsm-wp-event-calendar'),
+    __('Su', 'jsm-wp-event-calendar'),
 );
 
-// Počet dní v měsíci
+// Number of days in month
 $days_in_month = date('t', strtotime("$year-$month-01"));
 
-// OPRAVENO: Získání prvního dne měsíce (0 = pondělí, 6 = neděle - evropský formát)
+// FIXED: Get first day of month (0 = Monday, 6 = Sunday - European format)
 $first_day_timestamp = strtotime("$year-$month-01");
-$first_day_of_week = date('N', $first_day_timestamp); // 1 (pondělí) až 7 (neděle)
-$first_day_of_month = $first_day_of_week - 1; // Konverze na 0-6, kde 0 je pondělí
+$first_day_of_week = date('N', $first_day_timestamp); // 1 (Monday) to 7 (Sunday)
+$first_day_of_month = $first_day_of_week - 1; // Convert to 0-6, where 0 is Monday
 
-// Dnes
+// Today
 $today = date('Y-m-d');
 $today_day = date('j');
 $today_month = date('m');
 $today_year = date('Y');
 
-// Kategorie pro filtrování
+// Category for filtering
 $category = !empty($atts['category']) ? $atts['category'] : '';
 
-// Zobrazit seznam událostí pod kalendářem
+// Show event list below calendar
 $show_list = ($atts['show_list'] === 'yes');
 ?>
 
 <div id="<?php echo esc_attr($calendar_id); ?>" class="jsm-event-calendar-wrapper" data-month="<?php echo esc_attr($month); ?>" data-year="<?php echo esc_attr($year); ?>" data-show-list="<?php echo esc_attr($atts['show_list']); ?>" data-category="<?php echo esc_attr($category); ?>">
-    <!-- Navigace kalendáře -->
+    <!-- Calendar navigation -->
     <div class="jsm-event-calendar-nav">
         <h2 id="<?php echo esc_attr($calendar_id); ?>-title" class="jsm-event-calendar-title"><?php echo esc_html($month_name . ' ' . $year); ?></h2>
 
         <div class="jsm-event-calendar-nav-buttons">
             <?php
-            // Zobrazíme tlačítko Předchozí pouze pokud nejsme v aktuálním měsíci
+            // Show Previous button only if we're not in the current month
             $show_prev = ($month > $current_month || $year > $current_year);
             if ($show_prev) :
             ?>
             <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-prev" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php _e('Předchozí', 'jsm-wp-event-calendar'); ?>
+                <?php _e('Previous', 'jsm-wp-event-calendar'); ?>
             </button>
             <?php endif; ?>
             <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-today" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php _e('Dnes', 'jsm-wp-event-calendar'); ?>
+                <?php _e('Today', 'jsm-wp-event-calendar'); ?>
             </button>
             <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-next" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php _e('Další', 'jsm-wp-event-calendar'); ?>
+                <?php _e('Next', 'jsm-wp-event-calendar'); ?>
             </button>
         </div>
     </div>
 
-    <!-- Kalendář -->
+    <!-- Calendar -->
     <div id="<?php echo esc_attr($calendar_id); ?>-table" class="jsm-event-calendar-table-wrapper">
         <table class="jsm-event-calendar-table">
             <thead>
@@ -99,23 +99,23 @@ $show_list = ($atts['show_list'] === 'yes');
             <tbody>
                 <tr>
                     <?php
-                    // Prázdné buňky před prvním dnem měsíce
+                    // Empty cells before first day of month
                     for ($i = 0; $i < $first_day_of_month; $i++) {
                         echo '<td class="jsm-event-calendar-day empty other-month"></td>';
                     }
 
-                    // Dny v měsíci
+                    // Days in month
                     $day_count = $first_day_of_month;
                     for ($day = 1; $day <= $days_in_month; $day++) {
-                        // Nový řádek po 7 dnech
+                        // New row after 7 days
                         if ($day_count % 7 === 0 && $day_count > 0) {
                             echo '</tr><tr>';
                         }
 
-                        // Datum pro tento den
+                        // Date for this day
                         $date = sprintf('%s-%s-%s', $year, str_pad($month, 2, '0', STR_PAD_LEFT), str_pad($day, 2, '0', STR_PAD_LEFT));
 
-                        // Třída pro dnešní den
+                        // Class for today
                         $today_class = '';
                         if ($day == $today_day && $month == $today_month && $year == $today_year) {
                             $today_class = ' today';
@@ -124,14 +124,14 @@ $show_list = ($atts['show_list'] === 'yes');
                         echo '<td class="jsm-event-calendar-day' . esc_attr($today_class) . '" data-date="' . esc_attr($date) . '">';
                         echo '<span class="jsm-event-calendar-day-number">' . esc_html($day) . '</span>';
 
-                        // Zde by byly události, ale zobrazíme je dynamicky pomocí JavaScriptu
+                        // Events would go here, but they're loaded dynamically by JavaScript
 
                         echo '</td>';
 
                         $day_count++;
                     }
 
-                    // Prázdné buňky na konci měsíce
+                    // Empty cells after last day of month
                     while ($day_count % 7 !== 0) {
                         echo '<td class="jsm-event-calendar-day empty other-month"></td>';
                         $day_count++;
@@ -142,21 +142,18 @@ $show_list = ($atts['show_list'] === 'yes');
         </table>
     </div>
 
-    <!-- Seznam událostí -->
+    <!-- Event list -->
     <?php if ($show_list) : ?>
         <div id="<?php echo esc_attr($calendar_id); ?>-list" class="jsm-event-list-wrapper">
-            <!-- Seznam událostí bude naplněn dynamicky pomocí JavaScriptu -->
+            <!-- Event list will be populated dynamically by JavaScript -->
         </div>
     <?php endif; ?>
 
 </div>
 
-<!-- Modální okno pro detail události -->
+<!-- Modal for event details -->
 <div id="jsm-event-modal" class="jsm-event-modal">
-
     <div id="jsm-event-modal-content" class="jsm-event-modal-content">
-        <!-- Obsah modálního okna bude naplněn dynamicky -->
-
+        <!-- Modal content will be populated dynamically -->
     </div>
-
 </div>

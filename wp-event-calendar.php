@@ -15,29 +15,32 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
-// Zabránění přímému přístupu k souboru
+// Prevent direct access to file
 if (!defined('ABSPATH')) {
     exit;
 }
 
-// Definice konstant
+// Define constants
 define('WP_EVENT_CALENDAR_VERSION', '1.0.0');
 define('WP_EVENT_CALENDAR_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WP_EVENT_CALENDAR_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WP_EVENT_CALENDAR_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
 
-// Načtení požadovaných souborů
+// Load required files
 require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-post-type.php';
 require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-calendar.php';
 require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-shortcodes.php';
 require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-taxonomy.php';
 
 /**
- * Inicializace pluginu
+ * Initialize plugin and load text domain for translations
  */
 function wp_event_calendar_init() {
-    // Kontrola a načtení hlavních tříd pluginu
+    // Load text domain for translations
+    load_plugin_textdomain('jsm-wp-event-calendar', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+
+    // Check and load main plugin classes
     if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-calendar.php')) {
         require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-calendar.php';
     }
@@ -46,17 +49,17 @@ function wp_event_calendar_init() {
         require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-shortcodes.php';
     }
 
-    // Vytvoření instance kalendáře pro načtení CSS a JS
+    // Create calendar instance to load CSS and JS
     $calendar = new WP_Event_Calendar();
 
-    // Inicializace shortcodů
+    // Initialize shortcodes
     $shortcodes = new WP_Event_Shortcodes();
     $shortcodes->register();
 }
 add_action('plugins_loaded', 'wp_event_calendar_init');
 
 /**
- * Načtení a registrace post typu a taxonomie
+ * Register post type and taxonomy
  */
 function wp_event_calendar_register_post_type() {
     if (class_exists('WP_Event_Post_Type')) {
@@ -69,27 +72,27 @@ function wp_event_calendar_register_post_type() {
         $taxonomy->register();
     }
 }
-add_action('init', 'wp_event_calendar_register_post_type', 5); // Priorita 5 zajistí, že proběhne dříve
+add_action('init', 'wp_event_calendar_register_post_type', 5); // Priority 5 ensures it runs early
 
 
 /**
- * Inicializace admin části
+ * Initialize admin section
  */
 function wp_event_calendar_admin_init() {
-    // Načtení administrativních tříd
+    // Load admin classes
     if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-admin.php')) {
         require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-admin.php';
         $admin = new WP_Event_Admin();
         $admin->init();
     }
 
-    // Načtení nastavení událostí
+    // Load event settings
     if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-settings.php')) {
         require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-settings.php';
         WP_Event_Settings::init();
     }
 
-    // Načtení menu
+    // Load menu
     if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-menu.php')) {
         require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-menu.php';
         WP_Event_Menu::init();
@@ -98,21 +101,19 @@ function wp_event_calendar_admin_init() {
 add_action('admin_init', 'wp_event_calendar_admin_init');
 
 /**
- * Načtení admin menu
+ * Load admin menu
  */
 function wp_event_calendar_admin_menu() {
-    // Zkontrolovat zda byly načteny administrační třídy
+    // Check if admin classes were loaded
     if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-settings.php') && !function_exists('WP_Event_Settings::init')) {
         require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-settings.php';
         WP_Event_Settings::init();
     }
 
-    // Kontrola a načtení menu
+    // Check and load menu
     if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-menu.php') && !method_exists('WP_Event_Menu', 'init')) {
         require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-menu.php';
         WP_Event_Menu::init();
     }
 }
 add_action('admin_menu', 'wp_event_calendar_admin_menu', 5);
-
-// Zbytek kódu zůstává nezměněn (aktivační hook, deaktivační hook, update DB check)

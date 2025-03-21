@@ -1,9 +1,9 @@
 <?php
 /**
- * Šablona pro stránku dokumentace pluginu v administraci
+ * Template for plugin documentation page in admin
  */
 
-// Kontrola oprávnění
+// Check permissions
 if (!current_user_can('manage_options')) {
     return;
 }
@@ -13,119 +13,119 @@ if (!current_user_can('manage_options')) {
     <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
     <h2 class="nav-tab-wrapper">
-        <a href="?post_type=jsm_wp_event&page=wp_event_docs" class="nav-tab nav-tab-active"><?php _e('Dokumentace', 'jsm-wp-event-calendar'); ?></a>
-        <a href="?post_type=jsm_wp_event&page=wp_event_settings" class="nav-tab"><?php _e('Nastavení pluginu', 'jsm-wp-event-calendar'); ?></a>
+        <a href="?post_type=jsm_wp_event&page=wp_event_docs" class="nav-tab nav-tab-active"><?php _e('Documentation', 'jsm-wp-event-calendar'); ?></a>
+        <a href="?post_type=jsm_wp_event&page=wp_event_settings" class="nav-tab"><?php _e('Plugin Settings', 'jsm-wp-event-calendar'); ?></a>
     </h2>
 
-    <!-- Dokumentační tab -->
+    <!-- Documentation tab -->
     <div class="jsm-admin-content">
         <div class="jsm-admin-main">
             <div class="jsm-admin-card">
-                <h2><?php _e('Jak používat plugin', 'jsm-wp-event-calendar'); ?></h2>
+                <h2><?php _e('How to Use the Plugin', 'jsm-wp-event-calendar'); ?></h2>
 
                 <div class="jsm-admin-section">
-                    <h3><?php _e('Přidání nové události', 'jsm-wp-event-calendar'); ?></h3>
-                    <p><?php _e('Pro přidání nové události přejděte do sekce <strong>Události</strong> v menu administrace a klikněte na <strong>Přidat novou</strong>.', 'jsm-wp-event-calendar'); ?></p>
-                    <p><?php _e('Vyplňte název, popis a nastavte datum a čas události. Můžete také nastavit vlastní URL adresu, na kterou bude odkazovat tlačítko.', 'jsm-wp-event-calendar'); ?></p>
+                    <h3><?php _e('Adding a New Event', 'jsm-wp-event-calendar'); ?></h3>
+                    <p><?php _e('To add a new event, go to the <strong>Events</strong> section in the admin menu and click <strong>Add New</strong>.', 'jsm-wp-event-calendar'); ?></p>
+                    <p><?php _e('Fill in the title, description, and set the date and time of the event. You can also set a custom URL for the button to link to.', 'jsm-wp-event-calendar'); ?></p>
                 </div>
 
                 <div class="jsm-admin-section">
-                    <h3><?php _e('Správa kategorií událostí', 'jsm-wp-event-calendar'); ?></h3>
-                    <p><?php _e('Pro vytvoření a správu kategorií událostí přejděte do sekce <strong>Události</strong> > <strong>Kategorie</strong> v menu administrace.', 'jsm-wp-event-calendar'); ?></p>
-                    <p><?php _e('Kategorie vám pomohou lépe organizovat události a umožní návštěvníkům filtrovat události podle jejich zájmů.', 'jsm-wp-event-calendar'); ?></p>
+                    <h3><?php _e('Managing Event Categories', 'jsm-wp-event-calendar'); ?></h3>
+                    <p><?php _e('To create and manage event categories, go to the <strong>Events</strong> > <strong>Categories</strong> section in the admin menu.', 'jsm-wp-event-calendar'); ?></p>
+                    <p><?php _e('Categories help you better organize events and allow visitors to filter events by their interests.', 'jsm-wp-event-calendar'); ?></p>
                 </div>
 
                 <div class="jsm-admin-section">
-                    <h3><?php _e('Vložení kalendáře do stránky', 'jsm-wp-event-calendar'); ?></h3>
-                    <p><?php _e('Pro zobrazení kalendáře na stránce použijte shortcode:', 'jsm-wp-event-calendar'); ?></p>
+                    <h3><?php _e('Adding Calendar to a Page', 'jsm-wp-event-calendar'); ?></h3>
+                    <p><?php _e('To display the calendar on a page, use this shortcode:', 'jsm-wp-event-calendar'); ?></p>
                     <pre><code>[jsm_event_calendar]</code></pre>
 
-                    <p><?php _e('Můžete použít následující atributy pro přizpůsobení kalendáře:', 'jsm-wp-event-calendar'); ?></p>
+                    <p><?php _e('You can use the following attributes to customize the calendar:', 'jsm-wp-event-calendar'); ?></p>
                     <ul>
-                        <li><code>month</code> - <?php _e('Číslo měsíce (1-12)', 'jsm-wp-event-calendar'); ?></li>
-                        <li><code>year</code> - <?php _e('Rok (např. 2023)', 'jsm-wp-event-calendar'); ?></li>
-                        <li><code>show_list</code> - <?php _e('Zobrazit seznam událostí pod kalendářem (yes/no)', 'jsm-wp-event-calendar'); ?></li>
-                        <li><code>category</code> - <?php _e('ID nebo slug kategorie pro filtrování událostí', 'jsm-wp-event-calendar'); ?></li>
+                        <li><code>month</code> - <?php _e('Month number (1-12)', 'jsm-wp-event-calendar'); ?></li>
+                        <li><code>year</code> - <?php _e('Year (e.g. 2023)', 'jsm-wp-event-calendar'); ?></li>
+                        <li><code>show_list</code> - <?php _e('Show event list below the calendar (yes/no)', 'jsm-wp-event-calendar'); ?></li>
+                        <li><code>category</code> - <?php _e('Category ID or slug for filtering events', 'jsm-wp-event-calendar'); ?></li>
                     </ul>
 
-                    <p><?php _e('Příklad s parametry:', 'jsm-wp-event-calendar'); ?></p>
-                    <pre><code>[jsm_event_calendar month="1" year="2023" show_list="yes" category="akce"]</code></pre>
+                    <p><?php _e('Example with parameters:', 'jsm-wp-event-calendar'); ?></p>
+                    <pre><code>[jsm_event_calendar month="1" year="2023" show_list="yes" category="events"]</code></pre>
                 </div>
 
                 <div class="jsm-admin-section">
-                    <h3><?php _e('Vložení seznamu událostí do stránky', 'jsm-wp-event-calendar'); ?></h3>
-                    <p><?php _e('Pro zobrazení seznamu událostí na stránce použijte shortcode:', 'jsm-wp-event-calendar'); ?></p>
+                    <h3><?php _e('Adding Event List to a Page', 'jsm-wp-event-calendar'); ?></h3>
+                    <p><?php _e('To display an event list on a page, use this shortcode:', 'jsm-wp-event-calendar'); ?></p>
                     <pre><code>[jsm_event_list]</code></pre>
 
-                    <p><?php _e('Můžete použít následující atributy pro přizpůsobení seznamu:', 'jsm-wp-event-calendar'); ?></p>
+                    <p><?php _e('You can use the following attributes to customize the list:', 'jsm-wp-event-calendar'); ?></p>
                     <ul>
-                        <li><code>limit</code> - <?php _e('Počet zobrazených událostí', 'jsm-wp-event-calendar'); ?></li>
-                        <li><code>category</code> - <?php _e('ID nebo slug kategorie pro filtrování událostí', 'jsm-wp-event-calendar'); ?></li>
-                        <li><code>past</code> - <?php _e('Zobrazit proběhlé události (yes/no)', 'jsm-wp-event-calendar'); ?></li>
-                        <li><code>layout</code> - <?php _e('Způsob zobrazení (list/grid)', 'jsm-wp-event-calendar'); ?></li>
+                        <li><code>limit</code> - <?php _e('Number of events to display', 'jsm-wp-event-calendar'); ?></li>
+                        <li><code>category</code> - <?php _e('Category ID or slug for filtering events', 'jsm-wp-event-calendar'); ?></li>
+                        <li><code>past</code> - <?php _e('Show past events (yes/no)', 'jsm-wp-event-calendar'); ?></li>
+                        <li><code>layout</code> - <?php _e('Display type (list/grid)', 'jsm-wp-event-calendar'); ?></li>
                     </ul>
 
-                    <p><?php _e('Příklad s parametry:', 'jsm-wp-event-calendar'); ?></p>
-                    <pre><code>[jsm_event_list limit="5" past="no" layout="grid" category="akce"]</code></pre>
+                    <p><?php _e('Example with parameters:', 'jsm-wp-event-calendar'); ?></p>
+                    <pre><code>[jsm_event_list limit="5" past="no" layout="grid" category="events"]</code></pre>
                 </div>
 
                 <div class="jsm-admin-section">
-                    <h3><?php _e('Vložení detailu události do stránky', 'jsm-wp-event-calendar'); ?></h3>
-                    <p><?php _e('Pro zobrazení detailu konkrétní události na stránce použijte shortcode:', 'jsm-wp-event-calendar'); ?></p>
+                    <h3><?php _e('Adding Event Detail to a Page', 'jsm-wp-event-calendar'); ?></h3>
+                    <p><?php _e('To display the detail of a specific event on a page, use this shortcode:', 'jsm-wp-event-calendar'); ?></p>
                     <pre><code>[jsm_event_detail id="123"]</code></pre>
 
-                    <p><?php _e('Kde <code>id</code> je ID události, kterou chcete zobrazit.', 'jsm-wp-event-calendar'); ?></p>
+                    <p><?php _e('Where <code>id</code> is the ID of the event you want to display.', 'jsm-wp-event-calendar'); ?></p>
                 </div>
 
                 <div class="jsm-admin-section">
-                    <h3><?php _e('Vytvoření Add-onu pro externí události', 'jsm-wp-event-calendar'); ?></h3>
-                    <p><?php _e('Plugin podporuje externí zdroje událostí pomocí add-onů. Můžete vytvořit vlastní add-on pomocí filtru <code>jsm_event_calendar_external_events</code>:', 'jsm-wp-event-calendar'); ?></p>
+                    <h3><?php _e('Creating External Events Add-on', 'jsm-wp-event-calendar'); ?></h3>
+                    <p><?php _e('The plugin supports external event sources through add-ons. You can create your own add-on using the <code>jsm_event_calendar_external_events</code> filter:', 'jsm-wp-event-calendar'); ?></p>
                     <pre><code>add_filter('jsm_event_calendar_external_events', 'my_custom_events_addon');
 
 function my_custom_events_addon($events) {
-    // Vaše vlastní události ve stejném formátu jako události pluginu
+    // Your custom events in the same format as plugin events
     $custom_events = [
         [
             "id" => "custom-1",
-            "title" => "Vlastní událost",
+            "title" => "Custom Event",
             "startDate" => "2023-12-25",
             "endDate" => "2023-12-25",
-            "dateDisplay" => "25. prosinec 2023",
-            "timeDisplay" => "Celý den",
+            "dateDisplay" => "December 25, 2023",
+            "timeDisplay" => "All Day",
             "allDay" => true,
             "url" => "https://example.com/event",
-            "excerpt" => "Toto je vlastní událost z add-onu",
+            "excerpt" => "This is a custom event from an add-on",
             "customUrl" => "https://example.com/custom",
-            "buttonText" => "Registrovat",
+            "buttonText" => "Register",
             "categories" => [
-                ['id' => 1, 'name' => 'Vlastní kategorie', 'slug' => 'vlastni-kategorie']
+                ['id' => 1, 'name' => 'Custom Category', 'slug' => 'custom-category']
             ]
         ],
     ];
 
     return array_merge($events, $custom_events);
 }</code></pre>
-                    <p><?php _e('Toto umožňuje integraci s externími zdroji událostí, API nebo jinými pluginy.', 'jsm-wp-event-calendar'); ?></p>
+                    <p><?php _e('This allows integration with external event sources, APIs, or other plugins.', 'jsm-wp-event-calendar'); ?></p>
                 </div>
             </div>
         </div>
 
         <div class="jsm-admin-sidebar">
             <div class="jsm-admin-card">
-                <h3><?php _e('O pluginu', 'jsm-wp-event-calendar'); ?></h3>
-                <p><?php _e('JSM WP Event Calendar je jednoduchý plugin pro správu a zobrazení kalendáře událostí na vašem webu s podporou kategorií a filtrování.', 'jsm-wp-event-calendar'); ?></p>
-                <p><?php _e('Verze:', 'jsm-wp-event-calendar'); ?> <?php echo defined('WP_EVENT_CALENDAR_VERSION') ? WP_EVENT_CALENDAR_VERSION : '1.0'; ?></p>
+                <h3><?php _e('About the Plugin', 'jsm-wp-event-calendar'); ?></h3>
+                <p><?php _e('JSM WP Event Calendar is a simple plugin for managing and displaying event calendars on your website with category support and filtering.', 'jsm-wp-event-calendar'); ?></p>
+                <p><?php _e('Version:', 'jsm-wp-event-calendar'); ?> <?php echo defined('WP_EVENT_CALENDAR_VERSION') ? WP_EVENT_CALENDAR_VERSION : '1.0'; ?></p>
             </div>
 
             <div class="jsm-admin-card">
-                <h3><?php _e('Výchozí nastavení', 'jsm-wp-event-calendar'); ?></h3>
-                <p><?php _e('Celý plugin je navržen tak, aby fungoval ihned po aktivaci.', 'jsm-wp-event-calendar'); ?></p>
+                <h3><?php _e('Default Features', 'jsm-wp-event-calendar'); ?></h3>
+                <p><?php _e('The entire plugin is designed to work immediately after activation.', 'jsm-wp-event-calendar'); ?></p>
                 <ul>
-                    <li><?php _e('Responzivní design', 'jsm-wp-event-calendar'); ?></li>
-                    <li><?php _e('Podpora češtiny a angličtiny', 'jsm-wp-event-calendar'); ?></li>
-                    <li><?php _e('Kategorie událostí s filtrováním', 'jsm-wp-event-calendar'); ?></li>
-                    <li><?php _e('Snadné použití shortcodů', 'jsm-wp-event-calendar'); ?></li>
-                    <li><?php _e('Podpora add-onů', 'jsm-wp-event-calendar'); ?></li>
+                    <li><?php _e('Responsive design', 'jsm-wp-event-calendar'); ?></li>
+                    <li><?php _e('English and Czech language support', 'jsm-wp-event-calendar'); ?></li>
+                    <li><?php _e('Event categories with filtering', 'jsm-wp-event-calendar'); ?></li>
+                    <li><?php _e('Easy to use shortcodes', 'jsm-wp-event-calendar'); ?></li>
+                    <li><?php _e('Add-on support', 'jsm-wp-event-calendar'); ?></li>
                 </ul>
             </div>
         </div>
@@ -133,7 +133,7 @@ function my_custom_events_addon($events) {
 </div>
 
 <style>
-    /* Obecné styly */
+    /* General styles */
     .jsm-admin-content {
         display: flex;
         gap: 20px;
@@ -174,7 +174,7 @@ function my_custom_events_addon($events) {
         overflow: auto;
     }
 
-    /* Responzivní styly */
+    /* Responsive styles */
     @media screen and (max-width: 782px) {
         .jsm-admin-content {
             flex-direction: column;

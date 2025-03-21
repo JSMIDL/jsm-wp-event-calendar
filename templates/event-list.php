@@ -1,29 +1,29 @@
 <?php
 /**
- * Šablona pro vykreslení seznamu událostí
+ * Template for displaying event list
  *
- * @var array $atts Atributy shortcodu
- * @var array $events Pole událostí
+ * @var array $atts Shortcode attributes
+ * @var array $events Array of events
  */
 
-// Layout seznamu (list nebo grid)
+// List layout (list or grid)
 $layout = $atts['layout'];
 
-// Žádné události
+// No events
 if (empty($events)) {
     echo '<div class="jsm-event-no-events">';
-    echo esc_html__('Žádné události k zobrazení.', 'jsm-wp-event-calendar');
+    echo esc_html__('No events to display.', 'jsm-wp-event-calendar');
     echo '</div>';
     return;
 }
 
-// Třída pro layout
+// Class for layout
 $list_class = 'list' === $layout ? 'jsm-event-list' : 'jsm-event-grid';
 
-// Nadpis pro sekci
+// Section title
 $section_title = 'yes' === $atts['past']
-    ? esc_html__('Proběhlé události', 'jsm-wp-event-calendar')
-    : esc_html__('Nadcházející události', 'jsm-wp-event-calendar');
+    ? esc_html__('Past Events', 'jsm-wp-event-calendar')
+    : esc_html__('Upcoming Events', 'jsm-wp-event-calendar');
 ?>
 
 <div class="jsm-event-wrapper">
@@ -32,7 +32,7 @@ $section_title = 'yes' === $atts['past']
     <div class="<?php echo esc_attr($list_class); ?>">
         <?php foreach ($events as $event) : ?>
             <?php if ('list' === $layout) : ?>
-                <!-- Layout seznamu -->
+                <!-- List layout -->
                 <div class="jsm-event-list-item">
                     <div class="jsm-event-list-item-header">
                         <h3 class="jsm-event-list-item-title">
@@ -43,7 +43,7 @@ $section_title = 'yes' === $atts['past']
 
                         <div class="jsm-event-list-item-date">
                             <?php
-                            // Formátování data
+                            // Format date
                             $start_date = date_i18n(get_option('date_format'), strtotime($event['start_date']));
 
                             if (!empty($event['end_date']) && $event['end_date'] !== $event['start_date']) {
@@ -69,7 +69,7 @@ $section_title = 'yes' === $atts['past']
                     <div class="jsm-event-list-item-footer">
                         <div class="jsm-event-list-item-time">
                             <?php if ($event['all_day']) : ?>
-                                <?php echo esc_html__('Celý den', 'jsm-wp-event-calendar'); ?>
+                                <?php echo esc_html__('All Day', 'jsm-wp-event-calendar'); ?>
                             <?php else : ?>
                                 <?php
                                 if (!empty($event['start_time'])) {
@@ -89,7 +89,7 @@ $section_title = 'yes' === $atts['past']
                     </div>
                 </div>
             <?php else : ?>
-                <!-- Layout mřížky -->
+                <!-- Grid layout -->
                 <div class="jsm-event-grid-item">
                     <?php if (!empty($event['thumbnail'])) : ?>
                         <div class="jsm-event-grid-item-thumbnail">
@@ -114,7 +114,7 @@ $section_title = 'yes' === $atts['past']
 
                         <div class="jsm-event-grid-item-date">
                             <?php
-                            // Formátování data
+                            // Format date
                             $start_date = date_i18n(get_option('date_format'), strtotime($event['start_date']));
 
                             if (!empty($event['end_date']) && $event['end_date'] !== $event['start_date']) {
@@ -124,7 +124,7 @@ $section_title = 'yes' === $atts['past']
                                 echo esc_html($start_date);
                             }
 
-                            // Zobrazení času
+                            // Show time
                             if (!$event['all_day'] && !empty($event['start_time'])) {
                                 echo ', ' . esc_html(date_i18n(get_option('time_format'), strtotime($event['start_time'])));
 
@@ -132,7 +132,7 @@ $section_title = 'yes' === $atts['past']
                                     echo ' - ' . esc_html(date_i18n(get_option('time_format'), strtotime($event['end_time'])));
                                 }
                             } elseif ($event['all_day']) {
-                                echo ', ' . esc_html__('Celý den', 'jsm-wp-event-calendar');
+                                echo ', ' . esc_html__('All Day', 'jsm-wp-event-calendar');
                             }
                             ?>
                         </div>

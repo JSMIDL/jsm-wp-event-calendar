@@ -17,7 +17,7 @@ JSM WP Event Calendar is a simple and efficient plugin for managing and displayi
 = Key Features =
 
 * **Responsive Design** - Calendar adjusts to screen size, including mobile devices.
-* **Multilingual Support** - Full support for Czech and English languages.
+* **Multilingual Support** - Full support for English and Czech languages.
 * **Flexible Display** - Show events as a calendar or list.
 * **Event Categories** - Create and manage event categories for better organization.
 * **Category Filtering** - Filter events by category in both calendar and list views.
@@ -144,6 +144,10 @@ Yes, you can insert the shortcodes into a Custom HTML block in the Gutenberg edi
 
 Yes, the plugin uses a fully responsive design that displays optimally on devices of all sizes. On mobile devices, the calendar automatically switches to a more readable view.
 
+= Is this plugin multilingual? =
+
+Yes, the plugin supports Czech and English languages. The language will match your WordPress installation language.
+
 == Screenshots ==
 
 1. Event Calendar
@@ -163,6 +167,7 @@ Yes, the plugin uses a fully responsive design that displays optimally on device
 * Added ability to customize appearance directly in admin
 * Added event categories with filtering capabilities
 * Added add-on support through filters
+* Added multilingual support (English, Czech)
 
 == Upgrade Notice ==
 

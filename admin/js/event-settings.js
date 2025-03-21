@@ -1,14 +1,14 @@
 /**
- * JavaScript pro stránku nastavení
+ * JavaScript for settings page
  */
 (function($) {
     'use strict';
 
     $(document).ready(function() {
-        // Inicializace color pickeru
+        // Initialize color picker
         $('.jsm-color-picker').wpColorPicker({
             change: function(event, ui) {
-                // Aktualizace živého náhledu při změně barvy
+                // Update live preview when color changes
                 var id = $(this).attr('id');
                 var color = ui.color.toString();
                 updateColorPreview(id, color);
@@ -17,9 +17,9 @@
             }
         });
 
-        // Inicializace textových polí
+        // Initialize text fields
         $('.regular-text').on('input', function() {
-            // Aktualizace živého náhledu při změně hodnoty
+            // Update live preview when value changes
             updateCalendarPreview();
             updateButtonPreview();
         });
@@ -28,38 +28,38 @@
        $('#reset-settings').on('click', function(e) {
            e.preventDefault();
            if (confirm(jsmEventSettings.resetConfirmText)) {
-               // Konstruování správného URL pro reset
+               // Construct proper URL for reset
                var resetUrl = 'edit.php?post_type=jsm_wp_event&page=wp_event_settings&reset-settings=true&_wpnonce=' + jsmEventSettings.resetNonce;
                window.location.href = resetUrl;
            }
        });
 
-        // Přepínání tabů
+        // Tab switching
         $('.nav-tab').on('click', function(e) {
             var tab = $(this).attr('href').split('tab=')[1];
 
-            // Pokud už jsme na tomto tabu, neděláme nic
+            // If already on this tab, do nothing
             if (!tab || window.location.href.indexOf('tab=' + tab) > -1) {
                 return;
             }
 
-            // Ověření, zda jsou neuložená data
+            // Check for unsaved data
             var unsavedChanges = checkUnsavedChanges();
 
             if (unsavedChanges) {
-                if (!confirm('Máte neuložené změny. Opravdu chcete opustit stránku?')) {
+                if (!confirm('You have unsaved changes. Do you really want to leave this page?')) {
                     e.preventDefault();
                 }
             }
         });
 
         /**
-         * Kontrola neuložených změn
+         * Check for unsaved changes
          */
         function checkUnsavedChanges() {
             var hasChanges = false;
 
-            // Kontrola color pickerů
+            // Check color pickers
             $('.jsm-color-picker').each(function() {
                 var id = $(this).attr('id');
                 var currentValue = $(this).val();
@@ -67,11 +67,11 @@
 
                 if (currentValue !== originalValue) {
                     hasChanges = true;
-                    return false; // ukončit smyčku
+                    return false; // exit loop
                 }
             });
 
-            // Kontrola textových polí
+            // Check text fields
             if (!hasChanges) {
                 $('.regular-text').each(function() {
                     var id = $(this).attr('id');
@@ -80,7 +80,7 @@
 
                     if (currentValue !== originalValue) {
                         hasChanges = true;
-                        return false; // ukončit smyčku
+                        return false; // exit loop
                     }
                 });
             }
@@ -89,17 +89,17 @@
         }
 
         /**
-         * Aktualizace náhledu barvy
+         * Update color preview
          */
         function updateColorPreview(id, color) {
             $('.jsm-color-preview[data-color-id="' + id + '"]').css('background-color', color).text(color);
         }
 
         /**
-         * Aktualizace náhledu kalendáře
+         * Update calendar preview
          */
         function updateCalendarPreview() {
-            // Aktualizace hlavičky kalendáře
+            // Update calendar header
             var primaryColor = $('#primary_color').val();
             var secondaryColor = $('#secondary_color').val();
             var buttonText = $('#button_text').val();
@@ -111,7 +111,7 @@
             var textPrimary = $('#text_primary').val();
             var calendarSpacing = $('#calendar_spacing').val();
 
-            // Aktualizace prvků v náhledu
+            // Update elements in preview
             $('.jsm-preview-calendar-header').css({
                 'background': 'linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ')'
             });
@@ -134,7 +134,7 @@
                 'border-radius': borderRadius
             });
 
-            // Aktualizace dnešního dne
+            // Update today
             $('.jsm-preview-calendar-day:nth-child(2)').css({
                 'border-color': primaryColor
             });
@@ -152,7 +152,7 @@
         }
 
         /**
-         * Aktualizace náhledu tlačítka
+         * Update button preview
          */
         function updateButtonPreview() {
             var primaryColor = $('#primary_color').val();
@@ -168,7 +168,7 @@
                 'box-shadow': shadowSm
             });
 
-            // Nastavení hover efektu pro tlačítko
+            // Set hover effect for button
             $('.jsm-preview-button').hover(
                 function() {
                     $(this).css('background-color', primaryHover);
@@ -179,7 +179,7 @@
             );
         }
 
-        // Inicializace náhledu při načtení stránky
+        // Initialize preview on page load
         updateCalendarPreview();
         updateButtonPreview();
     });

@@ -1,47 +1,47 @@
 <?php
 /**
- * Třída pro správu událostí jako vlastního post typu
+ * Class for managing events as a custom post type
  */
 class WP_Event_Post_Type {
 
     /**
-     * Registrace post typu a metaboxů
+     * Register post type and metaboxes
      */
     public function register() {
-        // Registrace post typu
+        // Register post type
         add_action('init', array($this, 'register_post_type'));
 
-        // Registrace metaboxů
+        // Register metaboxes
         add_action('add_meta_boxes', array($this, 'register_meta_boxes'));
 
-        // Uložení metadat
+        // Save metadata
         add_action('save_post', array($this, 'save_event_metadata'), 10, 2);
     }
 
     /**
-     * Registrace post typu Event
+     * Register Event post type
      */
     public function register_post_type() {
         $labels = array(
-            'name'               => _x('Události', 'post type general name', 'jsm-wp-event-calendar'),
-            'singular_name'      => _x('Událost', 'post type singular name', 'jsm-wp-event-calendar'),
-            'menu_name'          => _x('Události', 'admin menu', 'jsm-wp-event-calendar'),
-            'name_admin_bar'     => _x('Událost', 'add new on admin bar', 'jsm-wp-event-calendar'),
-            'add_new'            => _x('Přidat novou', 'event', 'jsm-wp-event-calendar'),
-            'add_new_item'       => __('Přidat novou událost', 'jsm-wp-event-calendar'),
-            'new_item'           => __('Nová událost', 'jsm-wp-event-calendar'),
-            'edit_item'          => __('Upravit událost', 'jsm-wp-event-calendar'),
-            'view_item'          => __('Zobrazit událost', 'jsm-wp-event-calendar'),
-            'all_items'          => __('Všechny události', 'jsm-wp-event-calendar'),
-            'search_items'       => __('Hledat události', 'jsm-wp-event-calendar'),
-            'parent_item_colon'  => __('Nadřazené události:', 'jsm-wp-event-calendar'),
-            'not_found'          => __('Žádné události nenalezeny.', 'jsm-wp-event-calendar'),
-            'not_found_in_trash' => __('Žádné události v koši.', 'jsm-wp-event-calendar')
+            'name'               => _x('Events', 'post type general name', 'jsm-wp-event-calendar'),
+            'singular_name'      => _x('Event', 'post type singular name', 'jsm-wp-event-calendar'),
+            'menu_name'          => _x('Events', 'admin menu', 'jsm-wp-event-calendar'),
+            'name_admin_bar'     => _x('Event', 'add new on admin bar', 'jsm-wp-event-calendar'),
+            'add_new'            => _x('Add New', 'event', 'jsm-wp-event-calendar'),
+            'add_new_item'       => __('Add New Event', 'jsm-wp-event-calendar'),
+            'new_item'           => __('New Event', 'jsm-wp-event-calendar'),
+            'edit_item'          => __('Edit Event', 'jsm-wp-event-calendar'),
+            'view_item'          => __('View Event', 'jsm-wp-event-calendar'),
+            'all_items'          => __('All Events', 'jsm-wp-event-calendar'),
+            'search_items'       => __('Search Events', 'jsm-wp-event-calendar'),
+            'parent_item_colon'  => __('Parent Events:', 'jsm-wp-event-calendar'),
+            'not_found'          => __('No events found.', 'jsm-wp-event-calendar'),
+            'not_found_in_trash' => __('No events in trash.', 'jsm-wp-event-calendar')
         );
 
         $args = array(
             'labels'             => $labels,
-            'description'        => __('Události pro kalendář', 'jsm-wp-event-calendar'),
+            'description'        => __('Events for calendar', 'jsm-wp-event-calendar'),
             'public'             => true,
             'publicly_queryable' => true,
             'show_ui'            => true,
@@ -61,12 +61,12 @@ class WP_Event_Post_Type {
     }
 
     /**
-     * Registrace metaboxů pro události
+     * Register metaboxes for events
      */
     public function register_meta_boxes() {
         add_meta_box(
             'wp_event_details',
-            __('Detaily události', 'jsm-wp-event-calendar'),
+            __('Event Details', 'jsm-wp-event-calendar'),
             array($this, 'render_event_metabox'),
             'jsm_wp_event',
             'normal',
@@ -75,13 +75,13 @@ class WP_Event_Post_Type {
     }
 
     /**
-     * Vykreslení metaboxu pro detaily události
+     * Render metabox for event details
      */
     public function render_event_metabox($post) {
-        // Bezpečnostní nonce pole
+        // Security nonce field
         wp_nonce_field('wp_event_details_nonce', 'wp_event_details_nonce');
 
-        // Načtení uložených hodnot
+        // Load saved values
         $start_date = get_post_meta($post->ID, '_event_start_date', true);
         $start_time = get_post_meta($post->ID, '_event_start_time', true);
         $end_date = get_post_meta($post->ID, '_event_end_date', true);
@@ -90,36 +90,36 @@ class WP_Event_Post_Type {
         $url = get_post_meta($post->ID, '_event_url', true);
         $button_text = get_post_meta($post->ID, '_event_button_text', true);
 
-        // Obsahuje html soubor s formulářem
+        // Include html file with the form
         include WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/views/event-metabox.php';
     }
 
     /**
-     * Uložení metadat události
+     * Save event metadata
      */
     public function save_event_metadata($post_id, $post) {
-        // Kontrola nonce pole
+        // Check nonce field
         if (!isset($_POST['wp_event_details_nonce']) ||
             !wp_verify_nonce($_POST['wp_event_details_nonce'], 'wp_event_details_nonce')) {
             return;
         }
 
-        // Automatické uložení
+        // Autosave
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
         }
 
-        // Kontrola oprávnění
+        // Check permissions
         if (!current_user_can('edit_post', $post_id)) {
             return;
         }
 
-        // Kontrola správného post typu
+        // Check correct post type
         if ('jsm_wp_event' !== $post->post_type) {
             return;
         }
-        
-        // Uložení metadat
+
+        // Save metadata
         if (isset($_POST['_event_start_date'])) {
             update_post_meta($post_id, '_event_start_date', sanitize_text_field($_POST['_event_start_date']));
         }

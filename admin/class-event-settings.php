@@ -1,18 +1,18 @@
 <?php
 /**
- * Třída pro správu nastavení kalendáře událostí
+ * Class for managing event calendar settings
  */
 class WP_Event_Settings {
 
     /**
-     * Zamezení vícenásobné inicializace
+     * Prevent multiple initialization
      *
      * @var bool
      */
     private static $initialized = false;
 
     /**
-     * Výchozí hodnoty nastavení
+     * Default settings values
      *
      * @var array
      */
@@ -39,17 +39,17 @@ class WP_Event_Settings {
     );
 
     /**
-     * Získání výchozích hodnot nastavení
+     * Get default settings values
      */
     public static function get_defaults() {
         return self::$defaults;
     }
 
     /**
-     * Inicializace pluginu
+     * Initialize plugin settings
      */
     public static function init() {
-        // Ochrana proti vícenásobné inicializaci
+        // Protection against multiple initialization
         if (self::$initialized) {
             return;
         }
@@ -65,6 +65,9 @@ class WP_Event_Settings {
         add_action('admin_init', array($instance, 'maybe_reset_settings'));
     }
 
+    /**
+     * Enqueue admin scripts and styles
+     */
     public function enqueue_admin_scripts($hook) {
         if (strpos($hook, 'wp_event_settings') !== false || strpos($hook, 'wp_event_docs') !== false) {
             wp_enqueue_style('wp-color-picker');
@@ -82,12 +85,15 @@ class WP_Event_Settings {
             wp_localize_script('jsm-event-settings', 'jsmEventSettings', array(
                 'defaults' => self::$defaults,
                 'resetUrl' => wp_nonce_url(add_query_arg('reset-settings', 'true'), 'jsm_reset_settings_nonce'),
-                'resetConfirmText' => __('Opravdu chcete obnovit výchozí nastavení? Tato akce nelze vrátit zpět.', 'jsm-wp-event-calendar'),
+                'resetConfirmText' => __('Do you really want to reset to default settings? This action cannot be undone.', 'jsm-wp-event-calendar'),
                 'resetNonce' => wp_create_nonce('jsm_reset_settings_nonce')
             ));
         }
     }
 
+    /**
+     * Enqueue frontend styles
+     */
     public function enqueue_frontend_styles() {
         wp_enqueue_style(
             'jsm-wp-event-calendar',
@@ -105,6 +111,9 @@ class WP_Event_Settings {
         );
     }
 
+    /**
+     * Enqueue custom styles from settings
+     */
     public function enqueue_custom_styles() {
         $options = get_option('wp_event_calendar_settings', array());
         $options = wp_parse_args($options, self::$defaults);
@@ -113,6 +122,12 @@ class WP_Event_Settings {
         wp_add_inline_style('jsm-wp-event-calendar', $custom_css);
     }
 
+    /**
+     * Generate custom CSS from settings
+     *
+     * @param array $options Settings
+     * @return string Custom CSS
+     */
     private function generate_custom_css($options) {
         return "
         :root {
@@ -139,6 +154,9 @@ class WP_Event_Settings {
         ";
     }
 
+    /**
+     * Register settings
+     */
     public function register_settings() {
         register_setting(
             'wp_event_settings',
@@ -148,14 +166,14 @@ class WP_Event_Settings {
 
         add_settings_section(
             'colors_section',
-            __('Barevné schéma', 'jsm-wp-event-calendar'),
+            __('Color Scheme', 'jsm-wp-event-calendar'),
             array($this, 'colors_section_callback'),
             'wp_event_settings'
         );
 
         add_settings_section(
             'dimensions_section',
-            __('Rozměry a efekty', 'jsm-wp-event-calendar'),
+            __('Dimensions and Effects', 'jsm-wp-event-calendar'),
             array($this, 'dimensions_section_callback'),
             'wp_event_settings'
         );
@@ -164,27 +182,36 @@ class WP_Event_Settings {
         $this->add_dimension_fields();
     }
 
+    /**
+     * Colors section description
+     */
     public function colors_section_callback() {
-        echo '<p>' . __('Nastavte barevné schéma kalendáře událostí.', 'jsm-wp-event-calendar') . '</p>';
+        echo '<p>' . __('Set the color scheme for the event calendar.', 'jsm-wp-event-calendar') . '</p>';
     }
 
+    /**
+     * Dimensions section description
+     */
     public function dimensions_section_callback() {
-        echo '<p>' . __('Nastavte rozměry, stíny a zaoblení prvků kalendáře.', 'jsm-wp-event-calendar') . '</p>';
+        echo '<p>' . __('Set dimensions, shadows, and rounded corners for calendar elements.', 'jsm-wp-event-calendar') . '</p>';
     }
 
+    /**
+     * Add color setting fields
+     */
     private function add_color_fields() {
         $color_fields = array(
-            'primary_color' => __('Primární barva', 'jsm-wp-event-calendar'),
-            'primary_hover' => __('Primární barva (hover)', 'jsm-wp-event-calendar'),
-            'secondary_color' => __('Sekundární barva', 'jsm-wp-event-calendar'),
-            'secondary_hover' => __('Sekundární barva (hover)', 'jsm-wp-event-calendar'),
-            'button_text' => __('Barva textu tlačítek', 'jsm-wp-event-calendar'),
-            'background_color' => __('Barva pozadí', 'jsm-wp-event-calendar'),
-            'surface_color' => __('Barva povrchu', 'jsm-wp-event-calendar'),
-            'surface_hover' => __('Barva povrchu (hover)', 'jsm-wp-event-calendar'),
-            'border_color' => __('Barva ohraničení', 'jsm-wp-event-calendar'),
-            'text_primary' => __('Primární barva textu', 'jsm-wp-event-calendar'),
-            'text_secondary' => __('Sekundární barva textu', 'jsm-wp-event-calendar'),
+            'primary_color' => __('Primary Color', 'jsm-wp-event-calendar'),
+            'primary_hover' => __('Primary Color (hover)', 'jsm-wp-event-calendar'),
+            'secondary_color' => __('Secondary Color', 'jsm-wp-event-calendar'),
+            'secondary_hover' => __('Secondary Color (hover)', 'jsm-wp-event-calendar'),
+            'button_text' => __('Button Text Color', 'jsm-wp-event-calendar'),
+            'background_color' => __('Background Color', 'jsm-wp-event-calendar'),
+            'surface_color' => __('Surface Color', 'jsm-wp-event-calendar'),
+            'surface_hover' => __('Surface Color (hover)', 'jsm-wp-event-calendar'),
+            'border_color' => __('Border Color', 'jsm-wp-event-calendar'),
+            'text_primary' => __('Primary Text Color', 'jsm-wp-event-calendar'),
+            'text_secondary' => __('Secondary Text Color', 'jsm-wp-event-calendar'),
         );
 
         foreach ($color_fields as $id => $label) {
@@ -199,16 +226,19 @@ class WP_Event_Settings {
         }
     }
 
+    /**
+     * Add dimension setting fields
+     */
     private function add_dimension_fields() {
         $dimension_fields = array(
-            'shadow_sm' => __('Malý stín', 'jsm-wp-event-calendar'),
-            'shadow_md' => __('Střední stín', 'jsm-wp-event-calendar'),
-            'shadow_lg' => __('Velký stín', 'jsm-wp-event-calendar'),
-            'border_radius_sm' => __('Malý rádius', 'jsm-wp-event-calendar'),
-            'border_radius_md' => __('Střední rádius', 'jsm-wp-event-calendar'),
-            'border_radius_lg' => __('Velký rádius', 'jsm-wp-event-calendar'),
-            'button_radius' => __('Rádius tlačítek', 'jsm-wp-event-calendar'),
-            'calendar_spacing' => __('Mezery v kalendáři', 'jsm-wp-event-calendar'),
+            'shadow_sm' => __('Small Shadow', 'jsm-wp-event-calendar'),
+            'shadow_md' => __('Medium Shadow', 'jsm-wp-event-calendar'),
+            'shadow_lg' => __('Large Shadow', 'jsm-wp-event-calendar'),
+            'border_radius_sm' => __('Small Radius', 'jsm-wp-event-calendar'),
+            'border_radius_md' => __('Medium Radius', 'jsm-wp-event-calendar'),
+            'border_radius_lg' => __('Large Radius', 'jsm-wp-event-calendar'),
+            'button_radius' => __('Button Radius', 'jsm-wp-event-calendar'),
+            'calendar_spacing' => __('Calendar Spacing', 'jsm-wp-event-calendar'),
         );
 
         foreach ($dimension_fields as $id => $label) {
@@ -223,6 +253,9 @@ class WP_Event_Settings {
         }
     }
 
+    /**
+     * Color field callback
+     */
     public function color_field_callback($args) {
         $id = $args['id'];
         $options = get_option('wp_event_calendar_settings', array());
@@ -231,6 +264,9 @@ class WP_Event_Settings {
         echo '<input type="text" id="' . esc_attr($id) . '" name="wp_event_calendar_settings[' . esc_attr($id) . ']" value="' . esc_attr($options[$id]) . '" class="jsm-color-picker" data-default-color="' . esc_attr(self::$defaults[$id]) . '" />';
     }
 
+    /**
+     * Text field callback
+     */
     public function text_field_callback($args) {
         $id = $args['id'];
         $options = get_option('wp_event_calendar_settings', array());
@@ -239,6 +275,9 @@ class WP_Event_Settings {
         echo '<input type="text" id="' . esc_attr($id) . '" name="wp_event_calendar_settings[' . esc_attr($id) . ']" value="' . esc_attr($options[$id]) . '" class="regular-text" data-default="' . esc_attr(self::$defaults[$id]) . '" />';
     }
 
+    /**
+     * Sanitize settings
+     */
     public function sanitize_settings($input) {
         $sanitized_input = array();
         foreach (self::$defaults as $key => $default_value) {
@@ -247,12 +286,18 @@ class WP_Event_Settings {
         return $sanitized_input;
     }
 
+    /**
+     * Admin notices
+     */
     public function admin_notices() {
         if (isset($_GET['reset']) && $_GET['reset'] === 'success') {
-            echo '<div class="notice notice-success is-dismissible"><p>' . __('Nastavení kalendáře byla obnovena do výchozího stavu.', 'jsm-wp-event-calendar') . '</p></div>';
+            echo '<div class="notice notice-success is-dismissible"><p>' . __('Calendar settings have been reset to defaults.', 'jsm-wp-event-calendar') . '</p></div>';
         }
     }
 
+    /**
+     * Reset settings handler
+     */
     public function maybe_reset_settings() {
         if (
             isset($_GET['reset-settings']) &&

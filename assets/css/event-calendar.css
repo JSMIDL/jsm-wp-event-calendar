@@ -1,13 +1,13 @@
 /**
- * CSS pro frontend kalendáře událostí - Vylepšený minimalistický design 2025
+ * CSS for frontend event calendar - Minimalist design 2025
  */
 
-/* Proměnné pro lepší konzistenci barev a hodnot */
+/* Variables for better color and value consistency */
 
 :root {
   /*
-   * Tyto výchozí hodnoty budou přepsány hodnotami z nastavení pluginu
-   * Definujeme je zde pro případy, kdy by nastavení nebylo k dispozici
+   * These default values will be overridden by values from plugin settings
+   * They are defined here for cases when settings are not available
    */
   --primary-color: #2563eb;
   --primary-hover: #1d4ed8;
@@ -26,15 +26,15 @@
   --border-radius-sm: 0.375rem;
   --border-radius-md: 0.75rem;
   --border-radius-lg: 1rem;
-  --button-radius: 0.5rem; /* Sjednocený radius pro tlačítka */
-  --calendar-spacing: 0.5rem; /* Jednotný spacing pro vzdušnější design */
+  --button-radius: 0.5rem; /* Unified radius for buttons */
+  --calendar-spacing: 0.5rem; /* Unified spacing for airier design */
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Hlavní kontejner - minimalistický design 2025 - použití fontu ze šablony */
+/* Main container - minimalist design 2025 - using theme font */
 .jsm-event-calendar-wrapper {
   margin-bottom: 2.5rem;
-  /* Používáme font z šablony bez přímého definování */
+  /* Using font from theme without direct definition */
   background-color: var(--background-color);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-md);
@@ -44,7 +44,7 @@
   border: 1px solid var(--border-color);
 }
 
-/* Navigace kalendáře - minimalistický design */
+/* Calendar navigation - minimalist design */
 .jsm-event-calendar-nav {
   display: flex;
   justify-content: space-between;
@@ -82,7 +82,7 @@
   z-index: 1;
 }
 
-/* Vylepšené navigační tlačítka - sjednocené radiusy */
+/* Enhanced navigation buttons - unified radiuses */
 .jsm-event-calendar-nav-button {
   background-color: rgba(255, 255, 255, 0.15);
   border: none;
@@ -130,7 +130,7 @@
   cursor: not-allowed;
 }
 
-/* Tabulka kalendáře - minimalistický design s větším prostorem */
+/* Calendar table - minimalist design with more space */
 .jsm-event-calendar-table-wrapper {
   padding: 1.25rem;
 }
@@ -164,16 +164,16 @@
   box-sizing: border-box;
 }
 
-/* Zajištění, že řádky tabulky mají správné vertikální zarovnání */
+/* Ensure table rows have correct vertical alignment */
 .jsm-event-calendar-table tr {
   vertical-align: top;
 }
 
-/* Dynamická výška buněk kalendáře - vzdušnější design */
+/* Dynamic cell height for calendar - airier design */
 .jsm-event-calendar-day {
-  min-height: 8rem; /* Zvýšená minimální výška pro vzdušnější vzhled */
+  min-height: 8rem; /* Increased minimum height for airier look */
   height: 100%;
-  padding: 0.75rem; /* Zvětšený padding pro větší vzdušnost */
+  padding: 0.75rem; /* Larger padding for more spaciousness */
   border-radius: var(--border-radius-sm);
   border: 1px solid var(--border-color);
   background-color: var(--surface-color);
@@ -181,7 +181,7 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  gap: 0.375rem; /* Mezera mezi prvky uvnitř buňky */
+  gap: 0.375rem; /* Gap between elements inside cell */
 }
 
 .jsm-event-calendar-day:hover {
@@ -194,7 +194,7 @@
   background-color: transparent;
   border-color: transparent;
   cursor: default;
-  min-height: 8rem; /* Zachováme větší minimální výšku i u prázdných buněk */
+  min-height: 8rem; /* Maintain larger minimum height even for empty cells */
 }
 
 .jsm-event-calendar-day.empty:hover {
@@ -230,7 +230,7 @@
   color: white;
 }
 
-/* Vylepšené zobrazení událostí v kalendáři - lepší čitelnost */
+/* Enhanced event display in calendar - better readability */
 .jsm-event-calendar-event {
   margin-bottom: 0.375rem;
   padding: 0.5rem 0.75rem;
@@ -270,7 +270,7 @@
   margin-top: 0.125rem;
 }
 
-/* Optimalizace pro různé počty událostí */
+/* Optimization for different event counts */
 .jsm-event-calendar-day:has(.jsm-event-calendar-event:nth-child(3)) {
   min-height: 9.5rem;
 }
@@ -279,13 +279,13 @@
   min-height: 11rem;
 }
 
-/* Vylepšený seznam událostí - minimalistický design */
+/* Enhanced event list - minimalist design */
 .jsm-event-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
-  padding: 0 1.25rem 1.25rem; /* Padding pro větší vzdušnost */
+  padding: 0 1.25rem 1.25rem; /* Padding for more spaciousness */
 }
 
 .jsm-event-list-title {
@@ -382,7 +382,7 @@
   margin-right: 0.375rem;
 }
 
-/* Vylepšená tlačítka - konzistentní barevné schéma a radiusy */
+/* Enhanced buttons - consistent color scheme and radiuses */
 .jsm-event-button {
   display: inline-flex;
   align-items: center;
@@ -426,7 +426,7 @@
   pointer-events: none;
 }
 
-/* Detail události - minimalistický design */
+/* Event detail - minimalist design */
 .jsm-event-detail {
   margin-bottom: 2rem;
 }
@@ -495,15 +495,15 @@
   display: block;
 }
 
-/* Modální okno pro detail události - opravené na centrování a překrytí celé obrazovky */
+/* Modal window for event detail - fixed for proper centering and full screen overlay */
 .jsm-event-modal {
-  display: none; /* Výchozí stav je skrytý */
+  display: none; /* Hidden by default */
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6); /* Tmavší pozadí pro lepší kontrast */
+  background-color: rgba(0, 0, 0, 0.6); /* Darker background for better contrast */
   z-index: 9999;
   overflow-y: auto;
   backdrop-filter: blur(4px);
@@ -525,7 +525,7 @@
   position: relative;
   box-shadow: var(--shadow-lg);
   animation: modal-slide-up 0.3s ease-out;
-  margin: auto; /* Auto margin pro centrování */
+  margin: auto; /* Auto margin for centering */
   padding: 2.5rem;
   overflow-y: auto;
 }
@@ -567,7 +567,7 @@
   transform: rotate(90deg);
 }
 
-/* Načítací animace - minimalistický design */
+/* Loading animation - minimalist design */
 .jsm-event-loading {
   text-align: center;
   padding: 3rem 1rem;
@@ -588,7 +588,7 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Oznámení, když nejsou žádné události */
+/* Notification when no events */
 .jsm-event-no-events {
   padding: 2rem;
   text-align: center;
@@ -599,7 +599,7 @@
   margin: 1rem 0;
 }
 
-/* Mřížkový layout pro seznam událostí */
+/* Grid layout for event list */
 .jsm-event-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -686,24 +686,24 @@
   transform: scale(1.05);
 }
 
-/* Styl pro již proběhlé dny v aktuálním měsíci */
+/* Style for past days in current month */
 .jsm-event-calendar-day.past-day {
-  background-color: rgba(0, 0, 0, 0.05);  /* Mírně ztmavené pozadí */
-  opacity: 0.8;  /* Snížená neprůhlednost */
-  color: var(--text-secondary);  /* Světlejší text */
+  background-color: rgba(0, 0, 0, 0.05);  /* Slightly darker background */
+  opacity: 0.8;  /* Reduced opacity */
+  color: var(--text-secondary);  /* Lighter text */
 }
 
 .jsm-event-calendar-day.past-day .jsm-event-calendar-day-number {
-  color: var(--text-secondary);  /* Světlejší čísla dnů */
+  color: var(--text-secondary);  /* Lighter day numbers */
 }
 
-/* Ztmavení událostí v již proběhlých dnech */
+/* Dimming events in past days */
 .jsm-event-calendar-day.past-day .jsm-event-calendar-event {
-  opacity: 0.8;  /* Lehce ztmavit události v minulých dnech */
-  background-color: rgba(37, 99, 235, 0.7);  /* Ztlumená barva události */
+  opacity: 0.8;  /* Slightly dimming events in past days */
+  background-color: rgba(37, 99, 235, 0.7);  /* Muted event color */
 }
 
-/* Pro mobilní seznam dnů */
+/* For mobile day list */
 .jsm-event-calendar-list-view .jsm-event-calendar-day.past-day {
   background-color: rgba(0, 0, 0, 0.05);
   border-color: var(--border-color);

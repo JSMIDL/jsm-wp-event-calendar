@@ -1,11 +1,11 @@
 <?php
 /**
- * Třída pro správu shortcodů kalendáře
+ * Class for managing calendar shortcodes
  */
 class WP_Event_Shortcodes {
 
     /**
-     * Registrace shortcodů
+     * Register shortcodes
      */
     public function register() {
         add_shortcode('jsm_event_calendar', array($this, 'calendar_shortcode'));
@@ -14,10 +14,10 @@ class WP_Event_Shortcodes {
     }
 
     /**
-     * Shortcode pro zobrazení kalendáře
+     * Shortcode for displaying calendar
      *
-     * @param array $atts Atributy shortcodu
-     * @return string HTML kalendáře
+     * @param array $atts Shortcode attributes
+     * @return string Calendar HTML
      */
     public function calendar_shortcode($atts = array()) {
         $calendar = new WP_Event_Calendar();
@@ -25,10 +25,10 @@ class WP_Event_Shortcodes {
     }
 
     /**
-     * Shortcode pro zobrazení seznamu událostí
+     * Shortcode for displaying event list
      *
-     * @param array $atts Atributy shortcodu
-     * @return string HTML seznamu událostí
+     * @param array $atts Shortcode attributes
+     * @return string Event list HTML
      */
     public function event_list_shortcode($atts = array()) {
         $calendar = new WP_Event_Calendar();
@@ -36,10 +36,10 @@ class WP_Event_Shortcodes {
     }
 
     /**
-     * Shortcode pro zobrazení detailu události
+     * Shortcode for displaying event details
      *
-     * @param array $atts Atributy shortcodu
-     * @return string HTML detailu události
+     * @param array $atts Shortcode attributes
+     * @return string Event detail HTML
      */
     public function event_detail_shortcode($atts = array()) {
         $atts = shortcode_atts(array(

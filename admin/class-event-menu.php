@@ -1,11 +1,11 @@
 <?php
 /**
- * Třída pro správu menu a stránek pluginu
+ * Class for managing plugin menu and pages
  */
 class WP_Event_Menu {
 
     /**
-     * Inicializace menu a stránek
+     * Initialize menu and pages
      */
     public static function init() {
         $instance = new self();
@@ -13,24 +13,24 @@ class WP_Event_Menu {
     }
 
     /**
-     * Přidání stránek do menu
+     * Add pages to menu
      */
     public function add_menu_pages() {
-        // Registrace hlavní stránky dokumentace
+        // Register main documentation page
         add_submenu_page(
             'edit.php?post_type=jsm_wp_event',
-            __('Dokumentace kalendáře', 'jsm-wp-event-calendar'),
-            __('Dokumentace', 'jsm-wp-event-calendar'),
+            __('Calendar Documentation', 'jsm-wp-event-calendar'),
+            __('Documentation', 'jsm-wp-event-calendar'),
             'manage_options',
             'wp_event_docs',
             array($this, 'render_docs_page')
         );
 
-        // Registrace stránky nastavení
+        // Register settings page
         add_submenu_page(
             'edit.php?post_type=jsm_wp_event',
-            __('Nastavení kalendáře', 'jsm-wp-event-calendar'),
-            __('Nastavení', 'jsm-wp-event-calendar'),
+            __('Calendar Settings', 'jsm-wp-event-calendar'),
+            __('Settings', 'jsm-wp-event-calendar'),
             'manage_options',
             'wp_event_settings',
             array($this, 'render_settings_page')
@@ -38,45 +38,45 @@ class WP_Event_Menu {
     }
 
     /**
-     * Vykreslení stránky dokumentace
+     * Render documentation page
      */
     public function render_docs_page() {
-        // Kontrola oprávnění
+        // Check permissions
         if (!current_user_can('manage_options')) {
             return;
         }
 
-        // Vložení šablony dokumentace
+        // Include documentation template
         include WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/views/admin-documentation.php';
     }
 
     /**
-     * Vykreslení stránky nastavení
+     * Render settings page
      */
     public function render_settings_page() {
-        // Kontrola oprávnění
+        // Check permissions
         if (!current_user_can('manage_options')) {
             return;
         }
 
-        // Vložení šablony nastavení
+        // Include settings template
         include WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/views/admin-settings.php';
     }
 
     /**
-     * Reset nastavení do výchozích hodnot
+     * Reset settings to default values
      */
     public static function reset_settings() {
-        // Kontrola oprávnění a nonce
+        // Check permissions and nonce
         if (!current_user_can('manage_options') ||
             !check_admin_referer('jsm_reset_settings_nonce')) {
-            wp_die('Nedostatečná oprávnění');
+            wp_die(__('Insufficient permissions', 'jsm-wp-event-calendar'));
         }
 
-        // Smazání aktuálních nastavení
+        // Delete current settings
         delete_option('wp_event_calendar_settings');
 
-        // Přesměrování zpět na stránku nastavení s úspěšnou zprávou
+        // Redirect back to settings page with success message
         wp_redirect(add_query_arg(
             array(
                 'page' => 'wp_event_settings',

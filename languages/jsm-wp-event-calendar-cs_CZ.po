@@ -15,456 +15,341 @@ msgstr ""
 "X-Domain: jsm-wp-event-calendar\n"
 
 #: includes/class-event-post-type.php:30
-msgid "Události"
+msgid "Events"
 msgstr "Události"
 
 #: includes/class-event-post-type.php:31
-msgid "Událost"
-msgstr "Událost"
-
-#: includes/class-event-post-type.php:32
-msgid "Události"
-msgstr "Události"
-
-#: includes/class-event-post-type.php:33
-msgid "Událost"
+msgid "Event"
 msgstr "Událost"
 
 #: includes/class-event-post-type.php:34
-msgid "Přidat novou"
+msgid "Add New"
 msgstr "Přidat novou"
 
 #: includes/class-event-post-type.php:35
-msgid "Přidat novou událost"
+msgid "Add New Event"
 msgstr "Přidat novou událost"
 
 #: includes/class-event-post-type.php:36
-msgid "Nová událost"
+msgid "New Event"
 msgstr "Nová událost"
 
 #: includes/class-event-post-type.php:37
-msgid "Upravit událost"
+msgid "Edit Event"
 msgstr "Upravit událost"
 
 #: includes/class-event-post-type.php:38
-msgid "Zobrazit událost"
+msgid "View Event"
 msgstr "Zobrazit událost"
 
 #: includes/class-event-post-type.php:39
-msgid "Všechny události"
+msgid "All Events"
 msgstr "Všechny události"
 
 #: includes/class-event-post-type.php:40
-msgid "Hledat události"
+msgid "Search Events"
 msgstr "Hledat události"
 
 #: includes/class-event-post-type.php:41
-msgid "Nadřazené události:"
+msgid "Parent Events:"
 msgstr "Nadřazené události:"
 
 #: includes/class-event-post-type.php:42
-msgid "Žádné události nenalezeny."
+msgid "No events found."
 msgstr "Žádné události nenalezeny."
 
 #: includes/class-event-post-type.php:43
-msgid "Žádné události v koši."
+msgid "No events in trash."
 msgstr "Žádné události v koši."
 
 #: includes/class-event-post-type.php:54
-msgid "Události pro kalendář"
+msgid "Events for calendar"
 msgstr "Události pro kalendář"
 
 #: includes/class-event-post-type.php:83
-msgid "Detaily události"
+msgid "Event Details"
 msgstr "Detaily události"
 
 #: admin/views/event-metabox.php:31
-msgid "Datum začátku"
+msgid "Start Date"
 msgstr "Datum začátku"
 
 #: admin/views/event-metabox.php:36
-msgid "Čas začátku"
+msgid "Start Time"
 msgstr "Čas začátku"
 
 #: admin/views/event-metabox.php:42
-msgid "Celodenní událost"
+msgid "All Day Event"
 msgstr "Celodenní událost"
 
 #: admin/views/event-metabox.php:48
-msgid "Datum konce"
+msgid "End Date"
 msgstr "Datum konce"
 
 #: admin/views/event-metabox.php:50
-msgid "Volitelné. Ponechte prázdné, pokud událost končí ve stejný den jako začíná."
+msgid "Optional. Leave empty if the event ends on the same day it starts."
 msgstr "Volitelné. Ponechte prázdné, pokud událost končí ve stejný den jako začíná."
 
 #: admin/views/event-metabox.php:54
-msgid "Čas konce"
+msgid "End Time"
 msgstr "Čas konce"
 
 #: admin/views/event-metabox.php:56
-msgid "Volitelné."
+msgid "Optional."
 msgstr "Volitelné."
 
 #: admin/views/event-metabox.php:60
-msgid "URL adresa"
+msgid "URL Address"
 msgstr "URL adresa"
 
 #: admin/views/event-metabox.php:65
-msgid "Text tlačítka"
+msgid "Button Text"
 msgstr "Text tlačítka"
 
 #: admin/views/event-metabox.php:66
-msgid "Více informací"
+msgid "More Information"
 msgstr "Více informací"
 
 #: admin/class-event-admin.php:56
-msgid "Datum události"
+msgid "Event Date"
 msgstr "Datum události"
 
 #: admin/class-event-admin.php:57
-msgid "Čas"
+msgid "Time"
 msgstr "Čas"
 
 #: admin/class-event-admin.php:82
-msgid "Celý den"
+msgid "All Day"
 msgstr "Celý den"
 
 #: includes/class-event-calendar.php:52
-msgid "Načítání událostí..."
+msgid "Loading events..."
 msgstr "Načítání událostí..."
 
 #: includes/class-event-calendar.php:53
-msgid "Žádné události k zobrazení"
+msgid "No events to display"
 msgstr "Žádné události k zobrazení"
 
 #: includes/class-event-calendar.php:129
-msgid "Celý den"
+msgid "All Day"
 msgstr "Celý den"
 
 #: templates/calendar.php:77
-msgid "Předchozí"
+msgid "Previous"
 msgstr "Předchozí"
 
 #: templates/calendar.php:80
-msgid "Dnes"
+msgid "Today"
 msgstr "Dnes"
 
 #: templates/calendar.php:83
-msgid "Další"
+msgid "Next"
 msgstr "Další"
 
 #: templates/event-list.php:17
-msgid "Žádné události k zobrazení."
+msgid "No events to display."
 msgstr "Žádné události k zobrazení."
 
 #: templates/event-list.php:24
-msgid "Proběhlé události"
+msgid "Past Events"
 msgstr "Proběhlé události"
 
 #: templates/event-list.php:25
-msgid "Nadcházející události"
+msgid "Upcoming Events"
 msgstr "Nadcházející události"
 
 #: templates/event-list.php:86 templates/event-detail.php:32
-msgid "Celý den"
+msgid "All Day"
 msgstr "Celý den"
 
 #: templates/event-detail.php:13
-msgid "Událost nebyla nalezena."
+msgid "Event not found."
 msgstr "Událost nebyla nalezena."
 
-#: templates/event-detail.php:62
-msgid "Více informací"
-msgstr "Více informací"
+#: includes/class-event-taxonomy.php:25
+msgid "Event Categories"
+msgstr "Kategorie událostí"
 
-#: admin/views/admin-page.php:13
-msgid "Jak používat plugin"
-msgstr "Jak používat plugin"
+#: includes/class-event-taxonomy.php:26
+msgid "Event Category"
+msgstr "Kategorie události"
 
-#: admin/views/admin-page.php:16
-msgid "Přidání nové události"
-msgstr "Přidání nové události"
+#: includes/class-event-taxonomy.php:27
+msgid "Search Categories"
+msgstr "Hledat kategorie"
 
-#: admin/views/admin-page.php:17
-msgid "Pro přidání nové události přejděte do sekce <strong>Události</strong> v menu administrace a klikněte na <strong>Přidat novou</strong>."
-msgstr "Pro přidání nové události přejděte do sekce <strong>Události</strong> v menu administrace a klikněte na <strong>Přidat novou</strong>."
+#: includes/class-event-taxonomy.php:28
+msgid "Popular Categories"
+msgstr "Populární kategorie"
 
-#: admin/views/admin-page.php:18
-msgid "Vyplňte název, popis a nastavte datum a čas události. Můžete také nastavit vlastní URL adresu, na kterou bude odkazovat tlačítko."
-msgstr "Vyplňte název, popis a nastavte datum a čas události. Můžete také nastavit vlastní URL adresu, na kterou bude odkazovat tlačítko."
+#: includes/class-event-taxonomy.php:29
+msgid "All Categories"
+msgstr "Všechny kategorie"
 
-#: admin/views/admin-page.php:22
-msgid "Vložení kalendáře do stránky"
-msgstr "Vložení kalendáře do stránky"
+#: includes/class-event-taxonomy.php:30
+msgid "Parent Category"
+msgstr "Nadřazená kategorie"
 
-#: admin/views/admin-page.php:23
-msgid "Pro zobrazení kalendáře na stránce použijte shortcode:"
-msgstr "Pro zobrazení kalendáře na stránce použijte shortcode:"
+#: includes/class-event-taxonomy.php:31
+msgid "Parent Category:"
+msgstr "Nadřazená kategorie:"
 
-#: admin/views/admin-page.php:26
-msgid "Můžete použít následující atributy pro přizpůsobení kalendáře:"
-msgstr "Můžete použít následující atributy pro přizpůsobení kalendáře:"
+#: includes/class-event-taxonomy.php:32
+msgid "Edit Category"
+msgstr "Upravit kategorii"
 
-#: admin/views/admin-page.php:28
-msgid "Číslo měsíce (1-12)"
-msgstr "Číslo měsíce (1-12)"
+#: includes/class-event-taxonomy.php:33
+msgid "Update Category"
+msgstr "Aktualizovat kategorii"
 
-#: admin/views/admin-page.php:29
-msgid "Rok (např. 2023)"
-msgstr "Rok (např. 2023)"
+#: includes/class-event-taxonomy.php:34
+msgid "Add New Category"
+msgstr "Přidat novou kategorii"
 
-#: admin/views/admin-page.php:30
-msgid "Zobrazit seznam událostí pod kalendářem (yes/no)"
-msgstr "Zobrazit seznam událostí pod kalendářem (yes/no)"
+#: includes/class-event-taxonomy.php:35
+msgid "New Category Name"
+msgstr "Nová kategorie"
 
-#: admin/views/admin-page.php:31
-msgid "ID nebo slug kategorie pro filtrování událostí"
-msgstr "ID nebo slug kategorie pro filtrování událostí"
+#: includes/class-event-taxonomy.php:36
+msgid "Separate categories with commas"
+msgstr "Oddělte kategorie čárkami"
 
-#: admin/views/admin-page.php:34
-msgid "Příklad s parametry:"
-msgstr "Příklad s parametry:"
+#: includes/class-event-taxonomy.php:37
+msgid "Add or remove categories"
+msgstr "Přidat nebo odebrat kategorie"
 
-#: admin/views/admin-page.php:39
-msgid "Vložení seznamu událostí do stránky"
-msgstr "Vložení seznamu událostí do stránky"
+#: includes/class-event-taxonomy.php:38
+msgid "Choose from the most used categories"
+msgstr "Vybrat z nejpoužívanějších kategorií"
 
-#: admin/views/admin-page.php:40
-msgid "Pro zobrazení seznamu událostí na stránce použijte shortcode:"
-msgstr "Pro zobrazení seznamu událostí na stránce použijte shortcode:"
+#: includes/class-event-taxonomy.php:39
+msgid "No categories found"
+msgstr "Žádné kategorie nenalezeny"
 
-#: admin/views/admin-page.php:43
-msgid "Můžete použít následující atributy pro přizpůsobení seznamu:"
-msgstr "Můžete použít následující atributy pro přizpůsobení seznamu:"
+#: includes/class-event-taxonomy.php:40
+msgid "Categories"
+msgstr "Kategorie"
 
-#: admin/views/admin-page.php:45
-msgid "Počet zobrazených událostí"
-msgstr "Počet zobrazených událostí"
+#: admin/class-event-menu.php:21
+msgid "Calendar Documentation"
+msgstr "Dokumentace kalendáře"
 
-#: admin/views/admin-page.php:46
-msgid "ID nebo slug kategorie pro filtrování událostí"
-msgstr "ID nebo slug kategorie pro filtrování událostí"
+#: admin/class-event-menu.php:22
+msgid "Documentation"
+msgstr "Dokumentace"
 
-#: admin/views/admin-page.php:47
-msgid "Zobrazit proběhlé události (yes/no)"
-msgstr "Zobrazit proběhlé události (yes/no)"
-
-#: admin/views/admin-page.php:48
-msgid "Způsob zobrazení (list/grid)"
-msgstr "Způsob zobrazení (list/grid)"
-
-#: admin/views/admin-page.php:51
-msgid "Příklad s parametry:"
-msgstr "Příklad s parametry:"
-
-#: admin/views/admin-page.php:56
-msgid "Vložení detailu události do stránky"
-msgstr "Vložení detailu události do stránky"
-
-#: admin/views/admin-page.php:57
-msgid "Pro zobrazení detailu konkrétní události na stránce použijte shortcode:"
-msgstr "Pro zobrazení detailu konkrétní události na stránce použijte shortcode:"
-
-#: admin/views/admin-page.php:60
-msgid "Kde <code>id</code> je ID události, kterou chcete zobrazit."
-msgstr "Kde <code>id</code> je ID události, kterou chcete zobrazit."
-
-#: admin/views/admin-page.php:68
-msgid "O pluginu"
-msgstr "O pluginu"
-
-#: admin/views/admin-page.php:69
-msgid "Event Calendar je jednoduchý plugin pro správu a zobrazení kalendáře událostí na vašem webu."
-msgstr "Event Calendar je jednoduchý plugin pro správu a zobrazení kalendáře událostí na vašem webu."
-
-#: admin/views/admin-page.php:70
-msgid "Verze:"
-msgstr "Verze:"
-
-#: admin/views/admin-page.php:74
-msgid "Výchozí nastavení"
-msgstr "Výchozí nastavení"
-
-#: admin/views/admin-page.php:75
-msgid "Celý plugin je navržen tak, aby fungoval ihned po aktivaci."
-msgstr "Celý plugin je navržen tak, aby fungoval ihned po aktivaci."
-
-#: admin/views/admin-page.php:77
-msgid "Responzivní design"
-msgstr "Responzivní design"
-
-#: admin/views/admin-page.php:78
-msgid "Podpora češtiny a angličtiny"
-msgstr "Podpora češtiny a angličtiny"
-
-#: admin/views/admin-page.php:79
-msgid "Snadné použití shortcodů"
-msgstr "Snadné použití shortcodů"
-
-# Nastavení kalendáře
-msgid "Nastavení kalendáře"
+#: admin/class-event-menu.php:31
+msgid "Calendar Settings"
 msgstr "Nastavení kalendáře"
 
-msgid "Nastavení"
+#: admin/class-event-menu.php:32
+msgid "Settings"
 msgstr "Nastavení"
 
-msgid "Uložit nastavení"
-msgstr "Uložit nastavení"
+#: admin/class-event-menu.php:53
+msgid "Insufficient permissions"
+msgstr "Nedostatečná oprávnění"
 
-msgid "Obnovit výchozí nastavení"
-msgstr "Obnovit výchozí nastavení"
-
-msgid "Opravdu chcete obnovit výchozí nastavení? Tato akce nelze vrátit zpět."
-msgstr "Opravdu chcete obnovit výchozí nastavení? Tato akce nelze vrátit zpět."
-
-# Skupiny nastavení
-msgid "Barevné schéma"
+#: admin/class-event-settings.php:116
+msgid "Color Scheme"
 msgstr "Barevné schéma"
 
-msgid "Nastavte barevné schéma kalendáře událostí."
+#: admin/class-event-settings.php:117
+msgid "Set the color scheme for the event calendar."
 msgstr "Nastavte barevné schéma kalendáře událostí."
 
-msgid "Rozměry a efekty"
+#: admin/class-event-settings.php:122
+msgid "Dimensions and Effects"
 msgstr "Rozměry a efekty"
 
-msgid "Nastavte rozměry, stíny a zaoblení prvků kalendáře."
+#: admin/class-event-settings.php:123
+msgid "Set dimensions, shadows, and rounded corners for calendar elements."
 msgstr "Nastavte rozměry, stíny a zaoblení prvků kalendáře."
 
-msgid "Náhled nastavení"
-msgstr "Náhled nastavení"
+#: admin/views/admin-settings.php:40
+msgid "Save Settings"
+msgstr "Uložit nastavení"
 
-msgid "Náhled aktuálního nastavení barev."
-msgstr "Náhled aktuálního nastavení barev."
+#: admin/views/admin-settings.php:45
+msgid "Reset to Default Settings"
+msgstr "Obnovit výchozí nastavení"
 
-# Barvy
-msgid "Primární barva"
+#: admin/class-event-settings.php:185
+msgid "Do you really want to reset to default settings? This action cannot be undone."
+msgstr "Opravdu chcete obnovit výchozí nastavení? Tato akce nelze vrátit zpět."
+
+#: admin/class-event-settings.php:135
+msgid "Primary Color"
 msgstr "Primární barva"
 
-msgid "Hlavní barva pluginu používaná pro tlačítka, kalendář, atd."
-msgstr "Hlavní barva pluginu používaná pro tlačítka, kalendář, atd."
-
-msgid "Primární barva (hover)"
+#: admin/class-event-settings.php:136
+msgid "Primary Color (hover)"
 msgstr "Primární barva (hover)"
 
-msgid "Barva při najetí myší na prvky s primární barvou."
-msgstr "Barva při najetí myší na prvky s primární barvou."
-
-msgid "Sekundární barva"
+#: admin/class-event-settings.php:137
+msgid "Secondary Color"
 msgstr "Sekundární barva"
 
-msgid "Doplňková barva pro zvýraznění."
-msgstr "Doplňková barva pro zvýraznění."
-
-msgid "Sekundární barva (hover)"
+#: admin/class-event-settings.php:138
+msgid "Secondary Color (hover)"
 msgstr "Sekundární barva (hover)"
 
-msgid "Barva při najetí myší na prvky se sekundární barvou."
-msgstr "Barva při najetí myší na prvky se sekundární barvou."
-
-msgid "Barva textu tlačítek"
+#: admin/class-event-settings.php:139
+msgid "Button Text Color"
 msgstr "Barva textu tlačítek"
 
-msgid "Barva textu na tlačítkách."
-msgstr "Barva textu na tlačítkách."
-
-msgid "Barva pozadí"
+#: admin/class-event-settings.php:140
+msgid "Background Color"
 msgstr "Barva pozadí"
 
-msgid "Základní barva pozadí kalendáře."
-msgstr "Základní barva pozadí kalendáře."
-
-msgid "Barva povrchu"
+#: admin/class-event-settings.php:141
+msgid "Surface Color"
 msgstr "Barva povrchu"
 
-msgid "Barva povrchu prvků (buňky kalendáře, karty)."
-msgstr "Barva povrchu prvků (buňky kalendáře, karty)."
-
-msgid "Barva povrchu (hover)"
+#: admin/class-event-settings.php:142
+msgid "Surface Color (hover)"
 msgstr "Barva povrchu (hover)"
 
-msgid "Barva povrchu prvků při najetí myší."
-msgstr "Barva povrchu prvků při najetí myší."
-
-msgid "Barva ohraničení"
+#: admin/class-event-settings.php:143
+msgid "Border Color"
 msgstr "Barva ohraničení"
 
-msgid "Barva okrajů a ohraničení."
-msgstr "Barva okrajů a ohraničení."
-
-msgid "Primární barva textu"
+#: admin/class-event-settings.php:144
+msgid "Primary Text Color"
 msgstr "Primární barva textu"
 
-msgid "Hlavní barva textu."
-msgstr "Hlavní barva textu."
-
-msgid "Sekundární barva textu"
+#: admin/class-event-settings.php:145
+msgid "Secondary Text Color"
 msgstr "Sekundární barva textu"
 
-msgid "Barva méně důležitého textu."
-msgstr "Barva méně důležitého textu."
-
-# Stíny a rozměry
-msgid "Malý stín"
+#: admin/class-event-settings.php:159
+msgid "Small Shadow"
 msgstr "Malý stín"
 
-msgid "CSS hodnota pro malý stín."
-msgstr "CSS hodnota pro malý stín."
-
-msgid "Střední stín"
+#: admin/class-event-settings.php:160
+msgid "Medium Shadow"
 msgstr "Střední stín"
 
-msgid "CSS hodnota pro střední stín."
-msgstr "CSS hodnota pro střední stín."
-
-msgid "Velký stín"
+#: admin/class-event-settings.php:161
+msgid "Large Shadow"
 msgstr "Velký stín"
 
-msgid "CSS hodnota pro velký stín."
-msgstr "CSS hodnota pro velký stín."
-
-msgid "Malý rádius"
+#: admin/class-event-settings.php:162
+msgid "Small Radius"
 msgstr "Malý rádius"
 
-msgid "Hodnota pro malé zaoblení rohů."
-msgstr "Hodnota pro malé zaoblení rohů."
-
-msgid "Střední rádius"
+#: admin/class-event-settings.php:163
+msgid "Medium Radius"
 msgstr "Střední rádius"
 
-msgid "Hodnota pro střední zaoblení rohů."
-msgstr "Hodnota pro střední zaoblení rohů."
-
-msgid "Velký rádius"
+#: admin/class-event-settings.php:164
+msgid "Large Radius"
 msgstr "Velký rádius"
 
-msgid "Hodnota pro velké zaoblení rohů."
-msgstr "Hodnota pro velké zaoblení rohů."
-
-msgid "Rádius tlačítek"
+#: admin/class-event-settings.php:165
+msgid "Button Radius"
 msgstr "Rádius tlačítek"
 
-msgid "Hodnota zaoblení rohů pro tlačítka."
-msgstr "Hodnota zaoblení rohů pro tlačítka."
-
-msgid "Mezery v kalendáři"
+#: admin/class-event-settings.php:166
+msgid "Calendar Spacing"
 msgstr "Mezery v kalendáři"
-
-msgid "Velikost mezer mezi buňkami kalendáře."
-msgstr "Velikost mezer mezi buňkami kalendáře."
-
-# Náhled
-msgid "Primární barvy"
-msgstr "Primární barvy"
-
-msgid "Barvy pozadí"
-msgstr "Barvy pozadí"
-
-msgid "Barvy textu"
-msgstr "Barvy textu"
-
-msgid "Ukázka tlačítka"
-msgstr "Ukázka tlačítka"
-
-msgid "Ukázkové tlačítko"
-msgstr "Ukázkové tlačítko"
