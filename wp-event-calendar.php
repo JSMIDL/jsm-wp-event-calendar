@@ -29,20 +29,6 @@ require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-post-type.php'
 require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-calendar.php';
 require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-shortcodes.php';
 
-// Admin soubory
-<<<<<<< HEAD
-<<<<<<< HEAD
-if (is_admin()) {
-    require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-admin.php';
-    require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-settings.php';
-}
-=======
-// Načítáme tyto soubory později v admin_init
->>>>>>> parent of da6c2e6 (change slug and shortcode)
-=======
-// Načítáme tyto soubory později v admin_init
->>>>>>> parent of da6c2e6 (change slug and shortcode)
-
 /**
  * Inicializace pluginu
  */
@@ -66,24 +52,17 @@ function wp_event_calendar_init() {
 add_action('plugins_loaded', 'wp_event_calendar_init');
 
 /**
-<<<<<<< HEAD
-<<<<<<< HEAD
- * Registrace post typu - spouštíme na hooku init s nižší prioritou, aby se spustila před admin_init
+ * Načtení a registrace post typu
  */
 function wp_event_calendar_register_post_type() {
-    $post_type = new WP_Event_Post_Type();
-    // Nejprve přímo registrujeme post typ
-    $post_type->register_post_type();
-    // Pak registrujeme metaboxy a další hooky
-    $post_type->register();
+    if (class_exists('WP_Event_Post_Type')) {
+        $post_type = new WP_Event_Post_Type();
+        $post_type->register();
+    }
 }
-add_action('init', 'wp_event_calendar_register_post_type', 5); // Priorita 5 - spustí se dříve
+add_action('init', 'wp_event_calendar_register_post_type', 5); // Priorita 5 zajistí, že proběhne dříve
 
 /**
-=======
->>>>>>> parent of da6c2e6 (change slug and shortcode)
-=======
->>>>>>> parent of da6c2e6 (change slug and shortcode)
  * Inicializace admin části
  */
 function wp_event_calendar_admin_init() {
@@ -97,47 +76,27 @@ function wp_event_calendar_admin_init() {
     // Načtení nastavení událostí
     if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-settings.php')) {
         require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-settings.php';
-        $settings = new WP_Event_Settings();
-        $settings->init();
+        WP_Event_Settings::init();
     }
 }
 add_action('admin_init', 'wp_event_calendar_admin_init');
 
 /**
-<<<<<<< HEAD
-<<<<<<< HEAD
- * Inicializace nastavení pluginu - spouštíme na hooku admin_menu
+ * Načtení admin menu
  */
-function wp_event_calendar_settings_init() {
-    if (is_admin() && class_exists('WP_Event_Settings')) {
+function wp_event_calendar_admin_menu() {
+    // Zkontrolovat zda byly načteny administrační třídy
+    if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-settings.php') && !function_exists('WP_Event_Settings::init')) {
+        require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-settings.php';
         WP_Event_Settings::init();
     }
 }
-add_action('admin_menu', 'wp_event_calendar_settings_init', 5); // Priorita 5 zajistí dřívější spuštění
+add_action('admin_menu', 'wp_event_calendar_admin_menu', 5);
 
 /**
  * Registrace aktivačního hooku
  */
 function wp_event_calendar_activate() {
-    // Registrace post typu - musíme ji spustit při aktivaci
-    $post_type = new WP_Event_Post_Type();
-    $post_type->register_post_type();
-
-    // Propláchnutí permalinků
-    flush_rewrite_rules();
-
-    // Nastavení výchozích hodnot nastavení
-    if (!get_option('wp_event_calendar_settings') && class_exists('WP_Event_Settings')) {
-        $default_settings = WP_Event_Settings::$defaults;
-        update_option('wp_event_calendar_settings', $default_settings);
-    }
-
-    // Uložení verze pluginu pro případné budoucí aktualizace
-    update_option('wp_event_calendar_version', WP_EVENT_CALENDAR_VERSION);
-=======
- * Registrace aktivačního hooku
- */
-function wp_event_calendar_activate() {
     if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-post-type.php')) {
         require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-post-type.php';
 
@@ -148,22 +107,6 @@ function wp_event_calendar_activate() {
 
     // Propláchnutí permalinků
     flush_rewrite_rules();
->>>>>>> parent of da6c2e6 (change slug and shortcode)
-=======
- * Registrace aktivačního hooku
- */
-function wp_event_calendar_activate() {
-    if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-post-type.php')) {
-        require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-post-type.php';
-
-        // Registrace post typu
-        $post_type = new WP_Event_Post_Type();
-        $post_type->register();
-    }
-
-    // Propláchnutí permalinků
-    flush_rewrite_rules();
->>>>>>> parent of da6c2e6 (change slug and shortcode)
 }
 register_activation_hook(__FILE__, 'wp_event_calendar_activate');
 
@@ -175,3 +118,40 @@ function wp_event_calendar_deactivate() {
     flush_rewrite_rules();
 }
 register_deactivation_hook(__FILE__, 'wp_event_calendar_deactivate');
+
+/**
+ * Přidání migrace databáze při aktualizaci pluginu
+ */
+function wp_event_calendar_update_db_check() {
+    $installed_ver = get_option('wp_event_calendar_version');
+
+    // Pokud verze není nastavena nebo je nižší než aktuální, proveďte migraci
+    if (!$installed_ver || version_compare($installed_ver, WP_EVENT_CALENDAR_VERSION, '<')) {
+        global $wpdb;
+
+        // Zjištění všech wp_event postů
+        $old_posts = $wpdb->get_results("
+            SELECT ID
+            FROM {$wpdb->posts}
+            WHERE post_type = 'wp_event'
+        ");
+
+        if ($old_posts) {
+            foreach ($old_posts as $post) {
+                // Aktualizace post_type na jsm_wp_event
+                $wpdb->update(
+                    $wpdb->posts,
+                    array('post_type' => 'jsm_wp_event'),
+                    array('ID' => $post->ID)
+                );
+            }
+        }
+
+        // Aktualizace uložené verze
+        update_option('wp_event_calendar_version', WP_EVENT_CALENDAR_VERSION);
+
+        // Propláchnutí permalinků
+        flush_rewrite_rules();
+    }
+}
+add_action('plugins_loaded', 'wp_event_calendar_update_db_check');

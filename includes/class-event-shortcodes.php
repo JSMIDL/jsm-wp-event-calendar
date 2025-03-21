@@ -8,9 +8,9 @@ class WP_Event_Shortcodes {
      * Registrace shortcodů
      */
     public function register() {
-        add_shortcode('event_calendar', array($this, 'calendar_shortcode'));
-        add_shortcode('event_list', array($this, 'event_list_shortcode'));
-        add_shortcode('event_detail', array($this, 'event_detail_shortcode'));
+        add_shortcode('jsm_event_calendar', array($this, 'calendar_shortcode'));
+        add_shortcode('jsm_event_list', array($this, 'event_list_shortcode'));
+        add_shortcode('jsm_event_detail', array($this, 'event_detail_shortcode'));
     }
 
     /**

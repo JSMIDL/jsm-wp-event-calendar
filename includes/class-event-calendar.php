@@ -75,24 +75,22 @@ class WP_Event_Calendar {
                     __('Prosinec', 'jsm-wp-event-calendar')
                 ),
                 'weekdays' => array(
-
                     __('Pondělí', 'jsm-wp-event-calendar'),
                     __('Úterý', 'jsm-wp-event-calendar'),
                     __('Středa', 'jsm-wp-event-calendar'),
                     __('Čtvrtek', 'jsm-wp-event-calendar'),
                     __('Pátek', 'jsm-wp-event-calendar'),
                     __('Sobota', 'jsm-wp-event-calendar'),
-                     __('Neděle', 'jsm-wp-event-calendar'),
+                    __('Neděle', 'jsm-wp-event-calendar'),
                 ),
                 'weekdaysShort' => array(
-
                     __('Po', 'jsm-wp-event-calendar'),
                     __('Út', 'jsm-wp-event-calendar'),
                     __('St', 'jsm-wp-event-calendar'),
                     __('Čt', 'jsm-wp-event-calendar'),
                     __('Pá', 'jsm-wp-event-calendar'),
                     __('So', 'jsm-wp-event-calendar'),
-                       __('Ne', 'jsm-wp-event-calendar'),
+                    __('Ne', 'jsm-wp-event-calendar'),
                 )
             )
         ));
@@ -157,7 +155,7 @@ class WP_Event_Calendar {
 
         // Dotaz pro události v daném měsíci - pouze budoucí nebo aktuální
         $args = array(
-            'post_type' => 'wp_event',
+            'post_type' => 'jsm_wp_event',
             'posts_per_page' => -1,
             'post_status' => 'publish',
             'meta_query' => array(
@@ -294,7 +292,7 @@ class WP_Event_Calendar {
      */
     public function get_events($args = array()) {
         $default_args = array(
-            'post_type' => 'wp_event',
+            'post_type' => 'jsm_wp_event',
             'posts_per_page' => 10,
             'post_status' => 'publish',
             'meta_key' => '_event_start_date',
@@ -441,7 +439,7 @@ class WP_Event_Calendar {
     public function render_event_detail($post_id) {
         $post = get_post($post_id);
 
-        if (!$post || 'wp_event' !== $post->post_type) {
+        if (!$post || 'jsm_wp_event' !== $post->post_type) {
             return '';
         }
 
