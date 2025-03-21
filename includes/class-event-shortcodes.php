@@ -8,9 +8,9 @@ class WP_Event_Shortcodes {
      * Registrace shortcodů
      */
     public function register() {
-        add_shortcode('jsm_event_calendar', array($this, 'calendar_shortcode'));
-        add_shortcode('jsm_event_list', array($this, 'event_list_shortcode'));
-        add_shortcode('jsm_event_detail', array($this, 'event_detail_shortcode'));
+        add_shortcode('event_calendar', array($this, 'calendar_shortcode'));
+        add_shortcode('event_list', array($this, 'event_list_shortcode'));
+        add_shortcode('event_detail', array($this, 'event_detail_shortcode'));
     }
 
     /**
@@ -48,7 +48,7 @@ class WP_Event_Shortcodes {
 
         $post_id = intval($atts['id']);
 
-        if (0 === $post_id && is_singular('jsm_wp_event_calendar')) {
+        if (0 === $post_id && is_singular('wp_event')) {
             $post_id = get_the_ID();
         }
 

@@ -12,11 +12,11 @@ class WP_Event_Admin {
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
 
         // Přidání sloupce do seznamu událostí
-        add_filter('manage_jsm_wp_event_calendar_posts_columns', array($this, 'add_event_columns'));
-        add_action('manage_jsm_wp_event_calendar_posts_custom_column', array($this, 'render_event_columns'), 10, 2);
+        add_filter('manage_wp_event_posts_columns', array($this, 'add_event_columns'));
+        add_action('manage_wp_event_posts_custom_column', array($this, 'render_event_columns'), 10, 2);
 
         // Řazení sloupců
-        add_filter('manage_edit-jsm_wp_event_calendar_sortable_columns', array($this, 'sortable_event_columns'));
+        add_filter('manage_edit-wp_event_sortable_columns', array($this, 'sortable_event_columns'));
         add_action('pre_get_posts', array($this, 'sort_events_by_date'));
     }
 
@@ -27,7 +27,7 @@ class WP_Event_Admin {
         $screen = get_current_screen();
 
         if ('post.php' === $hook || 'post-new.php' === $hook) {
-            if ('jsm_wp_event_calendar' === $screen->post_type) {
+            if ('wp_event' === $screen->post_type) {
                 wp_enqueue_style('wp-event-admin', WP_EVENT_CALENDAR_PLUGIN_URL . 'admin/css/event-admin.css', array(), WP_EVENT_CALENDAR_VERSION);
                 wp_enqueue_script('jquery-ui-datepicker');
                 wp_enqueue_script('wp-event-admin', WP_EVENT_CALENDAR_PLUGIN_URL . 'admin/js/event-admin.js', array('jquery', 'jquery-ui-datepicker'), WP_EVENT_CALENDAR_VERSION, true);

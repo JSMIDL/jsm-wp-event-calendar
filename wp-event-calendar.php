@@ -30,28 +30,39 @@ require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-calendar.php';
 require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-shortcodes.php';
 
 // Admin soubory
+<<<<<<< HEAD
 if (is_admin()) {
     require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-admin.php';
     require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-settings.php';
 }
+=======
+// Načítáme tyto soubory později v admin_init
+>>>>>>> parent of da6c2e6 (change slug and shortcode)
 
 /**
  * Inicializace pluginu
  */
 function wp_event_calendar_init() {
+    // Kontrola a načtení hlavních tříd pluginu
+    if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-calendar.php')) {
+        require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-calendar.php';
+    }
+
+    if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-shortcodes.php')) {
+        require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-shortcodes.php';
+    }
+
     // Vytvoření instance kalendáře pro načtení CSS a JS
     $calendar = new WP_Event_Calendar();
 
     // Inicializace shortcodů
     $shortcodes = new WP_Event_Shortcodes();
     $shortcodes->register();
-
-    // Načtení textové domény
-    load_plugin_textdomain('jsm-wp-event-calendar', false, dirname(plugin_basename(__FILE__)) . '/languages');
 }
 add_action('plugins_loaded', 'wp_event_calendar_init');
 
 /**
+<<<<<<< HEAD
  * Registrace post typu - spouštíme na hooku init s nižší prioritou, aby se spustila před admin_init
  */
 function wp_event_calendar_register_post_type() {
@@ -64,17 +75,29 @@ function wp_event_calendar_register_post_type() {
 add_action('init', 'wp_event_calendar_register_post_type', 5); // Priorita 5 - spustí se dříve
 
 /**
+=======
+>>>>>>> parent of da6c2e6 (change slug and shortcode)
  * Inicializace admin části
  */
 function wp_event_calendar_admin_init() {
-    if (is_admin()) {
+    // Načtení administrativních tříd
+    if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-admin.php')) {
+        require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-admin.php';
         $admin = new WP_Event_Admin();
         $admin->init();
+    }
+
+    // Načtení nastavení událostí
+    if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-settings.php')) {
+        require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/class-event-settings.php';
+        $settings = new WP_Event_Settings();
+        $settings->init();
     }
 }
 add_action('admin_init', 'wp_event_calendar_admin_init');
 
 /**
+<<<<<<< HEAD
  * Inicializace nastavení pluginu - spouštíme na hooku admin_menu
  */
 function wp_event_calendar_settings_init() {
@@ -103,6 +126,21 @@ function wp_event_calendar_activate() {
 
     // Uložení verze pluginu pro případné budoucí aktualizace
     update_option('wp_event_calendar_version', WP_EVENT_CALENDAR_VERSION);
+=======
+ * Registrace aktivačního hooku
+ */
+function wp_event_calendar_activate() {
+    if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-post-type.php')) {
+        require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-post-type.php';
+
+        // Registrace post typu
+        $post_type = new WP_Event_Post_Type();
+        $post_type->register();
+    }
+
+    // Propláchnutí permalinků
+    flush_rewrite_rules();
+>>>>>>> parent of da6c2e6 (change slug and shortcode)
 }
 register_activation_hook(__FILE__, 'wp_event_calendar_activate');
 

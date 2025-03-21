@@ -157,7 +157,7 @@ class WP_Event_Calendar {
 
         // Dotaz pro události v daném měsíci - pouze budoucí nebo aktuální
         $args = array(
-            'post_type' => 'jsm_wp_event_calendar',
+            'post_type' => 'wp_event',
             'posts_per_page' => -1,
             'post_status' => 'publish',
             'meta_query' => array(
@@ -294,7 +294,7 @@ class WP_Event_Calendar {
      */
     public function get_events($args = array()) {
         $default_args = array(
-            'post_type' => 'jsm_wp_event_calendar',
+            'post_type' => 'wp_event',
             'posts_per_page' => 10,
             'post_status' => 'publish',
             'meta_key' => '_event_start_date',
@@ -441,7 +441,7 @@ class WP_Event_Calendar {
     public function render_event_detail($post_id) {
         $post = get_post($post_id);
 
-        if (!$post || 'jsm_wp_event_calendar' !== $post->post_type) {
+        if (!$post || 'wp_event' !== $post->post_type) {
             return '';
         }
 
