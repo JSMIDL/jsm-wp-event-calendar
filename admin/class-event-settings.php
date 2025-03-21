@@ -44,24 +44,36 @@ class WP_Event_Settings {
     );
 
     /**
+     * Získání výchozích hodnot nastavení
+     *
+     * @return array Výchozí hodnoty nastavení
+     */
+    public static function get_defaults() {
+        return self::$defaults;
+    }
+
+    /**
      * Inicializace pluginu
      */
     public static function init() {
         $instance = new self();
-        add_action('admin_menu', array($instance, 'add_settings_page'));
+        add_action('admin_menu', array($instance, 'add_settings_pages'));
         add_action('admin_init', array($instance, 'register_settings'));
         add_action('admin_enqueue_scripts', array($instance, 'enqueue_admin_scripts'));
-        add_action('wp_head', array($instance, 'output_custom_css'));
+
+        // Přidáme filter pro načtení CSS a dynamických hodnot
+        add_action('wp_head', array($instance, 'output_custom_css'), 999); // Vysoká priorita, aby přepsala statické hodnoty
+
+        // Přidáme akci pro načtení základního CSS
+        add_action('wp_enqueue_scripts', array($instance, 'enqueue_frontend_styles'));
     }
 
     /**
      * Načtení skriptů a stylů pro admin
      */
     public function enqueue_admin_scripts($hook) {
-        $screen = get_current_screen();
-
-        // Načtení pouze na stránce nastavení našeho pluginu
-        if ($hook == 'jsm_wp_event_page_wp_event_settings') {
+        // Načtení pouze na stránkách našeho pluginu
+        if (strpos($hook, 'wp_event_settings') !== false || strpos($hook, 'wp_event_docs') !== false) {
             wp_enqueue_style('wp-color-picker');
             wp_enqueue_script('wp-color-picker');
             wp_enqueue_script('jquery');
@@ -69,24 +81,58 @@ class WP_Event_Settings {
             // Vlastní skript pro nastavení
             wp_enqueue_script(
                 'jsm-event-settings',
-                WP_EVENT_CALENDAR_PLUGIN_URL . 'admin/js/event-settings.js',
+                plugin_dir_url(dirname(__FILE__)) . 'admin/js/event-settings.js',
                 array('jquery', 'wp-color-picker'),
-                WP_EVENT_CALENDAR_VERSION,
+                defined('WP_EVENT_CALENDAR_VERSION') ? WP_EVENT_CALENDAR_VERSION : '1.0',
                 true
             );
 
             // Lokalizace pro JS
             wp_localize_script('jsm-event-settings', 'jsmEventSettings', array(
                 'defaults' => self::$defaults,
-                'resetUrl' => wp_nonce_url(add_query_arg('reset-settings', 'true'), 'jsm_reset_settings_nonce')
+                'resetUrl' => wp_nonce_url(add_query_arg('reset-settings', 'true'), 'jsm_reset_settings_nonce'),
+                'resetConfirmText' => __('Opravdu chcete obnovit výchozí nastavení? Tato akce nelze vrátit zpět.', 'jsm-wp-event-calendar')
             ));
         }
     }
 
     /**
-     * Přidání stránky nastavení do menu
+     * Načtení stylů pro frontend
      */
-    public function add_settings_page() {
+    public function enqueue_frontend_styles() {
+        // Načteme základní CSS soubor
+        wp_enqueue_style(
+            'jsm-wp-event-calendar',
+            plugin_dir_url(dirname(__FILE__)) . 'assets/css/event-calendar.css',
+            array(),
+            defined('WP_EVENT_CALENDAR_VERSION') ? WP_EVENT_CALENDAR_VERSION : '1.0'
+        );
+
+        // Responzivní styly
+        wp_enqueue_style(
+            'jsm-wp-event-calendar-mobile',
+            plugin_dir_url(dirname(__FILE__)) . 'assets/css/event-calendar-mobile.css',
+            array('jsm-wp-event-calendar'),
+            defined('WP_EVENT_CALENDAR_VERSION') ? WP_EVENT_CALENDAR_VERSION : '1.0',
+            'only screen and (max-width: 768px)'
+        );
+    }
+
+    /**
+     * Přidání stránek do menu
+     */
+    public function add_settings_pages() {
+        // Přidání stránky dokumentace
+        add_submenu_page(
+            'edit.php?post_type=jsm_wp_event',
+            __('Dokumentace kalendáře', 'jsm-wp-event-calendar'),
+            __('Dokumentace', 'jsm-wp-event-calendar'),
+            'manage_options',
+            'wp_event_docs',
+            array($this, 'render_docs_page')
+        );
+
+        // Přidání stránky nastavení
         add_submenu_page(
             'edit.php?post_type=jsm_wp_event',
             __('Nastavení kalendáře', 'jsm-wp-event-calendar'),
@@ -98,6 +144,19 @@ class WP_Event_Settings {
     }
 
     /**
+     * Vykreslení stránky dokumentace
+     */
+    public function render_docs_page() {
+        // Kontrola oprávnění
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        // Vložení šablony dokumentace
+        include plugin_dir_path(dirname(__FILE__)) . 'admin/views/admin-documentation.php';
+    }
+
+    /**
      * Vykreslení stránky nastavení
      */
     public function render_settings_page() {
@@ -106,20 +165,8 @@ class WP_Event_Settings {
             return;
         }
 
-        // Kontrola resetu nastavení
-        if (isset($_GET['reset-settings']) && $_GET['reset-settings'] === 'true'
-            && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'jsm_reset_settings_nonce')) {
-            delete_option('wp_event_calendar_settings');
-            wp_redirect(remove_query_arg(array('reset-settings', '_wpnonce')));
-            exit;
-        }
-
-        // Získání aktuálních hodnot
-        $options = get_option('wp_event_calendar_settings', array());
-        $options = wp_parse_args($options, self::$defaults);
-
         // Vložení šablony nastavení
-        include WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/views/admin-page.php';
+        include plugin_dir_path(dirname(__FILE__)) . 'admin/views/admin-settings.php';
     }
 
     /**
@@ -268,34 +315,99 @@ class WP_Event_Settings {
 
     /**
      * Výstup vlastních CSS stylů
+     *
+     * Používáme vysokou prioritu (999), aby naše vlastní CSS přepsalo
+     * výchozí hodnoty ze statického CSS souboru
      */
     public function output_custom_css() {
         $options = get_option('wp_event_calendar_settings', array());
         $options = wp_parse_args($options, self::$defaults);
         ?>
-        <style>
+        <style id="jsm-event-calendar-custom-css">
             :root {
-                --primary-color: <?php echo esc_attr($options['primary_color']); ?>;
-                --primary-hover: <?php echo esc_attr($options['primary_hover']); ?>;
-                --secondary-color: <?php echo esc_attr($options['secondary_color']); ?>;
-                --secondary-hover: <?php echo esc_attr($options['secondary_hover']); ?>;
-                --button-text: <?php echo esc_attr($options['button_text']); ?>;
-                --background-color: <?php echo esc_attr($options['background_color']); ?>;
-                --surface-color: <?php echo esc_attr($options['surface_color']); ?>;
-                --surface-hover: <?php echo esc_attr($options['surface_hover']); ?>;
-                --border-color: <?php echo esc_attr($options['border_color']); ?>;
-                --text-primary: <?php echo esc_attr($options['text_primary']); ?>;
-                --text-secondary: <?php echo esc_attr($options['text_secondary']); ?>;
-                --shadow-sm: <?php echo esc_attr($options['shadow_sm']); ?>;
-                --shadow-md: <?php echo esc_attr($options['shadow_md']); ?>;
-                --shadow-lg: <?php echo esc_attr($options['shadow_lg']); ?>;
-                --border-radius-sm: <?php echo esc_attr($options['border_radius_sm']); ?>;
-                --border-radius-md: <?php echo esc_attr($options['border_radius_md']); ?>;
-                --border-radius-lg: <?php echo esc_attr($options['border_radius_lg']); ?>;
-                --button-radius: <?php echo esc_attr($options['button_radius']); ?>;
-                --calendar-spacing: <?php echo esc_attr($options['calendar_spacing']); ?>;
+                --primary-color: <?php echo esc_attr($options['primary_color']); ?> !important;
+                --primary-hover: <?php echo esc_attr($options['primary_hover']); ?> !important;
+                --secondary-color: <?php echo esc_attr($options['secondary_color']); ?> !important;
+                --secondary-hover: <?php echo esc_attr($options['secondary_hover']); ?> !important;
+                --button-text: <?php echo esc_attr($options['button_text']); ?> !important;
+                --background-color: <?php echo esc_attr($options['background_color']); ?> !important;
+                --surface-color: <?php echo esc_attr($options['surface_color']); ?> !important;
+                --surface-hover: <?php echo esc_attr($options['surface_hover']); ?> !important;
+                --border-color: <?php echo esc_attr($options['border_color']); ?> !important;
+                --text-primary: <?php echo esc_attr($options['text_primary']); ?> !important;
+                --text-secondary: <?php echo esc_attr($options['text_secondary']); ?> !important;
+                --shadow-sm: <?php echo esc_attr($options['shadow_sm']); ?> !important;
+                --shadow-md: <?php echo esc_attr($options['shadow_md']); ?> !important;
+                --shadow-lg: <?php echo esc_attr($options['shadow_lg']); ?> !important;
+                --border-radius-sm: <?php echo esc_attr($options['border_radius_sm']); ?> !important;
+                --border-radius-md: <?php echo esc_attr($options['border_radius_md']); ?> !important;
+                --border-radius-lg: <?php echo esc_attr($options['border_radius_lg']); ?> !important;
+                --button-radius: <?php echo esc_attr($options['button_radius']); ?> !important;
+                --calendar-spacing: <?php echo esc_attr($options['calendar_spacing']); ?> !important;
+                --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            }
+
+            /* Opravená specifická barva pro kalendář - počítá s alfa kanálem */
+            .jsm-event-list-item-date {
+                background-color: <?php echo esc_attr($this->hex_to_rgba($options['primary_color'], 0.1)); ?> !important;
+                color: <?php echo esc_attr($options['primary_color']); ?> !important;
+            }
+
+            .jsm-event-calendar-day.past-day .jsm-event-calendar-event {
+                background-color: <?php echo esc_attr($this->hex_to_rgba($options['primary_color'], 0.7)); ?> !important;
+            }
+
+            /* Speciální vzhled pro dnešní den */
+            .jsm-event-calendar-day.today {
+                background-color: <?php echo esc_attr($this->hex_to_rgba($options['primary_color'], 0.05)); ?> !important;
+                border-color: <?php echo esc_attr($options['primary_color']); ?> !important;
+            }
+
+            /* Barva pro tlačítka a prvky s interakcí */
+            .jsm-event-button,
+            .jsm-event-calendar-event,
+            .jsm-event-calendar-day.today .jsm-event-calendar-day-number {
+                background-color: <?php echo esc_attr($options['primary_color']); ?> !important;
+                color: <?php echo esc_attr($options['button_text']); ?> !important;
+            }
+
+            .jsm-event-button:hover,
+            .jsm-event-calendar-event:hover {
+                background-color: <?php echo esc_attr($options['primary_hover']); ?> !important;
+            }
+
+            /* Barva pro navigační panel kalendáře */
+            .jsm-event-calendar-nav {
+                background: linear-gradient(135deg, <?php echo esc_attr($options['primary_color']); ?>, <?php echo esc_attr($options['secondary_color']); ?>) !important;
+            }
+
+            /* Barva pro záhlaví seznamu událostí */
+            .jsm-event-list-title:after {
+                background-color: <?php echo esc_attr($options['primary_color']); ?> !important;
             }
         </style>
         <?php
+    }
+
+    /**
+     * Pomocná funkce pro převod HEX barvy na RGBA
+     */
+    private function hex_to_rgba($hex, $alpha = 1) {
+        // Odstranění # pokud existuje
+        $hex = str_replace('#', '', $hex);
+
+        // Zpracování 3 nebo 6 znakové hex barvy
+        if (strlen($hex) == 3) {
+            $r = hexdec(substr($hex, 0, 1) . substr($hex, 0, 1));
+            $g = hexdec(substr($hex, 1, 1) . substr($hex, 1, 1));
+            $b = hexdec(substr($hex, 2, 1) . substr($hex, 2, 1));
+        } else {
+            $r = hexdec(substr($hex, 0, 2));
+            $g = hexdec(substr($hex, 2, 2));
+            $b = hexdec(substr($hex, 4, 2));
+        }
+
+        // Vrácení RGBA hodnoty
+        return "rgba($r, $g, $b, $alpha)";
     }
 }

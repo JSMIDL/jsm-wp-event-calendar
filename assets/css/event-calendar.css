@@ -3,7 +3,12 @@
  */
 
 /* Proměnné pro lepší konzistenci barev a hodnot */
+
 :root {
+  /*
+   * Tyto výchozí hodnoty budou přepsány hodnotami z nastavení pluginu
+   * Definujeme je zde pro případy, kdy by nastavení nebylo k dispozici
+   */
   --primary-color: #2563eb;
   --primary-hover: #1d4ed8;
   --secondary-color: #4f46e5;
@@ -22,8 +27,8 @@
   --border-radius-md: 0.75rem;
   --border-radius-lg: 1rem;
   --button-radius: 0.5rem; /* Sjednocený radius pro tlačítka */
-  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --calendar-spacing: 0.5rem; /* Jednotný spacing pro vzdušnější design */
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Hlavní kontejner - minimalistický design 2025 - použití fontu ze šablony */
@@ -680,6 +685,7 @@
 .jsm-event-list-item:hover .jsm-event-list-item-thumbnail img {
   transform: scale(1.05);
 }
+
 /* Styl pro již proběhlé dny v aktuálním měsíci */
 .jsm-event-calendar-day.past-day {
   background-color: rgba(0, 0, 0, 0.05);  /* Mírně ztmavené pozadí */

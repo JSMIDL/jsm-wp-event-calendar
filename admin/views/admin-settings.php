@@ -3,95 +3,32 @@
  * Šablona pro stránku nastavení pluginu v administraci
  */
 
-// Získání aktuálního tabu
-$active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'docs';
+// Kontrola oprávnění
+if (!current_user_can('manage_options')) {
+    return;
+}
+
+// Kontrola resetu nastavení
+if (isset($_GET['reset-settings']) && $_GET['reset-settings'] === 'true'
+    && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'jsm_reset_settings_nonce')) {
+    delete_option('wp_event_calendar_settings');
+    wp_redirect(remove_query_arg(array('reset-settings', '_wpnonce')));
+    exit;
+}
+
+// Získání aktuálních hodnot
+$options = get_option('wp_event_calendar_settings', array());
+$options = wp_parse_args($options, WP_Event_Settings::get_defaults());
 ?>
 
 <div class="wrap">
     <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
     <h2 class="nav-tab-wrapper">
-        <a href="?post_type=jsm_wp_event&page=wp_event_settings&tab=docs" class="nav-tab <?php echo $active_tab == 'docs' ? 'nav-tab-active' : ''; ?>"><?php _e('Dokumentace', 'jsm-wp-event-calendar'); ?></a>
-        <a href="?post_type=jsm_wp_event&page=wp_event_settings&tab=settings" class="nav-tab <?php echo $active_tab == 'settings' ? 'nav-tab-active' : ''; ?>"><?php _e('Nastavení pluginu', 'jsm-wp-event-calendar'); ?></a>
+        <a href="?post_type=jsm_wp_event&page=wp_event_docs" class="nav-tab"><?php _e('Dokumentace', 'jsm-wp-event-calendar'); ?></a>
+        <a href="?post_type=jsm_wp_event&page=wp_event_settings" class="nav-tab nav-tab-active"><?php _e('Nastavení pluginu', 'jsm-wp-event-calendar'); ?></a>
     </h2>
 
-    <?php if ($active_tab == 'docs') : ?>
-    <!-- Dokumentační tab -->
-    <div class="jsm-admin-content">
-        <div class="jsm-admin-main">
-            <div class="jsm-admin-card">
-                <h2><?php _e('Jak používat plugin', 'jsm-wp-event-calendar'); ?></h2>
-
-                <div class="jsm-admin-section">
-                    <h3><?php _e('Přidání nové události', 'jsm-wp-event-calendar'); ?></h3>
-                    <p><?php _e('Pro přidání nové události přejděte do sekce <strong>Události</strong> v menu administrace a klikněte na <strong>Přidat novou</strong>.', 'jsm-wp-event-calendar'); ?></p>
-                    <p><?php _e('Vyplňte název, popis a nastavte datum a čas události. Můžete také nastavit vlastní URL adresu, na kterou bude odkazovat tlačítko.', 'jsm-wp-event-calendar'); ?></p>
-                </div>
-
-                <div class="jsm-admin-section">
-                    <h3><?php _e('Vložení kalendáře do stránky', 'jsm-wp-event-calendar'); ?></h3>
-                    <p><?php _e('Pro zobrazení kalendáře na stránce použijte shortcode:', 'jsm-wp-event-calendar'); ?></p>
-                    <pre><code>[event_calendar]</code></pre>
-
-                    <p><?php _e('Můžete použít následující atributy pro přizpůsobení kalendáře:', 'jsm-wp-event-calendar'); ?></p>
-                    <ul>
-                        <li><code>month</code> - <?php _e('Číslo měsíce (1-12)', 'jsm-wp-event-calendar'); ?></li>
-                        <li><code>year</code> - <?php _e('Rok (např. 2023)', 'jsm-wp-event-calendar'); ?></li>
-                        <li><code>show_list</code> - <?php _e('Zobrazit seznam událostí pod kalendářem (yes/no)', 'jsm-wp-event-calendar'); ?></li>
-                        <li><code>category</code> - <?php _e('ID nebo slug kategorie pro filtrování událostí', 'jsm-wp-event-calendar'); ?></li>
-                    </ul>
-
-                    <p><?php _e('Příklad s parametry:', 'jsm-wp-event-calendar'); ?></p>
-                    <pre><code>[event_calendar month="1" year="2023" show_list="yes" category="akce"]</code></pre>
-                </div>
-
-                <div class="jsm-admin-section">
-                    <h3><?php _e('Vložení seznamu událostí do stránky', 'jsm-wp-event-calendar'); ?></h3>
-                    <p><?php _e('Pro zobrazení seznamu událostí na stránce použijte shortcode:', 'jsm-wp-event-calendar'); ?></p>
-                    <pre><code>[event_list]</code></pre>
-
-                    <p><?php _e('Můžete použít následující atributy pro přizpůsobení seznamu:', 'jsm-wp-event-calendar'); ?></p>
-                    <ul>
-                        <li><code>limit</code> - <?php _e('Počet zobrazených událostí', 'jsm-wp-event-calendar'); ?></li>
-                        <li><code>category</code> - <?php _e('ID nebo slug kategorie pro filtrování událostí', 'jsm-wp-event-calendar'); ?></li>
-                        <li><code>past</code> - <?php _e('Zobrazit proběhlé události (yes/no)', 'jsm-wp-event-calendar'); ?></li>
-                        <li><code>layout</code> - <?php _e('Způsob zobrazení (list/grid)', 'jsm-wp-event-calendar'); ?></li>
-                    </ul>
-
-                    <p><?php _e('Příklad s parametry:', 'jsm-wp-event-calendar'); ?></p>
-                    <pre><code>[event_list limit="5" past="no" layout="grid" category="akce"]</code></pre>
-                </div>
-
-                <div class="jsm-admin-section">
-                    <h3><?php _e('Vložení detailu události do stránky', 'jsm-wp-event-calendar'); ?></h3>
-                    <p><?php _e('Pro zobrazení detailu konkrétní události na stránce použijte shortcode:', 'jsm-wp-event-calendar'); ?></p>
-                    <pre><code>[event_detail id="123"]</code></pre>
-
-                    <p><?php _e('Kde <code>id</code> je ID události, kterou chcete zobrazit.', 'jsm-wp-event-calendar'); ?></p>
-                </div>
-            </div>
-        </div>
-
-        <div class="jsm-admin-sidebar">
-            <div class="jsm-admin-card">
-                <h3><?php _e('O pluginu', 'jsm-wp-event-calendar'); ?></h3>
-                <p><?php _e('JŠM WP Event Calendar je jednoduchý plugin pro správu a zobrazení kalendáře událostí na vašem webu.', 'jsm-wp-event-calendar'); ?></p>
-                <p><?php _e('Verze:', 'jsm-wp-event-calendar'); ?> <?php echo WP_EVENT_CALENDAR_VERSION; ?></p>
-            </div>
-
-            <div class="jsm-admin-card">
-                <h3><?php _e('Výchozí nastavení', 'jsm-wp-event-calendar'); ?></h3>
-                <p><?php _e('Celý plugin je navržen tak, aby fungoval ihned po aktivaci.', 'jsm-wp-event-calendar'); ?></p>
-                <ul>
-                    <li><?php _e('Responzivní design', 'jsm-wp-event-calendar'); ?></li>
-                    <li><?php _e('Podpora češtiny a angličtiny', 'jsm-wp-event-calendar'); ?></li>
-                    <li><?php _e('Snadné použití shortcodů', 'jsm-wp-event-calendar'); ?></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <?php else : ?>
     <!-- Nastavení tab -->
     <div class="jsm-settings-content">
         <form method="post" action="options.php">
@@ -169,6 +106,90 @@ $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'docs';
                     </div>
                 </div>
 
+                <div class="jsm-calendar-preview">
+                    <h4><?php _e('Ukázka kalendáře', 'jsm-wp-event-calendar'); ?></h4>
+                    <div class="jsm-preview-calendar-wrapper" style="
+                        background-color: <?php echo esc_attr($options['background_color']); ?>;
+                        color: <?php echo esc_attr($options['text_primary']); ?>;
+                        border-radius: <?php echo esc_attr($options['border_radius_lg']); ?>;
+                        box-shadow: <?php echo esc_attr($options['shadow_md']); ?>;
+                        border: 1px solid <?php echo esc_attr($options['border_color']); ?>;
+                        overflow: hidden;
+                        max-width: 500px;
+                        margin: 0 auto;
+                    ">
+                        <!-- Ukázka navigace -->
+                        <div class="jsm-preview-calendar-header" style="
+                            background: linear-gradient(135deg, <?php echo esc_attr($options['primary_color']); ?>, <?php echo esc_attr($options['secondary_color']); ?>);
+                            color: white;
+                            padding: 1rem;
+                            text-align: center;
+                            font-weight: bold;
+                        ">
+                            <?php _e('Březen 2025', 'jsm-wp-event-calendar'); ?>
+                        </div>
+
+                        <!-- Ukázka dnů a událostí -->
+                        <div class="jsm-preview-calendar-days" style="
+                            display: grid;
+                            grid-template-columns: repeat(3, 1fr);
+                            grid-gap: <?php echo esc_attr($options['calendar_spacing']); ?>;
+                            padding: 1rem;
+                        ">
+                            <div class="jsm-preview-calendar-day" style="
+                                background-color: <?php echo esc_attr($options['surface_color']); ?>;
+                                border: 1px solid <?php echo esc_attr($options['border_color']); ?>;
+                                border-radius: <?php echo esc_attr($options['border_radius_sm']); ?>;
+                                padding: 0.75rem;
+                                min-height: 80px;
+                            ">
+                                <div style="font-weight: bold; color: <?php echo esc_attr($options['text_primary']); ?>;">15</div>
+                            </div>
+
+                            <!-- Dnešní den -->
+                            <div class="jsm-preview-calendar-day" style="
+                                background-color: #EFF6FF;
+                                border: 1px solid <?php echo esc_attr($options['primary_color']); ?>;
+                                border-radius: <?php echo esc_attr($options['border_radius_sm']); ?>;
+                                padding: 0.75rem;
+                                min-height: 80px;
+                            ">
+                                <div style="
+                                    font-weight: bold;
+                                    display: inline-block;
+                                    width: 24px;
+                                    height: 24px;
+                                    line-height: 24px;
+                                    text-align: center;
+                                    background-color: <?php echo esc_attr($options['primary_color']); ?>;
+                                    color: <?php echo esc_attr($options['button_text']); ?>;
+                                    border-radius: 50%;
+                                ">16</div>
+
+                                <div style="
+                                    margin-top: 0.5rem;
+                                    background-color: <?php echo esc_attr($options['primary_color']); ?>;
+                                    color: <?php echo esc_attr($options['button_text']); ?>;
+                                    padding: 0.375rem;
+                                    border-radius: <?php echo esc_attr($options['border_radius_sm']); ?>;
+                                    font-size: 0.75rem;
+                                    text-align: center;
+                                ">Událost</div>
+                            </div>
+
+                            <div class="jsm-preview-calendar-day" style="
+                                background-color: <?php echo esc_attr($options['surface_color']); ?>;
+                                border: 1px solid <?php echo esc_attr($options['border_color']); ?>;
+                                border-radius: <?php echo esc_attr($options['border_radius_sm']); ?>;
+                                padding: 0.75rem;
+                                min-height: 80px;
+                            ">
+                                <div style="font-weight: bold; color: <?php echo esc_attr($options['text_primary']); ?>;">17</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="jsm-button-preview">
                     <h4><?php _e('Ukázka tlačítka', 'jsm-wp-event-calendar'); ?></h4>
                     <button class="jsm-preview-button" style="
@@ -188,54 +209,12 @@ $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'docs';
                 </div>
             </div>
 
-            <?php submit_button(); ?>
+            <?php submit_button(__('Uložit nastavení', 'jsm-wp-event-calendar'), 'primary', 'submit', true, array('id' => 'jsm-save-settings')); ?>
         </form>
     </div>
-    <?php endif; ?>
 </div>
 
 <style>
-    /* Obecné styly */
-    .jsm-admin-content {
-        display: flex;
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .jsm-admin-main {
-        flex: 2;
-    }
-
-    .jsm-admin-sidebar {
-        flex: 1;
-        min-width: 250px;
-    }
-
-    .jsm-admin-card {
-        background: #fff;
-        border: 1px solid #ccd0d4;
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
-        margin-bottom: 20px;
-        padding: 15px;
-    }
-
-    .jsm-admin-section {
-        margin-bottom: 25px;
-    }
-
-    .jsm-admin-section h3 {
-        margin-top: 0;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
-    }
-
-    pre {
-        background: #f6f7f7;
-        padding: 10px;
-        border: 1px solid #ddd;
-        overflow: auto;
-    }
-
     /* Styly pro nastavení */
     .jsm-settings-content {
         margin-top: 20px;
@@ -289,6 +268,11 @@ $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'docs';
         font-family: monospace;
     }
 
+    .jsm-calendar-preview {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
     .jsm-button-preview {
         margin-top: 20px;
         padding: 15px;
@@ -313,7 +297,6 @@ $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'docs';
 
     /* Responzivní styly */
     @media screen and (max-width: 782px) {
-        .jsm-admin-content,
         .jsm-color-previews,
         .jsm-settings-columns {
             flex-direction: column;
@@ -336,6 +319,7 @@ $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'docs';
                     var id = $(this).attr('id');
                     var color = ui.color.toString();
                     updateColorPreview(id, color);
+                    updateCalendarPreview();
                     updateButtonPreview();
                 }
             });
@@ -344,18 +328,73 @@ $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'docs';
         // Reset settings button
         $('#reset-settings').on('click', function() {
             if (confirm('<?php _e('Opravdu chcete obnovit výchozí nastavení? Tato akce nelze vrátit zpět.', 'jsm-wp-event-calendar'); ?>')) {
-                window.location.href = "?post_type=jsm_wp_event&page=wp_event_settings&tab=settings&reset-settings=true&_wpnonce=<?php echo wp_create_nonce('jsm_reset_settings_nonce'); ?>";
+                window.location.href = "?post_type=jsm_wp_event&page=wp_event_settings&reset-settings=true&_wpnonce=<?php echo wp_create_nonce('jsm_reset_settings_nonce'); ?>";
             }
         });
 
         // Náhled barev při změně - pro textová pole
         $('.regular-text').on('input', function() {
+            updateCalendarPreview();
             updateButtonPreview();
         });
 
         // Funkce pro aktualizaci náhledu barev
         function updateColorPreview(id, color) {
             $('.jsm-color-preview[data-color-id="' + id + '"]').css('background-color', color).text(color);
+        }
+
+        // Funkce pro aktualizaci náhledu kalendáře
+        function updateCalendarPreview() {
+            // Aktualizace hlavičky kalendáře
+            var primaryColor = $('#primary_color').val();
+            var secondaryColor = $('#secondary_color').val();
+            var buttonText = $('#button_text').val();
+            var borderRadius = $('#border_radius_sm').val();
+            var shadowMd = $('#shadow_md').val();
+            var borderColor = $('#border_color').val();
+            var backgroundColor = $('#background_color').val();
+            var surfaceColor = $('#surface_color').val();
+            var textPrimary = $('#text_primary').val();
+            var calendarSpacing = $('#calendar_spacing').val();
+
+            // Aktualizace prvků v náhledu
+            $('.jsm-preview-calendar-header').css({
+                'background': 'linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ')'
+            });
+
+            $('.jsm-preview-calendar-wrapper').css({
+                'background-color': backgroundColor,
+                'color': textPrimary,
+                'border-radius': $('#border_radius_lg').val(),
+                'box-shadow': shadowMd,
+                'border-color': borderColor
+            });
+
+            $('.jsm-preview-calendar-days').css({
+                'grid-gap': calendarSpacing
+            });
+
+            $('.jsm-preview-calendar-day').css({
+                'background-color': surfaceColor,
+                'border-color': borderColor,
+                'border-radius': borderRadius
+            });
+
+            // Aktualizace dnešního dne
+            $('.jsm-preview-calendar-day:nth-child(2)').css({
+                'border-color': primaryColor
+            });
+
+            $('.jsm-preview-calendar-day:nth-child(2) > div:first-child').css({
+                'background-color': primaryColor,
+                'color': buttonText
+            });
+
+            $('.jsm-preview-calendar-day:nth-child(2) > div:last-child').css({
+                'background-color': primaryColor,
+                'color': buttonText,
+                'border-radius': borderRadius
+            });
         }
 
         // Funkce pro aktualizaci náhledu tlačítka

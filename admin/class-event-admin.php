@@ -26,11 +26,17 @@ class WP_Event_Admin {
     public function enqueue_admin_scripts($hook) {
         $screen = get_current_screen();
 
+        // Načtení na stránce editace/přidání události
         if ('post.php' === $hook || 'post-new.php' === $hook) {
             if ('jsm_wp_event' === $screen->post_type) {
-                wp_enqueue_style('wp-event-admin', WP_EVENT_CALENDAR_PLUGIN_URL . 'admin/css/event-admin.css', array(), WP_EVENT_CALENDAR_VERSION);
-                wp_enqueue_script('wp-event-admin', WP_EVENT_CALENDAR_PLUGIN_URL . 'admin/js/event-admin.js', array('jquery', 'jquery-ui-datepicker'), WP_EVENT_CALENDAR_VERSION, true);
+                wp_enqueue_style('wp-event-admin', plugin_dir_url(dirname(__FILE__)) . 'admin/css/event-admin.css', array(), defined('WP_EVENT_CALENDAR_VERSION') ? WP_EVENT_CALENDAR_VERSION : '1.0');
+                wp_enqueue_script('wp-event-admin', plugin_dir_url(dirname(__FILE__)) . 'admin/js/event-admin.js', array('jquery', 'jquery-ui-datepicker'), defined('WP_EVENT_CALENDAR_VERSION') ? WP_EVENT_CALENDAR_VERSION : '1.0', true);
             }
+        }
+        
+        // Načtení na stránkách dokumentace a nastavení
+        if (strpos($hook, 'wp_event_docs') !== false || strpos($hook, 'wp_event_settings') !== false) {
+            wp_enqueue_style('wp-event-admin-pages', plugin_dir_url(dirname(__FILE__)) . 'admin/css/event-admin-pages.css', array(), defined('WP_EVENT_CALENDAR_VERSION') ? WP_EVENT_CALENDAR_VERSION : '1.0');
         }
     }
 

@@ -9,14 +9,17 @@
         $('.jsm-color-picker').wpColorPicker({
             change: function(event, ui) {
                 // Aktualizace živého náhledu při změně barvy
-                updateLivePreview();
+                var id = $(this).attr('id');
+                var color = ui.color.toString();
+                updateColorPreview(id, color);
+                updateButtonPreview();
             }
         });
 
         // Inicializace textových polí
         $('.regular-text').on('input', function() {
             // Aktualizace živého náhledu při změně hodnoty
-            updateLivePreview();
+            updateButtonPreview();
         });
 
         // Reset settings button
@@ -37,10 +40,7 @@
             }
 
             // Ověření, zda jsou neuložená data
-            var unsavedChanges = false;
-
-            // Kontrola inputů, zde potřebujete logiku pro detekci změn
-            // Příklad: porovnání aktuální hodnoty s původní hodnotou
+            var unsavedChanges = checkUnsavedChanges();
 
             if (unsavedChanges) {
                 if (!confirm('Máte neuložené změny. Opravdu chcete opustit stránku?')) {
@@ -50,45 +50,76 @@
         });
 
         /**
-         * Aktualizace živého náhledu
+         * Kontrola neuložených změn
          */
-        function updateLivePreview() {
-            // Získání všech hodnot
-            var values = {};
-            $('.jsm-color-picker, .regular-text').each(function() {
-                var id = $(this).attr('id');
-                values[id] = $(this).val();
-            });
+        function checkUnsavedChanges() {
+            var hasChanges = false;
 
-            // Aktualizace náhledů barev
-            $('.jsm-color-preview').each(function() {
-                var id = $(this).data('color-id');
-                if (values[id]) {
-                    $(this).css('background-color', values[id]);
-                    $(this).text(values[id]);
+            // Kontrola color pickerů
+            $('.jsm-color-picker').each(function() {
+                var id = $(this).attr('id');
+                var currentValue = $(this).val();
+                var originalValue = $(this).data('default-color');
+
+                if (currentValue !== originalValue) {
+                    hasChanges = true;
+                    return false; // ukončit smyčku
                 }
             });
 
-            // Aktualizace náhledu tlačítka
+            // Kontrola textových polí
+            if (!hasChanges) {
+                $('.regular-text').each(function() {
+                    var id = $(this).attr('id');
+                    var currentValue = $(this).val();
+                    var originalValue = $(this).data('default');
+
+                    if (currentValue !== originalValue) {
+                        hasChanges = true;
+                        return false; // ukončit smyčku
+                    }
+                });
+            }
+
+            return hasChanges;
+        }
+
+        /**
+         * Aktualizace náhledu barvy
+         */
+        function updateColorPreview(id, color) {
+            $('.jsm-color-preview[data-color-id="' + id + '"]').css('background-color', color).text(color);
+        }
+
+        /**
+         * Aktualizace náhledu tlačítka
+         */
+        function updateButtonPreview() {
+            var primaryColor = $('#primary_color').val();
+            var buttonText = $('#button_text').val();
+            var buttonRadius = $('#button_radius').val();
+            var shadowSm = $('#shadow_sm').val();
+            var primaryHover = $('#primary_hover').val();
+
             $('.jsm-preview-button').css({
-                'background-color': values.primary_color || jsmEventSettings.defaults.primary_color,
-                'color': values.button_text || jsmEventSettings.defaults.button_text,
-                'border-radius': values.button_radius || jsmEventSettings.defaults.button_radius,
-                'box-shadow': values.shadow_sm || jsmEventSettings.defaults.shadow_sm
+                'background-color': primaryColor,
+                'color': buttonText,
+                'border-radius': buttonRadius,
+                'box-shadow': shadowSm
             });
 
-            // Při najetí na tlačítko ukažte hover stav
+            // Nastavení hover efektu pro tlačítko
             $('.jsm-preview-button').hover(
                 function() {
-                    $(this).css('background-color', values.primary_hover || jsmEventSettings.defaults.primary_hover);
+                    $(this).css('background-color', primaryHover);
                 },
                 function() {
-                    $(this).css('background-color', values.primary_color || jsmEventSettings.defaults.primary_color);
+                    $(this).css('background-color', primaryColor);
                 }
             );
         }
 
         // Inicializace náhledu při načtení stránky
-        updateLivePreview();
+        updateButtonPreview();
     });
 })(jQuery);
