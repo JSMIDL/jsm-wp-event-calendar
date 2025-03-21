@@ -193,24 +193,44 @@
     border-radius: var(--button-radius);
   }
 
-  /* Modal window for event detail - fixed for centering and full screen */
+  /* Modal window for event detail - FIXED for proper mobile display */
   .jsm-event-modal {
-    padding: 0.5rem;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
   }
 
   .jsm-event-modal-content {
-    margin: auto;
-    padding: 1.5rem;
     width: 92%;
     max-width: 100%;
-    border-radius: var(--border-radius-md);
     max-height: 85vh;
+    margin: 0 auto;
+    padding: 1.25rem;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    background-color: var(--surface-color);
     overflow-y: auto;
+    position: relative;
+    box-sizing: border-box;
+    word-wrap: break-word
+    overflow-x: hidden;
+    box-sizing: border-box;
+    word-wrap: break-word
+    overflow-x: hidden;
+
   }
 
   .jsm-event-detail-title {
     font-size: 1.5rem;
     margin-bottom: 0.75rem;
+    width: 90%;
   }
 
   .jsm-event-detail-meta {
@@ -301,10 +321,28 @@
   }
 
   /* Modal for tablets */
+  .jsm-event-modal {
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+
   .jsm-event-modal-content {
     max-width: 80%;
     padding: 2rem;
     max-height: 80vh;
+    margin: 0 auto;
+    background-color: var(--surface-color);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+
   }
 }
 
@@ -336,5 +374,35 @@
 
   .jsm-event-calendar-table {
     border-spacing: 0.5rem;
+  }
+
+  /* Modal for desktop */
+  .jsm-event-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    padding: 0;
+  }
+
+  .jsm-event-modal-content {
+    width: 600px;
+    max-width: 90%;
+    max-height: 85vh;
+    background-color: var(--surface-color);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 2.5rem;
+    margin: 0 auto;
+    position: relative;
+    overflow-y: auto;
+    box-sizing: border-box;
+    word-wrap: break-word
+    overflow-x: hidden;
   }
 }
