@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: JŠM WP Event Calendar With WooCommerce
+ * Plugin Name: JŠM WP Event Calendar
  * Plugin URI: https://jansmidl.cz
- * Description: Plugin pro zobrazení kalendáře událostí s responzivním designem s napojením na produkty woocommerce.
+ * Description: Plugin pro zobrazení kalendáře událostí s responzivním designem.
  * Version: 1.0.0
  * Author: Jan Šmídl
  * Author URI: https://jansmidl.cz

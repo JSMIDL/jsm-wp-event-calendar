@@ -65,7 +65,7 @@
         <div class="jsm-admin-sidebar">
             <div class="jsm-admin-card">
                 <h3><?php _e('O pluginu', 'jsm-wp-event-calendar'); ?></h3>
-                <p><?php _e('Event Calendar je jednoduchý plugin pro správu a zobrazení kalendáře událostí na vašem webu.', 'jsm-wp-event-calendar'); ?></p>
+                <p><?php _e('JŠM WP Event Calendar je jednoduchý plugin pro správu a zobrazení kalendáře událostí na vašem webu.', 'jsm-wp-event-calendar'); ?></p>
                 <p><?php _e('Verze:', 'jsm-wp-event-calendar'); ?> <?php echo WP_EVENT_CALENDAR_VERSION; ?></p>
             </div>
 
