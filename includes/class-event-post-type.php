@@ -57,9 +57,9 @@ class WP_Event_Post_Type {
             'show_in_rest'       => true,
         );
 
-        register_post_type('wp_event', $args);
+        register_post_type('jsm_wp_event_calendar', $args);
     }
-    
+
     /**
      * Registrace metaboxů pro události
      */
@@ -68,19 +68,19 @@ class WP_Event_Post_Type {
             'wp_event_details',
             __('Detaily události', 'jsm-wp-event-calendar'),
             array($this, 'render_event_metabox'),
-            'wp_event',
+            'jsm_wp_event_calendar',
             'normal',
             'high'
         );
     }
-    
+
     /**
      * Vykreslení metaboxu pro detaily události
      */
     public function render_event_metabox($post) {
         // Bezpečnostní nonce pole
         wp_nonce_field('wp_event_details_nonce', 'wp_event_details_nonce');
-        
+
         // Načtení uložených hodnot
         $start_date = get_post_meta($post->ID, '_event_start_date', true);
         $start_time = get_post_meta($post->ID, '_event_start_time', true);
@@ -89,33 +89,33 @@ class WP_Event_Post_Type {
         $all_day = get_post_meta($post->ID, '_event_all_day', true);
         $url = get_post_meta($post->ID, '_event_url', true);
         $button_text = get_post_meta($post->ID, '_event_button_text', true);
-        
+
         // Obsahuje html soubor s formulářem
         include WP_EVENT_CALENDAR_PLUGIN_DIR . 'admin/views/event-metabox.php';
     }
-    
+
     /**
      * Uložení metadat události
      */
     public function save_event_metadata($post_id, $post) {
         // Kontrola nonce pole
-        if (!isset($_POST['wp_event_details_nonce']) || 
+        if (!isset($_POST['wp_event_details_nonce']) ||
             !wp_verify_nonce($_POST['wp_event_details_nonce'], 'wp_event_details_nonce')) {
             return;
         }
-        
+
         // Automatické uložení
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
         }
-        
+
         // Kontrola oprávnění
         if (!current_user_can('edit_post', $post_id)) {
             return;
         }
-        
+
         // Kontrola správného post typu
-        if ('wp_event' !== $post->post_type) {
+        if ('jsm_wp_event_calendar' !== $post->post_type) {
             return;
         }
         

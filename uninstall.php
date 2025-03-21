@@ -13,7 +13,7 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 
 // Odstranění všech událostí
 $events = get_posts(array(
-    'post_type' => 'wp_event',
+    'post_type' => 'jsm_wp_event_calendar',
     'numberposts' => -1,
     'post_status' => 'any'
 ));
