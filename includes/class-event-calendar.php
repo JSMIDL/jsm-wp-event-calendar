@@ -319,6 +319,7 @@ class WP_Event_Calendar
 
         $month = isset($_GET["month"]) ? intval($_GET["month"]) : date("m");
         $year = isset($_GET["year"]) ? intval($_GET["year"]) : date("Y");
+        $category = isset($_GET["category"]) ? sanitize_text_field($_GET["category"]) : '';
 
         $start_date = $year . "-" . $month . "-01";
         $end_date = date("Y-m-t", strtotime($start_date));
@@ -381,6 +382,17 @@ class WP_Event_Calendar
             "order" => "ASC",
         ];
 
+        // Přidání filtru podle kategorie, pokud je specifikována
+        if (!empty($category)) {
+            $args['tax_query'] = [
+                [
+                    'taxonomy' => 'event_category',
+                    'field'    => 'slug',
+                    'terms'    => explode(',', $category),
+                ]
+            ];
+        }
+
         $query = new WP_Query($args);
         $events = [];
 
@@ -418,6 +430,18 @@ class WP_Event_Calendar
                     $date_display .= " - " . date_i18n(get_option("date_format"), strtotime($end_date));
                 }
 
+                // Získání kategorií události
+                $event_categories = wp_get_post_terms($post_id, 'event_category', array('fields' => 'all'));
+                $categories = array();
+
+                foreach ($event_categories as $cat) {
+                    $categories[] = array(
+                        'id' => $cat->term_id,
+                        'name' => $cat->name,
+                        'slug' => $cat->slug
+                    );
+                }
+
                 $events[] = [
                     "id" => $post_id,
                     "title" => get_the_title(),
@@ -430,6 +454,7 @@ class WP_Event_Calendar
                     "excerpt" => has_excerpt() ? get_the_excerpt() : wp_trim_words(get_the_content(), 20),
                     "customUrl" => $url,
                     "buttonText" => !empty($button_text) ? $button_text : __("Více informací", "jsm-wp-event-calendar"),
+                    "categories" => $categories
                 ];
             }
             wp_reset_postdata();
@@ -475,6 +500,18 @@ class WP_Event_Calendar
         ];
 
         $args = wp_parse_args($args, $default_args);
+
+        // Přidání filtrace podle kategorie, pokud je specifikována
+        if (!empty($args['category'])) {
+            $args['tax_query'] = [
+                [
+                    'taxonomy' => 'event_category',
+                    'field'    => is_numeric($args['category']) ? 'term_id' : 'slug',
+                    'terms'    => explode(',', $args['category']),
+                ]
+            ];
+        }
+
         $query = new WP_Query($args);
         $events = [];
 
@@ -491,6 +528,18 @@ class WP_Event_Calendar
                 $url = get_post_meta($post_id, "_event_url", true);
                 $button_text = get_post_meta($post_id, "_event_button_text", true);
 
+                // Získání kategorií události
+                $event_categories = wp_get_post_terms($post_id, 'event_category', array('fields' => 'all'));
+                $categories = array();
+
+                foreach ($event_categories as $cat) {
+                    $categories[] = array(
+                        'id' => $cat->term_id,
+                        'name' => $cat->name,
+                        'slug' => $cat->slug
+                    );
+                }
+
                 $events[] = [
                     "id" => $post_id,
                     "title" => get_the_title(),
@@ -505,6 +554,7 @@ class WP_Event_Calendar
                     "custom_url" => $url,
                     "button_text" => !empty($button_text) ? $button_text : __("Více informací", "jsm-wp-event-calendar"),
                     "thumbnail" => has_post_thumbnail() ? get_the_post_thumbnail_url($post_id, "medium") : "",
+                    "categories" => $categories
                 ];
             }
             wp_reset_postdata();
@@ -574,13 +624,7 @@ class WP_Event_Calendar
 
         // Přidání kategorie
         if (!empty($atts["category"])) {
-            $args["tax_query"] = [
-                [
-                    "taxonomy" => "category",
-                    "field" => "slug",
-                    "terms" => explode(",", $atts["category"]),
-                ],
-            ];
+            $args["category"] = $atts["category"];
         }
 
         // Minulé nebo budoucí události
@@ -635,6 +679,19 @@ class WP_Event_Calendar
         $url = get_post_meta($post_id, "_event_url", true);
         $button_text = get_post_meta($post_id, "_event_button_text", true);
 
+        // Získání kategorií události
+        $event_categories = wp_get_post_terms($post_id, 'event_category', array('fields' => 'all'));
+        $categories = array();
+
+        foreach ($event_categories as $cat) {
+            $categories[] = array(
+                'id' => $cat->term_id,
+                'name' => $cat->name,
+                'slug' => $cat->slug,
+                'url' => get_term_link($cat)
+            );
+        }
+
         // Sestavení události
         $event = [
             "id" => $post_id,
@@ -656,6 +713,7 @@ class WP_Event_Calendar
             "thumbnail" => has_post_thumbnail($post_id)
                 ? get_the_post_thumbnail_url($post_id, "large")
                 : "",
+            "categories" => $categories
         ];
 
         // Načtení šablony
