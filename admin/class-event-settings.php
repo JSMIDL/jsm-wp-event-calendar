@@ -50,7 +50,37 @@ class WP_Event_Settings {
         $instance = new self();
         add_action('admin_menu', array($instance, 'add_settings_page'));
         add_action('admin_init', array($instance, 'register_settings'));
+        add_action('admin_enqueue_scripts', array($instance, 'enqueue_admin_scripts'));
         add_action('wp_head', array($instance, 'output_custom_css'));
+    }
+
+    /**
+     * Načtení skriptů a stylů pro admin
+     */
+    public function enqueue_admin_scripts($hook) {
+        $screen = get_current_screen();
+
+        // Načtení pouze na stránce nastavení našeho pluginu
+        if ($hook == 'jsm_wp_event_page_wp_event_settings') {
+            wp_enqueue_style('wp-color-picker');
+            wp_enqueue_script('wp-color-picker');
+            wp_enqueue_script('jquery');
+
+            // Vlastní skript pro nastavení
+            wp_enqueue_script(
+                'jsm-event-settings',
+                WP_EVENT_CALENDAR_PLUGIN_URL . 'admin/js/event-settings.js',
+                array('jquery', 'wp-color-picker'),
+                WP_EVENT_CALENDAR_VERSION,
+                true
+            );
+
+            // Lokalizace pro JS
+            wp_localize_script('jsm-event-settings', 'jsmEventSettings', array(
+                'defaults' => self::$defaults,
+                'resetUrl' => wp_nonce_url(add_query_arg('reset-settings', 'true'), 'jsm_reset_settings_nonce')
+            ));
+        }
     }
 
     /**
@@ -74,6 +104,14 @@ class WP_Event_Settings {
         // Kontrola oprávnění
         if (!current_user_can('manage_options')) {
             return;
+        }
+
+        // Kontrola resetu nastavení
+        if (isset($_GET['reset-settings']) && $_GET['reset-settings'] === 'true'
+            && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'jsm_reset_settings_nonce')) {
+            delete_option('wp_event_calendar_settings');
+            wp_redirect(remove_query_arg(array('reset-settings', '_wpnonce')));
+            exit;
         }
 
         // Získání aktuálních hodnot
@@ -195,7 +233,11 @@ class WP_Event_Settings {
         $options = get_option('wp_event_calendar_settings', array());
         $options = wp_parse_args($options, self::$defaults);
 
-        echo '<input type="color" id="' . esc_attr($id) . '" name="wp_event_calendar_settings[' . esc_attr($id) . ']" value="' . esc_attr($options[$id]) . '" class="jsm-color-picker" />';
+        echo '<input type="text" id="' . esc_attr($id) . '" name="wp_event_calendar_settings[' . esc_attr($id) . ']" value="' . esc_attr($options[$id]) . '" class="jsm-color-picker" data-default-color="' . esc_attr(self::$defaults[$id]) . '" />';
+
+        if (isset($args['description'])) {
+            echo '<p class="description">' . esc_html($args['description']) . '</p>';
+        }
     }
 
     /**
@@ -206,7 +248,11 @@ class WP_Event_Settings {
         $options = get_option('wp_event_calendar_settings', array());
         $options = wp_parse_args($options, self::$defaults);
 
-        echo '<input type="text" id="' . esc_attr($id) . '" name="wp_event_calendar_settings[' . esc_attr($id) . ']" value="' . esc_attr($options[$id]) . '" class="regular-text" />';
+        echo '<input type="text" id="' . esc_attr($id) . '" name="wp_event_calendar_settings[' . esc_attr($id) . ']" value="' . esc_attr($options[$id]) . '" class="regular-text" data-default="' . esc_attr(self::$defaults[$id]) . '" />';
+
+        if (isset($args['description'])) {
+            echo '<p class="description">' . esc_html($args['description']) . '</p>';
+        }
     }
 
     /**
