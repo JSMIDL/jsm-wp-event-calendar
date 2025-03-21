@@ -81,7 +81,7 @@ $show_list = ($atts['show_list'] === 'yes');
                 <?php _e('Today', 'jsm-wp-event-calendar'); ?>
             </button>
             <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-next" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php _e('Next', 'jsm-wp-event-calendar'); ?>
+                <?php _e('Next Month', 'jsm-wp-event-calendar'); ?>
             </button>
         </div>
     </div>

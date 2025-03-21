@@ -7,7 +7,7 @@
     // Global object for our functions
     window.JSMEventCalendar = {
         init: function() {
-            console.log('Initializing JSM Event Calendar 2025 - Minimalist Edition');
+            //console.log('Initializing JSM Event Calendar 2025 - Minimalist Edition');
 
             // Set up navigation and modals
             this.setupCalendarNavigation();
@@ -31,7 +31,7 @@
                 const year = parseInt($(this).data('year'));
 
                 if (calendarId && month && year) {
-                    console.log('Loading initial calendar data:', calendarId, month, year);
+                    //console.log('Loading initial calendar data:', calendarId, month, year);
                     // Add slight delay for proper DOM rendering
                     setTimeout(function() {
                         JSMEventCalendar.updateCalendar(calendarId, month, year);
@@ -93,7 +93,7 @@
                 // If we're in the current month or trying to go to the past, stop
                 if ((currentYear < currentRealYear) ||
                     (currentYear === currentRealYear && currentMonth <= currentRealMonth)) {
-                    console.log("Cannot navigate to the past");
+                    //console.log("Cannot navigate to the past");
                     // Add "disabled" button effect
                     const $prevButton = $('.jsm-event-calendar-prev[data-calendar-id="' + calendarId + '"]');
                     $prevButton.addClass('disabled').delay(300).queue(function(next) {
@@ -212,6 +212,52 @@
         },
 
         /**
+         * Extract start time from timeDisplay string
+         * Returns time in minutes since midnight for easy comparison
+         */
+        extractStartTime: function(timeDisplay) {
+            if (!timeDisplay) return null;
+
+            // Try to extract the first time in format HH:MM from the string
+            const timeMatch = timeDisplay.match(/(\d{1,2}):(\d{2})/);
+            if (timeMatch) {
+                const hours = parseInt(timeMatch[1]);
+                const minutes = parseInt(timeMatch[2]);
+                return hours * 60 + minutes; // Convert to minutes for easier comparison
+            }
+            return null;
+        },
+
+        /**
+         * Sort events - all-day events first, then by start time
+         */
+        sortEventsByTime: function(events) {
+            if (!events || !Array.isArray(events)) return [];
+
+            return events.sort((a, b) => {
+                // All-day events always come first
+                if (a.allDay && !b.allDay) return -1;
+                if (!a.allDay && b.allDay) return 1;
+
+                // If both are all-day or both are not all-day, sort by time
+                const aTime = this.extractStartTime(a.timeDisplay);
+                const bTime = this.extractStartTime(b.timeDisplay);
+
+                // If we have valid times for both, compare them
+                if (aTime !== null && bTime !== null) {
+                    return aTime - bTime;
+                }
+
+                // If only one has a valid time, the one without time comes first
+                if (aTime === null && bTime !== null) return -1;
+                if (aTime !== null && bTime === null) return 1;
+
+                // If neither has a valid time, maintain original order
+                return 0;
+            });
+        },
+
+        /**
          * Render calendar - European format (Monday as first day)
          */
         renderCalendar: function($calendarTable, month, year, events) {
@@ -280,10 +326,13 @@
                 html += '<div class="' + dayClasses + '" data-date="' + dateStr + '">';
                 html += '<span class="jsm-event-calendar-day-number">' + i + '</span>';
 
-                // Events for this day
+                // Get and sort events for this day
                 const dayEvents = this.getEventsForDay(events, year, month, i);
-                for (let j = 0; j < dayEvents.length; j++) {
-                    html += this.renderEventInCell(dayEvents[j]);
+                // Sort events - all-day events first, then by start time
+                const sortedDayEvents = this.sortEventsByTime(dayEvents);
+
+                for (let j = 0; j < sortedDayEvents.length; j++) {
+                    html += this.renderEventInCell(sortedDayEvents[j]);
                 }
 
                 html += '</div>';
@@ -338,7 +387,7 @@
                 }
             });
 
-            console.log('Calendar cell heights equalized');
+            //console.log('Calendar cell heights equalized');
         },
 
         /**
@@ -370,79 +419,85 @@
                 $cells.css('height', maxHeight + 'px');
             }
 
-            console.log('All calendar cell heights equalized to ' + maxHeight + 'px');
+            //console.log('All calendar cell heights equalized to ' + maxHeight + 'px');
         },
 
+        /**
+         * Render calendar for mobile devices - only days with events
+         * Modified to ensure consistent event data handling with desktop view
+         */
+        renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDay, events, todayDate, todayMonth, todayYear) {
+            let html = '<div class="jsm-event-calendar-list-view">';
+            let hasEvents = false;
 
-/**
- * Render calendar for mobile devices - only days with events
- * Modified to ensure consistent event data handling with desktop view
- */
-renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDay, events, todayDate, todayMonth, todayYear) {
-    let html = '<div class="jsm-event-calendar-list-view">';
-    let hasEvents = false;
+            // Loop through days in month
+            for (let i = 1; i <= daysInMonth; i++) {
+                // Events for this day
+                const dayEvents = this.getEventsForDay(events, year, month, i);
 
-    // Loop through days in month
-    for (let i = 1; i <= daysInMonth; i++) {
-        // Events for this day
-        const dayEvents = this.getEventsForDay(events, year, month, i);
+                // Skip days without events
+                if (dayEvents.length === 0) {
+                    continue;
+                }
 
-        // Skip days without events
-        if (dayEvents.length === 0) {
-            continue;
-        }
+                hasEvents = true;
 
-        hasEvents = true;
+                // Classes for day
+                let dayClasses = 'jsm-event-calendar-day';
 
-        // Classes for day
-        let dayClasses = 'jsm-event-calendar-day';
+                // Check if day is today
+                if (i === todayDate && month === todayMonth && year === todayYear) {
+                    dayClasses += ' today';
+                }
 
-        // Check if day is today
-        if (i === todayDate && month === todayMonth && year === todayYear) {
-            dayClasses += ' today';
-        }
+                // Check if day is past (already occurred in current month)
+                if ((year === todayYear && month === todayMonth && i < todayDate) ||
+                    (year === todayYear && month < todayMonth) ||
+                    (year < todayYear)) {
+                    dayClasses += ' past-day';
+                }
 
-        // Check if day is past (already occurred in current month)
-        if ((year === todayYear && month === todayMonth && i < todayDate) ||
-            (year === todayYear && month < todayMonth) ||
-            (year < todayYear)) {
-            dayClasses += ' past-day';
-        }
+                // Calculate day of week for European format
+                const dayDate = new Date(year, month - 1, i);
+                let dayOfWeek = dayDate.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+                dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to 0=Monday, ..., 6=Sunday
 
-        // Calculate day of week for European format
-        const dayDate = new Date(year, month - 1, i);
-        let dayOfWeek = dayDate.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
-        dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to 0=Monday, ..., 6=Sunday
+                const dayName = jsmEventCalendar.i18n.weekdays[dayOfWeek];
+                const formattedDate = dayDate.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long'
+                });
 
-        const dayName = jsmEventCalendar.i18n.weekdays[dayOfWeek];
-        const formattedDate = dayDate.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' });
+                html += '<div class="' + dayClasses + '" data-date="' + year + '-' + this.pad(month) + '-' + this.pad(i) + '">';
+                html += '<div class="jsm-event-calendar-day-header">';
+                html += '<span class="jsm-event-calendar-day-number">' + i + '</span>';
+                html += '<span class="jsm-event-calendar-day-name">' + dayName + '</span>';
+                html += '</div>';
 
-        html += '<div class="' + dayClasses + '" data-date="' + year + '-' + this.pad(month) + '-' + this.pad(i) + '">';
-        html += '<div class="jsm-event-calendar-day-header">';
-        html += '<span class="jsm-event-calendar-day-number">' + i + '</span>';
-        html += '<span class="jsm-event-calendar-day-name">' + dayName + '</span>';
-        html += '</div>';
+                // Sort events before rendering
+                const sortedDayEvents = this.sortEventsByTime(dayEvents);
 
-        // Events for this day - use the same rendering function for consistency
-        for (let j = 0; j < dayEvents.length; j++) {
-            html += this.renderEventInCell(dayEvents[j]);
-        }
+                // Events for this day - use the same rendering function for consistency
+                for (let j = 0; j < sortedDayEvents.length; j++) {
+                    html += this.renderEventInCell(sortedDayEvents[j]);
+                }
 
-        html += '</div>';
-    }
+                html += '</div>';
+            }
 
-    html += '</div>';
+            html += '</div>';
 
-    // If no events, show message
-    if (!hasEvents) {
-        html = '<div class="jsm-event-no-events">' + jsmEventCalendar.i18n.noEventsText + '</div>';
-    }
+            // If no events, show message
+            if (!hasEvents) {
+                html = '<div class="jsm-event-no-events">' + jsmEventCalendar.i18n.noEventsText + '</div>';
+            }
 
-    $calendarTable.html(html);
+            $calendarTable.html(html);
 
-    // Make sure modal is closed after rendering calendar
-    this.closeEventModal();
-},
+            // Make sure modal is closed after rendering calendar
+            this.closeEventModal();
+        },
 
         /**
          * Get events for given day
@@ -485,10 +540,10 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
 
             // Store essential event data as data attributes
             let html = '<div class="jsm-event-calendar-event" ' +
-                       'data-event-id="' + event.id + '" ' +
-                       (isCustomEvent ? 'data-custom="true"' : '') + ' ' +
-                       'data-title="' + this.escapeAttr(event.title) + '" ' +
-                       'data-date="' + this.escapeAttr(event.dateDisplay || event.startDate) + '" ';
+                'data-event-id="' + event.id + '" ' +
+                (isCustomEvent ? 'data-custom="true"' : '') + ' ' +
+                'data-title="' + this.escapeAttr(event.title) + '" ' +
+                'data-date="' + this.escapeAttr(event.dateDisplay || event.startDate) + '" ';
 
             // Add optional data attributes only if they exist
             if (event.timeDisplay) {
@@ -546,11 +601,14 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
                 return;
             }
 
+            // Sort events by all-day status and start time
+            const sortedEvents = this.sortEventsByTime([...events]);
+
             let html = '<div class="jsm-event-list">';
             html += '<h3 class="jsm-event-list-title">' + jsmEventCalendar.i18n.eventsListTitle + '</h3>';
 
-            for (let i = 0; i < events.length; i++) {
-                const event = events[i];
+            for (let i = 0; i < sortedEvents.length; i++) {
+                const event = sortedEvents[i];
                 if (!event || !event.id) continue;
 
                 html += '<div class="jsm-event-list-item">';
@@ -615,7 +673,7 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
                 const eventId = $eventElement.data('event-id');
                 const isCustomEvent = $eventElement.data('custom') === true;
 
-                console.log('Event clicked:', eventId, 'Custom:', isCustomEvent);
+                //console.log('Event clicked:', eventId, 'Custom:', isCustomEvent);
 
                 // Show modal and loading indicator immediately
                 const $modal = $('#jsm-event-modal');
@@ -643,7 +701,7 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
                             excerptContent = decodeURIComponent(atob(excerptContent));
                         } catch (e) {
                             // If decoding fails, use as is
-                            console.log('Excerpt is not Base64 encoded or is invalid');
+                            //console.log('Excerpt is not Base64 encoded or is invalid');
                         }
                     }
 
@@ -670,7 +728,7 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
                                 event.id === eventId ||
                                 event.id.toString() === eventId.toString() ||
                                 (typeof event.id === 'string' && typeof eventId === 'string' &&
-                                 event.id.startsWith('Courses-') && eventId.includes(event.id.split('-')[1]))
+                                    event.id.startsWith('Courses-') && eventId.includes(event.id.split('-')[1]))
                             );
 
                             if (foundEvent) {
@@ -776,260 +834,261 @@ renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDa
             });
         },
 
-       /**
-        * Render event detail modal - unified method for all events
-        */
-       renderEventDetailModal: function(event) {
-           const $modal = $('#jsm-event-modal');
-           const $modalContent = $('#jsm-event-modal-content');
+        /**
+         * Render event detail modal - unified method for all events
+         */
+        renderEventDetailModal: function(event) {
+            const $modal = $('#jsm-event-modal');
+            const $modalContent = $('#jsm-event-modal-content');
 
-           // Use CSS class to activate modal
-           $modal.addClass('active');
+            // Use CSS class to activate modal
+            $modal.addClass('active');
 
-           // Add class to restrict scrolling on page under modal
-           $('body').addClass('modal-open');
+            // Add class to restrict scrolling on page under modal
+            $('body').addClass('modal-open');
 
-           console.log('Rendering event in modal:', event);
+            //console.log('Rendering event in modal:', event);
 
-           // Render modal HTML
-           let modalHtml = `
-               <div class="jsm-event-detail">
-                   <div class="jsm-event-detail-header">
-                       <h1 class="jsm-event-detail-title">${event.title || ''}</h1>
-                       <div class="jsm-event-detail-meta">
-                           <div class="jsm-event-detail-date">${event.dateDisplay || event.startDate}</div>
-                           <div class="jsm-event-detail-time">${event.timeDisplay || (event.allDay ? 'Celý den' : '')}</div>
-                       </div>
-                   </div>
-           `;
+            // Render modal HTML
+            let modalHtml = `
+                                       <div class="jsm-event-detail">
+                                           <div class="jsm-event-detail-header">
+                                               <h1 class="jsm-event-detail-title">${event.title || ''}</h1>
+                                               <div class="jsm-event-detail-meta">
+                                                   <div class="jsm-event-detail-date">${event.dateDisplay || event.startDate}</div>
+                                                   <div class="jsm-event-detail-time">${event.timeDisplay || (event.allDay ? 'Celý den' : '')}</div>
+                                               </div>
+                                           </div>
+                                   `;
 
-           // Add excerpt if available
-           if (event.excerpt) {
-               modalHtml += `
-                   <div class="jsm-event-detail-content">
-                       ${event.excerpt}
-                   </div>
-               `;
-           }
+            // Add excerpt if available
+            if (event.excerpt) {
+                modalHtml += `
+                                           <div class="jsm-event-detail-content">
+                                               ${event.excerpt}
+                                           </div>
+                                       `;
+            }
 
-           // Add custom URL button
-           if (event.customUrl || event.url) {
-               modalHtml += `
-                   <div class="jsm-event-detail-footer">
-                       <a href="${event.customUrl || event.url}" class="jsm-event-button" target="_blank">
-                           ${event.buttonText || 'Více informací'}
-                       </a>
-                   </div>
-               `;
-           }
+            // Add custom URL button
+            if (event.customUrl || event.url) {
+                modalHtml += `
+                                           <div class="jsm-event-detail-footer">
+                                               <a href="${event.customUrl || event.url}" class="jsm-event-button" target="_blank">
+                                                   ${event.buttonText || 'Více informací'}
+                                               </a>
+                                           </div>
+                                       `;
+            }
 
-           modalHtml += '</div>';
+            modalHtml += '</div>';
 
-           $modalContent.html(modalHtml + '<span class="jsm-event-modal-close">&times;</span>');
-       },
+            $modalContent.html(modalHtml + '<span class="jsm-event-modal-close">&times;</span>');
+        },
 
         /**
-        * Open modal with event details - improved implementation
-        */
-       openEventModal: function(eventId) {
-           if (!eventId) {
-               console.error('No event ID provided for modal');
-               return;
-           }
+         * Open modal with event details - improved implementation
+         */
+        openEventModal: function(eventId) {
+            if (!eventId) {
+                console.error('No event ID provided for modal');
+                return;
+            }
 
-           const $modal = $('#jsm-event-modal');
-           const $modalContent = $('#jsm-event-modal-content');
+            const $modal = $('#jsm-event-modal');
+            const $modalContent = $('#jsm-event-modal-content');
 
-           // Use CSS class to activate modal
-           $modal.addClass('active');
+            // Use CSS class to activate modal
+            $modal.addClass('active');
 
-           console.log('Opening modal for event ID:', eventId);
+            //console.log('Opening modal for event ID:', eventId);
 
-           // Add class to restrict scrolling on page under modal
-           $('body').addClass('modal-open');
+            // Add class to restrict scrolling on page under modal
+            $('body').addClass('modal-open');
 
-           // Loading animation
-           $modalContent.html('<div class="jsm-event-loading"><div class="jsm-event-loading-spinner"></div><p>' + jsmEventCalendar.i18n.loadingText + '</p></div>');
+            // Loading animation
+            $modalContent.html('<div class="jsm-event-loading"><div class="jsm-event-loading-spinner"></div><p>' + jsmEventCalendar.i18n.loadingText + '</p></div>');
 
-           // Function to render modal content
-           const renderEventModal = (event) => {
-               if (!event) {
-                   $modalContent.html('<div class="jsm-event-no-events">Událost nebyla nalezena.</div>');
-                   return;
-               }
+            // Function to render modal content
+            const renderEventModal = (event) => {
+                if (!event) {
+                    $modalContent.html('<div class="jsm-event-no-events">Událost nebyla nalezena.</div>');
+                    return;
+                }
 
-               console.log('Rendering event:', event);
+                //console.log('Rendering event:', event);
 
-               // Prepare date and time display
-               let dateDisplay = event.dateDisplay || event.startDate;
-               let timeDisplay = event.timeDisplay || (event.allDay ? 'Celý den' : '');
+                // Prepare date and time display
+                let dateDisplay = event.dateDisplay || event.startDate;
+                let timeDisplay = event.timeDisplay || (event.allDay ? 'Celý den' : '');
 
-               // Prepare HTML for modal
-               let modalHtml = `
-                   <div class="jsm-event-detail">
-                       <div class="jsm-event-detail-header">
-                           <h1 class="jsm-event-detail-title">${event.title || ''}</h1>
-                           <div class="jsm-event-detail-meta">
-                               <div class="jsm-event-detail-date">${dateDisplay}</div>
-                               <div class="jsm-event-detail-time">${timeDisplay}</div>
-                           </div>
-                       </div>
-               `;
+                // Prepare HTML for modal
+                let modalHtml = `
+                                           <div class="jsm-event-detail">
+                                               <div class="jsm-event-detail-header">
+                                                   <h1 class="jsm-event-detail-title">${event.title || ''}</h1>
+                                                   <div class="jsm-event-detail-meta">
+                                                       <div class="jsm-event-detail-date">${dateDisplay}</div>
+                                                       <div class="jsm-event-detail-time">${timeDisplay}</div>
+                                                   </div>
+                                               </div>
+                                       `;
 
-               // Add excerpt if available
-               if (event.excerpt) {
-                   modalHtml += `
-                       <div class="jsm-event-detail-content">
-                           ${event.excerpt}
-                       </div>
-                   `;
-               }
+                // Add excerpt if available
+                if (event.excerpt) {
+                    modalHtml += `
+                                               <div class="jsm-event-detail-content">
+                                                   ${event.excerpt}
+                                               </div>
+                                           `;
+                }
 
-               // Add custom URL button
-               if (event.customUrl || event.url) {
-                   modalHtml += `
-                       <div class="jsm-event-detail-footer">
-                           <a href="${event.customUrl || event.url}" class="jsm-event-button" target="_blank">
-                               ${event.buttonText || 'Více informací'}
-                           </a>
-                       </div>
-                   `;
-               }
+                // Add custom URL button
+                if (event.customUrl || event.url) {
+                    modalHtml += `
+                                               <div class="jsm-event-detail-footer">
+                                                   <a href="${event.customUrl || event.url}" class="jsm-event-button" target="_blank">
+                                                       ${event.buttonText || 'Více informací'}
+                                                   </a>
+                                               </div>
+                                           `;
+                }
 
-               modalHtml += '</div>';
+                modalHtml += '</div>';
 
-               $modalContent.html(modalHtml + '<span class="jsm-event-modal-close">&times;</span>');
-           };
+                $modalContent.html(modalHtml + '<span class="jsm-event-modal-close">&times;</span>');
+            };
 
-           // First, try to find in current allEvents
-           const addonEvent = jsmEventCalendar.allEvents &&
-               jsmEventCalendar.allEvents.find(event =>
-                   event.custom === true &&
-                   (event.id === eventId ||
-                    event.id === eventId.toString() ||
-                    (event.id.startsWith('Courses-') && eventId.toString().includes(event.id.split('-')[1])))
-               );
+            // First, try to find in current allEvents
+            const addonEvent = jsmEventCalendar.allEvents &&
+                jsmEventCalendar.allEvents.find(event =>
+                    event.custom === true &&
+                    (event.id === eventId ||
+                        event.id === eventId.toString() ||
+                        (event.id.startsWith('Courses-') && eventId.toString().includes(event.id.split('-')[1])))
+                );
 
-           if (addonEvent) {
-               renderEventModal(addonEvent);
-               return;
-           }
+            if (addonEvent) {
+                renderEventModal(addonEvent);
+                return;
+            }
 
-           // If not found in current events, fetch via AJAX
-           $.ajax({
-               url: jsmEventCalendar.ajaxurl,
-               type: 'GET',
-               data: {
-                   action: 'get_events_for_calendar',
-                   month: new Date().getMonth() + 1, // Current month
-                   year: new Date().getFullYear(),
-                   nonce: jsmEventCalendar.nonce
-               },
-               success: function(response) {
-                   if (response && response.success) {
-                       // Update allEvents
-                       jsmEventCalendar.allEvents = response.data;
+            // If not found in current events, fetch via AJAX
+            $.ajax({
+                url: jsmEventCalendar.ajaxurl,
+                type: 'GET',
+                data: {
+                    action: 'get_events_for_calendar',
+                    month: new Date().getMonth() + 1, // Current month
+                    year: new Date().getFullYear(),
+                    nonce: jsmEventCalendar.nonce
+                },
+                success: function(response) {
+                    if (response && response.success) {
+                        // Update allEvents
+                        jsmEventCalendar.allEvents = response.data;
 
-                       // Try to find the event again
-                       const foundEvent = response.data.find(event =>
-                           event.custom === true &&
-                           (event.id === eventId ||
-                            event.id === eventId.toString() ||
-                            (event.id.startsWith('Courses-') && eventId.toString().includes(event.id.split('-')[1])))
-                       );
+                        // Try to find the event again
+                        const foundEvent = response.data.find(event =>
+                            event.custom === true &&
+                            (event.id === eventId ||
+                                event.id === eventId.toString() ||
+                                (event.id.startsWith('Courses-') && eventId.toString().includes(event.id.split('-')[1])))
+                        );
 
-                       if (foundEvent) {
-                           renderEventModal(foundEvent);
-                       } else {
-                           $modalContent.html('<div class="jsm-event-no-events">Událost nebyla nalezena.</div><span class="jsm-event-modal-close">&times;</span>');
-                       }
-                   } else {
-                       $modalContent.html('<div class="jsm-event-no-events">Chyba při načítání událostí.</div><span class="jsm-event-modal-close">&times;</span>');
-                   }
-               },
-               error: function(xhr, status, error) {
-                   console.error('Error loading events:', error);
-                   $modalContent.html('<div class="jsm-event-no-events">Chyba při načítání události.</div><span class="jsm-event-modal-close">&times;</span>');
-               }
-           });
-       },
-       /**
-        * Find external event from loaded events
-        */
-       findExternalEvent: function(eventId) {
-           // Check if current events have been loaded
-           if (!window.jsmEventCalendar || !jsmEventCalendar.currentEvents) {
-               return null;
-           }
+                        if (foundEvent) {
+                            renderEventModal(foundEvent);
+                        } else {
+                            $modalContent.html('<div class="jsm-event-no-events">Událost nebyla nalezena.</div><span class="jsm-event-modal-close">&times;</span>');
+                        }
+                    } else {
+                        $modalContent.html('<div class="jsm-event-no-events">Chyba při načítání událostí.</div><span class="jsm-event-modal-close">&times;</span>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading events:', error);
+                    $modalContent.html('<div class="jsm-event-no-events">Chyba při načítání události.</div><span class="jsm-event-modal-close">&times;</span>');
+                }
+            });
+        },
 
-           // Find event with matching ID
-           return jsmEventCalendar.currentEvents.find(event => event.id === eventId);
-       },
+        /**
+         * Find external event from loaded events
+         */
+        findExternalEvent: function(eventId) {
+            // Check if current events have been loaded
+            if (!window.jsmEventCalendar || !jsmEventCalendar.currentEvents) {
+                return null;
+            }
 
-       /**
-        * Render external event modal content
-        */
-       renderExternalEventModal: function(event) {
-           console.log('Rendering external event', event);
+            // Find event with matching ID
+            return jsmEventCalendar.currentEvents.find(event => event.id === eventId);
+        },
 
-           // Prepare start date
-           const startDate = event.startDate ?
-               new Date(event.startDate).toLocaleDateString(undefined, {
-                   year: 'numeric',
-                   month: 'long',
-                   day: 'numeric'
-               }) : '';
+        /**
+         * Render external event modal content
+         */
+        renderExternalEventModal: function(event) {
+            //console.log('Rendering external event', event);
 
-           // Prepare end date (if different)
-           const endDate = event.endDate && event.endDate !== event.startDate ?
-               new Date(event.endDate).toLocaleDateString(undefined, {
-                   year: 'numeric',
-                   month: 'long',
-                   day: 'numeric'
-               }) : '';
+            // Prepare start date
+            const startDate = event.startDate ?
+                new Date(event.startDate).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }) : '';
 
-           // Combine dates
-           const dateDisplay = endDate ? `${startDate} - ${endDate}` : startDate;
+            // Prepare end date (if different)
+            const endDate = event.endDate && event.endDate !== event.startDate ?
+                new Date(event.endDate).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }) : '';
 
-           // HTML for modal
-           return `
-               <div class="jsm-event-detail">
-                   <div class="jsm-event-detail-header">
-                       <h1 class="jsm-event-detail-title">${event.title}</h1>
+            // Combine dates
+            const dateDisplay = endDate ? `${startDate} - ${endDate}` : startDate;
 
-                       <div class="jsm-event-detail-meta">
-                           <div class="jsm-event-detail-date">${dateDisplay}</div>
-                           <div class="jsm-event-detail-time">
-                               ${event.timeDisplay || (event.allDay ? 'Celý den' : '')}
-                           </div>
-                       </div>
-                   </div>
+            // HTML for modal
+            return `
+                                       <div class="jsm-event-detail">
+                                           <div class="jsm-event-detail-header">
+                                               <h1 class="jsm-event-detail-title">${event.title}</h1>
 
-                   <div class="jsm-event-detail-content">
-                       ${event.excerpt || ''}
-                   </div>
+                                               <div class="jsm-event-detail-meta">
+                                                   <div class="jsm-event-detail-date">${dateDisplay}</div>
+                                                   <div class="jsm-event-detail-time">
+                                                       ${event.timeDisplay || (event.allDay ? 'Celý den' : '')}
+                                                   </div>
+                                               </div>
+                                           </div>
 
-                   ${event.customUrl ? `
-                   <div class="jsm-event-detail-footer">
-                       <a href="${event.customUrl}" class="jsm-event-button" target="_blank">
-                           ${event.buttonText || 'Více informací'}
-                       </a>
-                   </div>
-                   ` : ''}
-               </div>
-           `;
-       },
+                                           <div class="jsm-event-detail-content">
+                                               ${event.excerpt || ''}
+                                           </div>
 
-       /**
-        * Close modal window - improved implementation
-        */
-       closeEventModal: function() {
-           const $modal = $('#jsm-event-modal');
-           // Remove active class
-           $modal.removeClass('active');
-           $('body').removeClass('modal-open');
-           console.log('Modal closed'); // Debugging
-       },
+                                           ${event.customUrl ? `
+                                           <div class="jsm-event-detail-footer">
+                                               <a href="${event.customUrl}" class="jsm-event-button" target="_blank">
+                                                   ${event.buttonText || 'Více informací'}
+                                               </a>
+                                           </div>
+                                           ` : ''}
+                                       </div>
+                                   `;
+        },
+
+        /**
+         * Close modal window - improved implementation
+         */
+        closeEventModal: function() {
+            const $modal = $('#jsm-event-modal');
+            // Remove active class
+            $modal.removeClass('active');
+            $('body').removeClass('modal-open');
+            //console.log('Modal closed'); // Debugging
+        },
 
         /**
          * Detect mobile view and switch to responsive layout
