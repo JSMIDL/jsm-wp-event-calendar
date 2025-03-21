@@ -27,7 +27,11 @@ class WP_Event_Settings {
      * @var array
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
     public static $defaults = array(
+=======
+    private $defaults = array(
+>>>>>>> parent of da6c2e6 (change slug and shortcode)
 =======
     private $defaults = array(
 >>>>>>> parent of da6c2e6 (change slug and shortcode)

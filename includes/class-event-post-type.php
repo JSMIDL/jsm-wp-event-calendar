@@ -62,10 +62,14 @@ class WP_Event_Post_Type {
         );
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         register_post_type('jsm_wp_event_calendar', $args);
 
         // Přidání category taxonomie k post typu událost
         register_taxonomy_for_object_type('category', 'jsm_wp_event_calendar');
+=======
+        register_post_type('wp_event', $args);
+>>>>>>> parent of da6c2e6 (change slug and shortcode)
 =======
         register_post_type('wp_event', $args);
 >>>>>>> parent of da6c2e6 (change slug and shortcode)
