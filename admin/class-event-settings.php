@@ -1,5 +1,10 @@
 <?php
 /**
+ * Upravená verze souboru
+ * admin/class-event-settings.php
+ */
+
+/**
  * Plugin Name: JSM WP Event Calendar
  * Description: Plugin pro správu nastavení kalendáře událostí.
  * Version: 1.0
@@ -21,7 +26,7 @@ class WP_Event_Settings {
      *
      * @var array
      */
-    private static $defaults = array(
+    public static $defaults = array(
         'primary_color' => '#2563eb',
         'primary_hover' => '#1d4ed8',
         'secondary_color' => '#4f46e5',
@@ -62,7 +67,7 @@ class WP_Event_Settings {
             __('Nastavení kalendáře', 'jsm-wp-event-calendar'),
             __('Nastavení', 'jsm-wp-event-calendar'),
             'manage_options',
-            'wp_event_settings',
+            'jsm_wp_event_settings',
             array($this, 'render_settings_page')
         );
     }

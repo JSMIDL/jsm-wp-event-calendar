@@ -29,8 +29,14 @@ class WP_Event_Admin {
         if ('post.php' === $hook || 'post-new.php' === $hook) {
             if ('jsm_wp_event_calendar' === $screen->post_type) {
                 wp_enqueue_style('wp-event-admin', WP_EVENT_CALENDAR_PLUGIN_URL . 'admin/css/event-admin.css', array(), WP_EVENT_CALENDAR_VERSION);
+                wp_enqueue_script('jquery-ui-datepicker');
                 wp_enqueue_script('wp-event-admin', WP_EVENT_CALENDAR_PLUGIN_URL . 'admin/js/event-admin.js', array('jquery', 'jquery-ui-datepicker'), WP_EVENT_CALENDAR_VERSION, true);
             }
+        }
+
+        // Přidání stylů i pro stránku nastavení
+        if ('jsm_wp_event_calendar_page_jsm_wp_event_settings' === $screen->id) {
+            wp_enqueue_style('wp-event-admin', WP_EVENT_CALENDAR_PLUGIN_URL . 'admin/css/event-admin.css', array(), WP_EVENT_CALENDAR_VERSION);
         }
     }
 
@@ -44,8 +50,8 @@ class WP_Event_Admin {
         foreach ($columns as $key => $value) {
             $new_columns[$key] = $value;
             if ('title' === $key) {
-                $new_columns['event_date'] = __('Datum události', 'wp-event-calendar');
-                $new_columns['event_time'] = __('Čas', 'wp-event-calendar');
+                $new_columns['event_date'] = __('Datum události', 'jsm-wp-event-calendar');
+                $new_columns['event_time'] = __('Čas', 'jsm-wp-event-calendar');
             }
         }
 
@@ -76,7 +82,7 @@ class WP_Event_Admin {
                 $all_day = get_post_meta($post_id, '_event_all_day', true);
 
                 if ('1' === $all_day) {
-                    echo esc_html__('Celý den', 'wp-event-calendar');
+                    echo esc_html__('Celý den', 'jsm-wp-event-calendar');
                 } else {
                     $start_time = get_post_meta($post_id, '_event_start_time', true);
                     $end_time = get_post_meta($post_id, '_event_end_time', true);

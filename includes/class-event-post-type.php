@@ -3,25 +3,29 @@
  * Třída pro správu událostí jako vlastního post typu
  */
 class WP_Event_Post_Type {
-    
+
     /**
      * Registrace post typu a metaboxů
+     * UPRAVENO: Odstraněna duplicitní registrace post typu
      */
     public function register() {
-        // Registrace post typu
-        add_action('init', array($this, 'register_post_type'));
-        
         // Registrace metaboxů
         add_action('add_meta_boxes', array($this, 'register_meta_boxes'));
-        
+
         // Uložení metadat
         add_action('save_post', array($this, 'save_event_metadata'), 10, 2);
     }
-    
+
     /**
      * Registrace post typu Event
+     * UPRAVENO: Přidána kontrola, zda již není post typ registrován
      */
     public function register_post_type() {
+        // Kontrola, zda již post typ neexistuje
+        if (post_type_exists('jsm_wp_event_calendar')) {
+            return;
+        }
+
         $labels = array(
             'name'               => _x('Události', 'post type general name', 'jsm-wp-event-calendar'),
             'singular_name'      => _x('Událost', 'post type singular name', 'jsm-wp-event-calendar'),
@@ -58,6 +62,9 @@ class WP_Event_Post_Type {
         );
 
         register_post_type('jsm_wp_event_calendar', $args);
+
+        // Přidání category taxonomie k post typu událost
+        register_taxonomy_for_object_type('category', 'jsm_wp_event_calendar');
     }
 
     /**
