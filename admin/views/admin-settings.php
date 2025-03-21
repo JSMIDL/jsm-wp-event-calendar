@@ -8,17 +8,11 @@ if (!current_user_can('manage_options')) {
     return;
 }
 
-// Kontrola resetu nastavení
-if (isset($_GET['reset-settings']) && $_GET['reset-settings'] === 'true'
-    && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'jsm_reset_settings_nonce')) {
-    delete_option('wp_event_calendar_settings');
-    wp_redirect(remove_query_arg(array('reset-settings', '_wpnonce')));
-    exit;
-}
 
 // Získání aktuálních hodnot
 $options = get_option('wp_event_calendar_settings', array());
 $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
+
 ?>
 
 <div class="wrap">
@@ -37,6 +31,12 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
             ?>
 
             <div class="jsm-settings-form">
+            <!-- Tlačítko reset nahoře -->
+                <div class="jsm-reset-settings-top-right">
+                    <button type="button" id="reset-settings" class="button button-secondary">
+                        <?php _e('Obnovit výchozí nastavení', 'jsm-wp-event-calendar'); ?>
+                    </button>
+                </div>
                 <div class="jsm-settings-columns">
                     <div class="jsm-settings-column">
                         <h3><?php _e('Barevné schéma', 'jsm-wp-event-calendar'); ?></h3>
@@ -203,17 +203,12 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
                         transition: all 0.2s;
                     "><?php _e('Ukázkové tlačítko', 'jsm-wp-event-calendar'); ?></button>
                 </div>
-
-                <div class="jsm-reset-settings">
-                    <button type="button" id="reset-settings" class="button button-secondary"><?php _e('Obnovit výchozí nastavení', 'jsm-wp-event-calendar'); ?></button>
-                </div>
             </div>
 
             <?php submit_button(__('Uložit nastavení', 'jsm-wp-event-calendar'), 'primary', 'submit', true, array('id' => 'jsm-save-settings')); ?>
         </form>
     </div>
 </div>
-
 <style>
     /* Styly pro nastavení */
     .jsm-settings-content {
@@ -281,9 +276,10 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
         text-align: center;
     }
 
-    .jsm-reset-settings {
-        margin-top: 30px;
-        text-align: right;
+    .jsm-reset-settings-top-right {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 1em;
     }
 
     /* WP Color Picker adjustments */
@@ -307,120 +303,3 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
         }
     }
 </style>
-
-<script>
-(function($) {
-    $(document).ready(function() {
-        // Inicializace color pickeru, pokud existuje
-        if ($.fn.wpColorPicker) {
-            $('.jsm-color-picker').wpColorPicker({
-                change: function(event, ui) {
-                    // Aktualizace živého náhledu při změně barvy
-                    var id = $(this).attr('id');
-                    var color = ui.color.toString();
-                    updateColorPreview(id, color);
-                    updateCalendarPreview();
-                    updateButtonPreview();
-                }
-            });
-        }
-
-        // Reset settings button
-        $('#reset-settings').on('click', function() {
-            if (confirm('<?php _e('Opravdu chcete obnovit výchozí nastavení? Tato akce nelze vrátit zpět.', 'jsm-wp-event-calendar'); ?>')) {
-                window.location.href = "?post_type=jsm_wp_event&page=wp_event_settings&reset-settings=true&_wpnonce=<?php echo wp_create_nonce('jsm_reset_settings_nonce'); ?>";
-            }
-        });
-
-        // Náhled barev při změně - pro textová pole
-        $('.regular-text').on('input', function() {
-            updateCalendarPreview();
-            updateButtonPreview();
-        });
-
-        // Funkce pro aktualizaci náhledu barev
-        function updateColorPreview(id, color) {
-            $('.jsm-color-preview[data-color-id="' + id + '"]').css('background-color', color).text(color);
-        }
-
-        // Funkce pro aktualizaci náhledu kalendáře
-        function updateCalendarPreview() {
-            // Aktualizace hlavičky kalendáře
-            var primaryColor = $('#primary_color').val();
-            var secondaryColor = $('#secondary_color').val();
-            var buttonText = $('#button_text').val();
-            var borderRadius = $('#border_radius_sm').val();
-            var shadowMd = $('#shadow_md').val();
-            var borderColor = $('#border_color').val();
-            var backgroundColor = $('#background_color').val();
-            var surfaceColor = $('#surface_color').val();
-            var textPrimary = $('#text_primary').val();
-            var calendarSpacing = $('#calendar_spacing').val();
-
-            // Aktualizace prvků v náhledu
-            $('.jsm-preview-calendar-header').css({
-                'background': 'linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ')'
-            });
-
-            $('.jsm-preview-calendar-wrapper').css({
-                'background-color': backgroundColor,
-                'color': textPrimary,
-                'border-radius': $('#border_radius_lg').val(),
-                'box-shadow': shadowMd,
-                'border-color': borderColor
-            });
-
-            $('.jsm-preview-calendar-days').css({
-                'grid-gap': calendarSpacing
-            });
-
-            $('.jsm-preview-calendar-day').css({
-                'background-color': surfaceColor,
-                'border-color': borderColor,
-                'border-radius': borderRadius
-            });
-
-            // Aktualizace dnešního dne
-            $('.jsm-preview-calendar-day:nth-child(2)').css({
-                'border-color': primaryColor
-            });
-
-            $('.jsm-preview-calendar-day:nth-child(2) > div:first-child').css({
-                'background-color': primaryColor,
-                'color': buttonText
-            });
-
-            $('.jsm-preview-calendar-day:nth-child(2) > div:last-child').css({
-                'background-color': primaryColor,
-                'color': buttonText,
-                'border-radius': borderRadius
-            });
-        }
-
-        // Funkce pro aktualizaci náhledu tlačítka
-        function updateButtonPreview() {
-            var primaryColor = $('#primary_color').val();
-            var buttonText = $('#button_text').val();
-            var buttonRadius = $('#button_radius').val();
-            var shadowSm = $('#shadow_sm').val();
-
-            $('.jsm-preview-button').css({
-                'background-color': primaryColor,
-                'color': buttonText,
-                'border-radius': buttonRadius,
-                'box-shadow': shadowSm
-            });
-        }
-
-        // Nastavení hover efektu pro tlačítko
-        $('.jsm-preview-button').hover(
-            function() {
-                $(this).css('background-color', $('#primary_hover').val());
-            },
-            function() {
-                $(this).css('background-color', $('#primary_color').val());
-            }
-        );
-    });
-})(jQuery);
-</script>
