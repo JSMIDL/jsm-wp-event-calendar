@@ -186,14 +186,14 @@ class WP_Event_Settings {
      * Colors section description
      */
     public function colors_section_callback() {
-        echo '<p>' . __('Set the color scheme for the event calendar.', 'jsm-wp-event-calendar') . '</p>';
+        echo '<p>' . esc_html__('Set the color scheme for the event calendar.', 'jsm-wp-event-calendar') . '</p>';
     }
 
     /**
      * Dimensions section description
      */
     public function dimensions_section_callback() {
-        echo '<p>' . __('Set dimensions, shadows, and rounded corners for calendar elements.', 'jsm-wp-event-calendar') . '</p>';
+        echo '<p>' . esc_html__('Set dimensions, shadows, and rounded corners for calendar elements.', 'jsm-wp-event-calendar') . '</p>';
     }
 
     /**
@@ -291,7 +291,7 @@ class WP_Event_Settings {
      */
     public function admin_notices() {
         if (isset($_GET['reset']) && $_GET['reset'] === 'success') {
-            echo '<div class="notice notice-success is-dismissible"><p>' . __('Calendar settings have been reset to defaults.', 'jsm-wp-event-calendar') . '</p></div>';
+            echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Calendar settings have been reset to defaults.', 'jsm-wp-event-calendar') . '</p></div>';
         }
     }
 

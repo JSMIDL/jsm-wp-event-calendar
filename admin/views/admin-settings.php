@@ -19,8 +19,8 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
     <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
     <h2 class="nav-tab-wrapper">
-        <a href="?post_type=jsm_wp_event&page=wp_event_docs" class="nav-tab"><?php _e('Documentation', 'jsm-wp-event-calendar'); ?></a>
-        <a href="?post_type=jsm_wp_event&page=wp_event_settings" class="nav-tab nav-tab-active"><?php _e('Plugin Settings', 'jsm-wp-event-calendar'); ?></a>
+        <a href="?post_type=jsm_wp_event&page=wp_event_docs" class="nav-tab"><?php esc_html_e('Documentation', 'jsm-wp-event-calendar'); ?></a>
+        <a href="?post_type=jsm_wp_event&page=wp_event_settings" class="nav-tab nav-tab-active"><?php esc_html_e('Plugin Settings', 'jsm-wp-event-calendar'); ?></a>
     </h2>
 
     <!-- Settings tab -->
@@ -34,12 +34,12 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
             <!-- Reset button at top -->
                 <div class="jsm-reset-settings-top-right">
                     <button type="button" id="reset-settings" class="button button-secondary">
-                        <?php _e('Reset to Default Settings', 'jsm-wp-event-calendar'); ?>
+                        <?php esc_html_e('Reset to Default Settings', 'jsm-wp-event-calendar'); ?>
                     </button>
                 </div>
                 <div class="jsm-settings-columns">
                     <div class="jsm-settings-column">
-                        <h3><?php _e('Color Scheme', 'jsm-wp-event-calendar'); ?></h3>
+                        <h3><?php esc_html_e('Color Scheme', 'jsm-wp-event-calendar'); ?></h3>
                         <table class="form-table">
                             <tbody>
                                 <?php do_settings_fields('wp_event_settings', 'colors_section'); ?>
@@ -47,7 +47,7 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
                         </table>
                     </div>
                     <div class="jsm-settings-column">
-                        <h3><?php _e('Dimensions and Effects', 'jsm-wp-event-calendar'); ?></h3>
+                        <h3><?php esc_html_e('Dimensions and Effects', 'jsm-wp-event-calendar'); ?></h3>
                         <table class="form-table">
                             <tbody>
                                 <?php do_settings_fields('wp_event_settings', 'dimensions_section'); ?>
@@ -58,10 +58,10 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
             </div>
 
             <div class="jsm-settings-preview">
-                <h3><?php _e('Settings Preview', 'jsm-wp-event-calendar'); ?></h3>
+                <h3><?php esc_html_e('Settings Preview', 'jsm-wp-event-calendar'); ?></h3>
                 <div class="jsm-color-previews">
                     <div class="jsm-preview-section">
-                        <h4><?php _e('Primary Colors', 'jsm-wp-event-calendar'); ?></h4>
+                        <h4><?php esc_html_e('Primary Colors', 'jsm-wp-event-calendar'); ?></h4>
                         <div class="jsm-color-preview" data-color-id="primary_color" style="background-color: <?php echo esc_attr($options['primary_color']); ?>">
                             <?php echo esc_html($options['primary_color']); ?>
                         </div>
@@ -77,7 +77,7 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
                     </div>
 
                     <div class="jsm-preview-section">
-                        <h4><?php _e('Background Colors', 'jsm-wp-event-calendar'); ?></h4>
+                        <h4><?php esc_html_e('Background Colors', 'jsm-wp-event-calendar'); ?></h4>
                         <div class="jsm-color-preview" data-color-id="background_color" style="background-color: <?php echo esc_attr($options['background_color']); ?>; color: #333;">
                             <?php echo esc_html($options['background_color']); ?>
                         </div>
@@ -93,7 +93,7 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
                     </div>
 
                     <div class="jsm-preview-section">
-                        <h4><?php _e('Text Colors', 'jsm-wp-event-calendar'); ?></h4>
+                        <h4><?php esc_html_e('Text Colors', 'jsm-wp-event-calendar'); ?></h4>
                         <div class="jsm-color-preview" data-color-id="text_primary" style="background-color: <?php echo esc_attr($options['text_primary']); ?>">
                             <?php echo esc_html($options['text_primary']); ?>
                         </div>
@@ -107,7 +107,7 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
                 </div>
 
                 <div class="jsm-calendar-preview">
-                    <h4><?php _e('Calendar Example', 'jsm-wp-event-calendar'); ?></h4>
+                    <h4><?php esc_html_e('Calendar Example', 'jsm-wp-event-calendar'); ?></h4>
                     <div class="jsm-preview-calendar-wrapper" style="
                         background-color: <?php echo esc_attr($options['background_color']); ?>;
                         color: <?php echo esc_attr($options['text_primary']); ?>;
@@ -126,7 +126,7 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
                             text-align: center;
                             font-weight: bold;
                         ">
-                            <?php _e('March 2025', 'jsm-wp-event-calendar'); ?>
+                            <?php esc_html_e('March 2025', 'jsm-wp-event-calendar'); ?>
                         </div>
 
                         <!-- Days and events example -->
@@ -191,7 +191,7 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
                 </div>
 
                 <div class="jsm-button-preview">
-                    <h4><?php _e('Button Example', 'jsm-wp-event-calendar'); ?></h4>
+                    <h4><?php esc_html_e('Button Example', 'jsm-wp-event-calendar'); ?></h4>
                     <button class="jsm-preview-button" style="
                         background-color: <?php echo esc_attr($options['primary_color']); ?>;
                         color: <?php echo esc_attr($options['button_text']); ?>;
@@ -201,11 +201,11 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
                         padding: 8px 16px;
                         cursor: pointer;
                         transition: all 0.2s;
-                    "><?php _e('Example Button', 'jsm-wp-event-calendar'); ?></button>
+                    "><?php esc_html_e('Example Button', 'jsm-wp-event-calendar'); ?></button>
                 </div>
             </div>
 
-            <?php submit_button(__('Save Settings', 'jsm-wp-event-calendar'), 'primary', 'submit', true, array('id' => 'jsm-save-settings')); ?>
+            <?php submit_button(esc_html__('Save Settings', 'jsm-wp-event-calendar'), 'primary', 'submit', true, array('id' => 'jsm-save-settings')); ?>
         </form>
     </div>
 </div>

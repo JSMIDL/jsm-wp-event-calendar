@@ -9,7 +9,7 @@
  * Text Domain: jsm-wp-event-calendar
  * Domain Path: /languages
  * Requires at least: 5.0
- * Tested up to: 6.4
+ * Tested up to: 6.7
  * Requires PHP: 7.2
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -39,15 +39,6 @@ require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-taxonomy.php';
 function wp_event_calendar_init() {
     // Load text domain for translations
     load_plugin_textdomain('jsm-wp-event-calendar', false, dirname(plugin_basename(__FILE__)) . '/languages/');
-
-    // Check and load main plugin classes
-    if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-calendar.php')) {
-        require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-calendar.php';
-    }
-
-    if (file_exists(WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-shortcodes.php')) {
-        require_once WP_EVENT_CALENDAR_PLUGIN_DIR . 'includes/class-event-shortcodes.php';
-    }
 
     // Create calendar instance to load CSS and JS
     $calendar = new WP_Event_Calendar();

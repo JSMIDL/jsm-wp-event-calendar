@@ -58,7 +58,7 @@ if (empty($event)) {
     <?php endif; ?>
 
     <div class="jsm-event-detail-content">
-        <?php echo $event['content']; ?>
+        <?php echo wp_kses_post($event['content']); ?>
     </div>
 
     <?php if (!empty($event['custom_url'])) : ?>

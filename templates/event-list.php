@@ -27,7 +27,7 @@ $section_title = 'yes' === $atts['past']
 ?>
 
 <div class="jsm-event-wrapper">
-    <h2 class="jsm-event-section-title"><?php echo $section_title; ?></h2>
+    <h2 class="jsm-event-section-title"><?php echo esc_html($section_title); ?></h2>
 
     <div class="<?php echo esc_attr($list_class); ?>">
         <?php foreach ($events as $event) : ?>
@@ -63,7 +63,7 @@ $section_title = 'yes' === $atts['past']
                     <?php endif; ?>
 
                     <div class="jsm-event-list-item-content">
-                        <?php echo wpautop($event['excerpt']); ?>
+                        <?php echo wp_kses_post(wpautop($event['excerpt'])); ?>
                     </div>
 
                     <div class="jsm-event-list-item-footer">
@@ -138,7 +138,7 @@ $section_title = 'yes' === $atts['past']
                         </div>
 
                         <div class="jsm-event-grid-item-excerpt">
-                            <?php echo wpautop(wp_trim_words($event['excerpt'], 15)); ?>
+                            <?php echo wp_kses_post(wpautop(wp_trim_words($event['excerpt'], 15))); ?>
                         </div>
 
                         <?php if (!empty($event['custom_url']) && !empty($event['button_text'])): ?>

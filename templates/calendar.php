@@ -9,8 +9,8 @@
 $calendar_id = 'jsm-event-calendar-' . uniqid();
 
 // Current month and year - ensure we never display past months
-$current_month = date('m');
-$current_year = date('Y');
+$current_month = gmdate('m');
+$current_year = gmdate('Y');
 
 $month = absint($atts['month']);
 $year = absint($atts['year']);
@@ -42,18 +42,18 @@ $weekdays = array(
 );
 
 // Number of days in month
-$days_in_month = date('t', strtotime("$year-$month-01"));
+$days_in_month = gmdate('t', strtotime("$year-$month-01"));
 
 // FIXED: Get first day of month (0 = Monday, 6 = Sunday - European format)
 $first_day_timestamp = strtotime("$year-$month-01");
-$first_day_of_week = date('N', $first_day_timestamp); // 1 (Monday) to 7 (Sunday)
+$first_day_of_week = gmdate('N', $first_day_timestamp); // 1 (Monday) to 7 (Sunday)
 $first_day_of_month = $first_day_of_week - 1; // Convert to 0-6, where 0 is Monday
 
 // Today
-$today = date('Y-m-d');
-$today_day = date('j');
-$today_month = date('m');
-$today_year = date('Y');
+$today = gmdate('Y-m-d');
+$today_day = gmdate('j');
+$today_month = gmdate('m');
+$today_year = gmdate('Y');
 
 // Category for filtering
 $category = !empty($atts['category']) ? $atts['category'] : '';
@@ -74,14 +74,14 @@ $show_list = ($atts['show_list'] === 'yes');
             if ($show_prev) :
             ?>
             <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-prev" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php _e('Previous', 'jsm-wp-event-calendar'); ?>
+                <?php esc_html_e('Previous', 'jsm-wp-event-calendar'); ?>
             </button>
             <?php endif; ?>
             <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-today" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php _e('Today', 'jsm-wp-event-calendar'); ?>
+                <?php esc_html_e('Today', 'jsm-wp-event-calendar'); ?>
             </button>
             <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-next" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php _e('Next Month', 'jsm-wp-event-calendar'); ?>
+                <?php esc_html_e('Next Month', 'jsm-wp-event-calendar'); ?>
             </button>
         </div>
     </div>

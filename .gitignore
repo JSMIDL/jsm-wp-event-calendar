@@ -67,3 +67,6 @@ ehthumbs_vista.db
 *.stackdump
 Desktop.ini
 $RECYCLE.BIN/
+
+# Exclude all .DS_Store files in any subdirectory
+**/.DS_Store

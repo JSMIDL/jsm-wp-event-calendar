@@ -23,6 +23,8 @@ foreach ($events as $event) {
 }
 
 // Remove all meta data associated with events
+// Note: Using direct DB query here as this is more efficient for cleanup on uninstall
+// A direct query is necessary to bulk remove all plugin meta data in one operation
 global $wpdb;
 $wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE meta_key LIKE '_event_%'");
 

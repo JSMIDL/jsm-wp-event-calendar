@@ -100,7 +100,7 @@ class WP_Event_Post_Type {
     public function save_event_metadata($post_id, $post) {
         // Check nonce field
         if (!isset($_POST['wp_event_details_nonce']) ||
-            !wp_verify_nonce($_POST['wp_event_details_nonce'], 'wp_event_details_nonce')) {
+            !wp_verify_nonce(wp_unslash($_POST['wp_event_details_nonce']), 'wp_event_details_nonce')) {
             return;
         }
 
@@ -121,30 +121,30 @@ class WP_Event_Post_Type {
 
         // Save metadata
         if (isset($_POST['_event_start_date'])) {
-            update_post_meta($post_id, '_event_start_date', sanitize_text_field($_POST['_event_start_date']));
+            update_post_meta($post_id, '_event_start_date', sanitize_text_field(wp_unslash($_POST['_event_start_date'])));
         }
-        
+
         if (isset($_POST['_event_start_time'])) {
-            update_post_meta($post_id, '_event_start_time', sanitize_text_field($_POST['_event_start_time']));
+            update_post_meta($post_id, '_event_start_time', sanitize_text_field(wp_unslash($_POST['_event_start_time'])));
         }
-        
+
         if (isset($_POST['_event_end_date'])) {
-            update_post_meta($post_id, '_event_end_date', sanitize_text_field($_POST['_event_end_date']));
+            update_post_meta($post_id, '_event_end_date', sanitize_text_field(wp_unslash($_POST['_event_end_date'])));
         }
-        
+
         if (isset($_POST['_event_end_time'])) {
-            update_post_meta($post_id, '_event_end_time', sanitize_text_field($_POST['_event_end_time']));
+            update_post_meta($post_id, '_event_end_time', sanitize_text_field(wp_unslash($_POST['_event_end_time'])));
         }
-        
+
         $all_day = isset($_POST['_event_all_day']) ? '1' : '0';
         update_post_meta($post_id, '_event_all_day', $all_day);
-        
+
         if (isset($_POST['_event_url'])) {
-            update_post_meta($post_id, '_event_url', esc_url_raw($_POST['_event_url']));
+            update_post_meta($post_id, '_event_url', esc_url_raw(wp_unslash($_POST['_event_url'])));
         }
-        
+
         if (isset($_POST['_event_button_text'])) {
-            update_post_meta($post_id, '_event_button_text', sanitize_text_field($_POST['_event_button_text']));
+            update_post_meta($post_id, '_event_button_text', sanitize_text_field(wp_unslash($_POST['_event_button_text'])));
         }
     }
 }

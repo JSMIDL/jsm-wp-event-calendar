@@ -19,8 +19,8 @@ class WP_Event_Menu {
         // Register main documentation page
         add_submenu_page(
             'edit.php?post_type=jsm_wp_event',
-            __('Calendar Documentation', 'jsm-wp-event-calendar'),
-            __('Documentation', 'jsm-wp-event-calendar'),
+            esc_html__('Calendar Documentation', 'jsm-wp-event-calendar'),
+            esc_html__('Documentation', 'jsm-wp-event-calendar'),
             'manage_options',
             'wp_event_docs',
             array($this, 'render_docs_page')
@@ -29,8 +29,8 @@ class WP_Event_Menu {
         // Register settings page
         add_submenu_page(
             'edit.php?post_type=jsm_wp_event',
-            __('Calendar Settings', 'jsm-wp-event-calendar'),
-            __('Settings', 'jsm-wp-event-calendar'),
+            esc_html__('Calendar Settings', 'jsm-wp-event-calendar'),
+            esc_html__('Settings', 'jsm-wp-event-calendar'),
             'manage_options',
             'wp_event_settings',
             array($this, 'render_settings_page')
@@ -70,7 +70,7 @@ class WP_Event_Menu {
         // Check permissions and nonce
         if (!current_user_can('manage_options') ||
             !check_admin_referer('jsm_reset_settings_nonce')) {
-            wp_die(__('Insufficient permissions', 'jsm-wp-event-calendar'));
+            wp_die(esc_html__('Insufficient permissions', 'jsm-wp-event-calendar'));
         }
 
         // Delete current settings
