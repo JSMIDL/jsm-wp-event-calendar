@@ -52,6 +52,8 @@
                 JSMEventCalendar.detectMobileView();
                 // Equalize heights after resize
                 JSMEventCalendar.equalizeCalendarCellHeights();
+                // Also equalize all-day cell heights
+                JSMEventCalendar.equalizeAllDayCellHeights();
             }, 250);
         },
 
@@ -564,6 +566,36 @@
         },
 
         /**
+         * Equalize heights of all-day cells in weekly view
+         */
+        equalizeAllDayCellHeights: function() {
+            // Skip on mobile devices
+            if (window.innerWidth <= 768) {
+                return;
+            }
+
+            const $allDayCells = $('.jsm-weekly-all-day-cell');
+            if ($allDayCells.length === 0) return;
+
+            // Reset height for accurate measurement
+            $allDayCells.css('height', 'auto');
+
+            // Find maximum height
+            let maxHeight = 0;
+            $allDayCells.each(function() {
+                const height = $(this).outerHeight();
+                if (height > maxHeight) {
+                    maxHeight = height;
+                }
+            });
+
+            // Apply same height to all cells
+            if (maxHeight > 0) {
+                $allDayCells.css('height', maxHeight + 'px');
+            }
+        },
+
+        /**
          * Render weekly calendar content without reloading the entire template
          */
         renderWeeklyCalendarContent: function($calendarTable, year, month, day, events) {
@@ -632,7 +664,7 @@
             // Time column
             const $timeColumn = $('<div class="jsm-weekly-time-column"></div>');
             
-            // Add all-day row label
+            // Add all-day row label - use translation from i18n
             $timeColumn.append('<div class="jsm-weekly-time-label jsm-all-day-label">' + (jsmEventCalendar.i18n.allDay || 'All Day') + '</div>');
 
             // Generate time slots - full day (0-23)
@@ -668,7 +700,18 @@
                 // Sort and render all-day events
                 const sortedAllDayEvents = this.sortEventsByTime(allDayEvents);
                 for (let i = 0; i < sortedAllDayEvents.length; i++) {
-                    $allDayCell.append(this.renderEventInDailyCell(sortedAllDayEvents[i], true));
+                    // Apply staggered positioning for all-day events
+                    const leftOffset = (i * 10) + '%';
+                    const widthAdjust = (sortedAllDayEvents.length > 1) ? (100 - (i * 10)) + '%' : '100%';
+                    const zIndex = 10 + (sortedAllDayEvents.length - i);
+                    
+                    $allDayCell.append(
+                        this.renderEventInDailyCell(
+                            sortedAllDayEvents[i], 
+                            true, 
+                            { left: leftOffset, width: widthAdjust, zIndex: zIndex }
+                        )
+                    );
                 }
                 
                 $dayColumn.append($allDayCell);
@@ -710,6 +753,11 @@
 
                 $body.append($dayColumn);
             }
+            
+            // Equalize heights of all-day cells after rendering
+            setTimeout(() => {
+                this.equalizeAllDayCellHeights();
+            }, 100);
         },
 
         /**
@@ -1310,9 +1358,17 @@
                     // Sort events
                     const sortedDayEvents = this.sortEventsByTime(dayEvents);
 
-                    // Render events
+                    // Render events with staggered positioning
                     for (let i = 0; i < sortedDayEvents.length; i++) {
-                        html += this.renderEventInDailyCell(sortedDayEvents[i]);
+                        const leftOffset = (i * 10) + '%';
+                        const widthAdjust = (sortedDayEvents.length > 1) ? (100 - (i * 10)) + '%' : '100%';
+                        const zIndex = 10 + (sortedDayEvents.length - i);
+                        
+                        html += this.renderEventInDailyCell(
+                            sortedDayEvents[i], 
+                            false, 
+                            { left: leftOffset, width: widthAdjust, zIndex: zIndex }
+                        );
                     }
 
                     html += '</div>'; // End hour cell

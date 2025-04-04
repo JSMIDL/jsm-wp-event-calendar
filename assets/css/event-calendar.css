@@ -1022,10 +1022,9 @@
 }
 
 .jsm-weekly-all-day-cell .jsm-daily-event {
-  position: relative;
-  left: auto;
-  right: auto;
+  position: absolute;
   margin-bottom: 0.5rem;
+  z-index: 5;
 }
 
 .jsm-weekly-hour-cell {
@@ -1043,6 +1042,11 @@
   position: absolute;
   left: 0.25rem;
   right: 0.25rem;
+  transition: var(--transition);
+}
+
+.jsm-weekly-hour-cell .jsm-daily-event:hover {
+  z-index: 20 !important;
 }
 
 /* Add some responsive adjustments for mobile */

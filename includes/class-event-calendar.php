@@ -82,6 +82,7 @@ class WP_Event_Calendar
                 "day" => __("Day", "jsm-wp-event-calendar"),
                 "week" => __("Week", "jsm-wp-event-calendar"),
                 "month" => __("Month", "jsm-wp-event-calendar"),
+                "allDay" => __("All Day", "jsm-wp-event-calendar"),
                 "months" => [
                     __("January", "jsm-wp-event-calendar"),
                     __("February", "jsm-wp-event-calendar"),
