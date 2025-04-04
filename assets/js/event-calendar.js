@@ -574,6 +574,9 @@
 
             // Time column
             const $timeColumn = $('<div class="jsm-weekly-time-column"></div>');
+            
+            // Add all-day row label
+            $timeColumn.append('<div class="jsm-weekly-time-label jsm-all-day-label">' + (jsmEventCalendar.i18n.allDay || 'All Day') + '</div>');
 
             // Generate time slots - full day (0-23)
             for (let hour = 0; hour <= 23; hour++) {
@@ -593,26 +596,56 @@
                 }
 
                 const $dayColumn = $('<div class="' + dayClass + '" data-date="' + dayInfo.dateStr + '"></div>');
+                
+                // Add all-day events cell first
+                const $allDayCell = $('<div class="jsm-weekly-all-day-cell" data-hour="all-day"></div>');
+                
+                // Get all-day events for this day
+                const allDayEvents = this.getAllDayEvents(
+                    events,
+                    dayInfo.date.getFullYear(),
+                    dayInfo.date.getMonth() + 1,
+                    dayInfo.date.getDate()
+                );
+                
+                // Sort and render all-day events
+                const sortedAllDayEvents = this.sortEventsByTime(allDayEvents);
+                for (let i = 0; i < sortedAllDayEvents.length; i++) {
+                    $allDayCell.append(this.renderEventInDailyCell(sortedAllDayEvents[i], true));
+                }
+                
+                $dayColumn.append($allDayCell);
 
                 // Hours cells
                 for (let hour = 0; hour <= 23; hour++) {
                     const $hourCell = $('<div class="jsm-weekly-hour-cell" data-hour="' + hour + '"></div>');
 
-                    // Get events for this day and hour
+                    // Get events for this day and hour (excluding all-day events)
                     const dayEvents = this.getEventsForHour(
                         events,
                         dayInfo.date.getFullYear(),
                         dayInfo.date.getMonth() + 1,
                         dayInfo.date.getDate(),
-                        hour
+                        hour,
+                        false
                     );
 
                     // Sort events
                     const sortedDayEvents = this.sortEventsByTime(dayEvents);
 
-                    // Render events
+                    // Render events with staggered positioning
                     for (let i = 0; i < sortedDayEvents.length; i++) {
-                        $hourCell.append(this.renderEventInDailyCell(sortedDayEvents[i]));
+                        const leftOffset = (i * 10) + '%';
+                        const widthAdjust = (sortedDayEvents.length > 1) ? (100 - (i * 10)) + '%' : '100%';
+                        const zIndex = 10 + (sortedDayEvents.length - i);
+                        
+                        $hourCell.append(
+                            this.renderEventInDailyCell(
+                                sortedDayEvents[i], 
+                                false, 
+                                { left: leftOffset, width: widthAdjust, zIndex: zIndex }
+                            )
+                        );
                     }
 
                     $dayColumn.append($hourCell);
@@ -1025,8 +1058,11 @@
 
         /**
          * Render event in daily cell
+         * @param {Object} event - The event to render
+         * @param {boolean} isAllDay - Whether this is in the all-day section
+         * @param {Object} positioning - Optional positioning parameters
          */
-        renderEventInDailyCell: function(event) {
+        renderEventInDailyCell: function(event, isAllDay = false, positioning = null) {
             if (!event || !event.id || !event.title) {
                 return '';
             }
@@ -1053,17 +1089,32 @@
                 }
             }
             
-            // Set height based on duration
-            const heightStyle = event.allDay ? '' : `height: ${Math.max(durationHours * 60 - 10, 50)}px;`;
+            // Set styles based on parameters
+            let styles = [];
+            
+            // Height for regular events
+            if (!isAllDay && !event.allDay) {
+                styles.push(`height: ${Math.max(durationHours * 60 - 10, 50)}px`);
+            }
+            
+            // Apply custom positioning if provided
+            if (positioning) {
+                if (positioning.left) styles.push(`left: ${positioning.left}`);
+                if (positioning.width) styles.push(`width: ${positioning.width}`);
+                if (positioning.zIndex) styles.push(`z-index: ${positioning.zIndex}`);
+            }
+            
+            // Join all styles
+            const styleAttr = styles.length > 0 ? `style="${styles.join('; ')}"` : '';
 
             // Create event element
-            let html = '<div class="jsm-daily-event jsm-event-calendar-event" ' +
+            let html = '<div class="jsm-daily-event jsm-event-calendar-event' + (isAllDay || event.allDay ? ' jsm-all-day-event' : '') + '" ' +
                 'data-event-id="' + event.id + '" ' +
                 (isCustomEvent ? 'data-custom="true"' : '') + ' ' +
                 'data-title="' + this.escapeAttr(event.title) + '" ' +
                 'data-date="' + this.escapeAttr(event.dateDisplay || event.startDate) + '" ' +
                 'data-duration="' + durationHours + '" ' +
-                'style="' + heightStyle + '" ';
+                styleAttr + ' ';
 
             // Add optional data attributes only if they exist
             if (event.timeDisplay) {
@@ -1221,8 +1272,9 @@
 
         /**
          * Get events for a specific hour
+         * @param {boolean} includeAllDay - Whether to include all-day events
          */
-        getEventsForHour: function(events, year, month, day, hour) {
+        getEventsForHour: function(events, year, month, day, hour, includeAllDay = true) {
             if (!events || !Array.isArray(events)) {
                 return [];
             }
@@ -1239,10 +1291,10 @@
 
                 // Check if event belongs to this day
                 if (dateString >= startDate && dateString <= endDate) {
-                    // All-day events belong to all hours
+                    // Handle all-day events
                     if (event.allDay) {
-                        // Only add all-day events to the first hour (to avoid duplicates)
-                        if (hour === 0) {
+                        // Only include all-day events if requested
+                        if (includeAllDay && hour === 0) {
                             hourEvents.push(event);
                         }
                         continue;

@@ -142,10 +142,13 @@ $allow_past_navigation = isset($options['allow_past_navigation']) ? $options['al
             </div>
             <div class="jsm-weekly-body">
                 <div class="jsm-weekly-time-column">
+                    <!-- All-day label -->
+                    <div class="jsm-weekly-time-label jsm-all-day-label"><?php _e('All Day', 'jsm-wp-event-calendar'); ?></div>
+                    
                     <?php
-                    // Generate time slots - from 6 AM to 9 PM
-                    $start_hour = 6;
-                    $end_hour = 21;
+                    // Generate time slots - from 0 to 23 (full day)
+                    $start_hour = 0;
+                    $end_hour = 23;
 
                     for ($hour = $start_hour; $hour <= $end_hour; $hour++) {
                         $time_display = date_i18n(get_option('time_format'), strtotime("$hour:00"));
@@ -165,6 +168,9 @@ $allow_past_navigation = isset($options['allow_past_navigation']) ? $options['al
                     }
 
                     echo '<div class="' . esc_attr($day_class) . '" data-date="' . esc_attr($day_date) . '">';
+                    
+                    // All-day events cell
+                    echo '<div class="jsm-weekly-all-day-cell" data-hour="all-day"></div>';
 
                     // Hours in the day
                     for ($hour = $start_hour; $hour <= $end_hour; $hour++) {

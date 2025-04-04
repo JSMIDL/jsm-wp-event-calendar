@@ -835,6 +835,7 @@
 .jsm-daily-time-slot.jsm-all-day-slot {
   background-color: rgba(37, 99, 235, 0.05);
   min-height: auto;
+  padding: 0.5rem 0;
 }
 
 .jsm-all-day-slot .jsm-daily-events-container {
@@ -848,6 +849,7 @@
   position: relative;
   left: auto;
   right: auto;
+  margin-bottom: 0.5rem;
 }
 
 .jsm-daily-time-label {
@@ -860,6 +862,12 @@
   border-right: 1px solid var(--border-color);
   background-color: var(--surface-color);
   flex-shrink: 0;
+}
+
+.jsm-daily-time-label.jsm-all-day-label {
+  background-color: rgba(37, 99, 235, 0.1);
+  font-weight: 600;
+  color: var(--primary-color);
 }
 
 .jsm-daily-events-container {
@@ -888,16 +896,17 @@
   flex-direction: column;
 }
 
-.jsm-daily-event[data-all-day="true"] {
+.jsm-daily-event.jsm-all-day-event {
   position: relative;
   margin-bottom: 0.5rem;
+  background-color: var(--primary-color);
 }
 
 .jsm-daily-event:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   background-color: var(--primary-hover);
-  z-index: 10;
+  z-index: 20 !important;
 }
 
 .jsm-daily-event .jsm-event-calendar-event-title {
@@ -994,6 +1003,29 @@
   font-size: 0.875rem;
   font-weight: 500;
   height: 5rem;
+}
+
+.jsm-weekly-time-label.jsm-all-day-label {
+  background-color: rgba(37, 99, 235, 0.1);
+  font-weight: 600;
+  color: var(--primary-color);
+  height: auto;
+  min-height: 3rem;
+}
+
+.jsm-weekly-all-day-cell {
+  min-height: 3rem;
+  border-bottom: 2px solid var(--border-color);
+  padding: 0.25rem;
+  position: relative;
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.jsm-weekly-all-day-cell .jsm-daily-event {
+  position: relative;
+  left: auto;
+  right: auto;
+  margin-bottom: 0.5rem;
 }
 
 .jsm-weekly-hour-cell {
