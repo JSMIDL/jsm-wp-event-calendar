@@ -66,20 +66,22 @@ class WP_Event_Calendar
             "nonce" => wp_create_nonce("jsm_event_calendar_nonce"),
             "allEvents" => [], // Initially empty, will be populated by AJAX
             "timeFormat" => $time_format,
-            "allowPastNavigation" => $allow_past_navigation, // Přidáno nastavení pro navigaci do minulosti
+            "allowPastNavigation" => $allow_past_navigation,
             "i18n" => [
-                "loadingText" => __(
-                    "Loading events...",
-                    "jsm-wp-event-calendar"
-                ),
-                "noEventsText" => __(
-                    "No events to display",
-                    "jsm-wp-event-calendar"
-                ),
-                "eventsListTitle" => __(
-                    "Events List",
-                    "jsm-wp-event-calendar"
-                ),
+                "loadingText" => __("Loading events...", "jsm-wp-event-calendar"),
+                "noEventsText" => __("No events to display", "jsm-wp-event-calendar"),
+                "eventsListTitle" => __("Events List", "jsm-wp-event-calendar"),
+                "previous" => __("Previous", "jsm-wp-event-calendar"),
+                "previousDay" => __("Previous Day", "jsm-wp-event-calendar"),
+                "previousWeek" => __("Previous Week", "jsm-wp-event-calendar"),
+                "today" => __("Today", "jsm-wp-event-calendar"),
+                "thisWeek" => __("This Week", "jsm-wp-event-calendar"),
+                "nextMonth" => __("Next Month", "jsm-wp-event-calendar"),
+                "nextDay" => __("Next Day", "jsm-wp-event-calendar"),
+                "nextWeek" => __("Next Week", "jsm-wp-event-calendar"),
+                "day" => __("Day", "jsm-wp-event-calendar"),
+                "week" => __("Week", "jsm-wp-event-calendar"),
+                "month" => __("Month", "jsm-wp-event-calendar"),
                 "months" => [
                     __("January", "jsm-wp-event-calendar"),
                     __("February", "jsm-wp-event-calendar"),

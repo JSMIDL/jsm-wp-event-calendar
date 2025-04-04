@@ -80,11 +80,11 @@ $allow_past_navigation = isset($options['allow_past_navigation']) ? $options['al
         <h2 id="<?php echo esc_attr($calendar_id); ?>-title" class="jsm-event-calendar-title"><?php echo esc_html($month_name . ' ' . $year); ?></h2>
 
         <div class="jsm-event-calendar-nav-buttons">
-            <?php
-            // Show Previous button only if we're not in the current month
-            $show_prev = ($month > $current_month || $year > $current_year);
-            if ($show_prev) :
-            ?>
+           <?php
+           // Show Previous button based on allow_past_navigation setting or if we're not in the current month
+           $show_prev = $allow_past_navigation;
+           if ($show_prev) :
+           ?>
             <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-prev" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
                             <?php _e('Previous', 'jsm-wp-event-calendar'); ?>
                         </button>

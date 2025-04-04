@@ -703,21 +703,52 @@
 
                         $calendarTitle.text(titleText);
 
-                        // Show/Hide Previous button based on current date
+                        // Get the current date for comparison
                         const today = new Date();
                         const currentRealDay = today.getDate();
                         const currentRealMonth = today.getMonth() + 1;
                         const currentRealYear = today.getFullYear();
+
+                        // Check if past navigation is allowed
+                        const allowPastNavigation = jsmEventCalendar.allowPastNavigation === 'yes';
                         const $prevButton = $('.jsm-event-calendar-prev[data-calendar-id="' + calendarId + '"]');
 
-                        if (
-                            (view === 'monthly' && month === currentRealMonth && year === currentRealYear) ||
-                            (view === 'weekly' && new Date(year, month - 1, day) <= today) ||
-                            (view === 'daily' && new Date(year, month - 1, day) < new Date(currentRealYear, currentRealMonth - 1, currentRealDay))
-                        ) {
-                            $prevButton.css('visibility', 'hidden');
+                        if (!allowPastNavigation) {
+                            // Skrýt tlačítko pro navigaci do minulosti podle aktuálního data
+                            if (
+                                (view === 'monthly' && month === currentRealMonth && year === currentRealYear) ||
+                                (view === 'weekly' && new Date(year, month - 1, day) <= today) ||
+                                (view === 'daily' && new Date(year, month - 1, day) < new Date(currentRealYear, currentRealMonth - 1, currentRealDay))
+                            ) {
+                                $prevButton.css('visibility', 'hidden');
+                            } else {
+                                $prevButton.css('visibility', 'visible');
+                            }
                         } else {
+                            // Vždy zobrazit tlačítko, pokud je povolena navigace do minulosti
                             $prevButton.css('visibility', 'visible');
+                        }
+
+                        // Update navigation button texts based on view
+                        const $todayButton = $('.jsm-event-calendar-today[data-calendar-id="' + calendarId + '"]');
+                        const $nextButton = $('.jsm-event-calendar-next[data-calendar-id="' + calendarId + '"]');
+
+                        switch(view) {
+                            case 'daily':
+                                $prevButton.text(jsmEventCalendar.i18n.previousDay || 'Previous Day');
+                                $todayButton.text(jsmEventCalendar.i18n.today || 'Today');
+                                $nextButton.text(jsmEventCalendar.i18n.nextDay || 'Next Day');
+                                break;
+                            case 'weekly':
+                                $prevButton.text(jsmEventCalendar.i18n.previousWeek || 'Previous Week');
+                                $todayButton.text(jsmEventCalendar.i18n.thisWeek || 'This Week');
+                                $nextButton.text(jsmEventCalendar.i18n.nextWeek || 'Next Week');
+                                break;
+                            default: // monthly
+                                $prevButton.text(jsmEventCalendar.i18n.previous || 'Previous');
+                                $todayButton.text(jsmEventCalendar.i18n.today || 'Today');
+                                $nextButton.text(jsmEventCalendar.i18n.nextMonth || 'Next Month');
+                                break;
                         }
 
                         // Render calendar based on the view
@@ -745,6 +776,14 @@
 
                         // Re-setup event handlers for event modals
                         JSMEventCalendar.setupEventModals();
+
+                        // Přidáme třídu navigační liště pro změnu rozložení
+                        const $nav = $calendar.find('.jsm-event-calendar-nav');
+                        const $navButtons = $calendar.find('.jsm-event-calendar-nav-buttons');
+
+                        // Přidáme třídu pro vertikální rozložení
+                        $nav.addClass('jsm-nav-vertical-layout');
+                        $navButtons.addClass('jsm-nav-buttons-vertical');
                     } else {
                         $calendarTable.html('<div class="jsm-event-no-events">Error loading calendar: ' + (response ? response.data : 'Invalid response') + '</div>');
                     }

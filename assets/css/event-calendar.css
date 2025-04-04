@@ -920,3 +920,143 @@
 .jsm-event-calendar-wrapper {
   position: relative; /* Ensure positioning context for overlay */
 }
+/* Styl pro navigační tlačítka pod kalendářem */
+.jsm-event-calendar-bottom-nav {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: rgba(37, 99, 235, 0.05);
+    border-radius: var(--border-radius-md);
+}
+
+/* Přizpůsobení rozložení pro mobilní zařízení */
+@media screen and (max-width: 768px) {
+    .jsm-event-calendar-bottom-nav {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .jsm-event-calendar-nav-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+/* Vertikální rozložení navigace - modernější a minimalistický design */
+.jsm-event-calendar-nav {
+    padding: 1.25rem 1rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+}
+
+.jsm-nav-vertical-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 1rem 1rem;
+}
+
+.jsm-event-calendar-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    letter-spacing: 0.01em;
+}
+
+.jsm-nav-buttons-vertical {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Konzistentní, menší a modernější tlačítka */
+.jsm-event-calendar-nav-button {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--button-radius);
+    background-color: rgba(255, 255, 255, 0.12);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin: 0;
+    min-width: 90px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.jsm-event-calendar-nav-button:hover {
+    background-color: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.jsm-event-calendar-nav-button:active {
+    background-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+}
+
+.jsm-event-calendar-nav-button.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Přepínače pohledu */
+.jsm-event-calendar-view-switcher {
+    display: flex;
+    gap: 0.375rem;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.jsm-event-calendar-view-button {
+    font-size: 0.75rem;
+    padding: 0.3125rem 0.625rem;
+    min-width: 70px;
+    height: 28px;
+}
+
+.jsm-event-calendar-view-button.active {
+    background-color: rgba(255, 255, 255, 0.3);
+    font-weight: 600;
+}
+
+/* Responzivní úpravy */
+@media screen and (max-width: 480px) {
+    .jsm-event-calendar-nav-button {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 0.375rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .jsm-event-calendar-view-button {
+        font-size: 0.6875rem;
+        padding: 0.25rem 0.5rem;
+        min-width: 60px;
+        height: 26px;
+    }
+
+    .jsm-nav-buttons-vertical {
+        gap: 0.375rem;
+    }
+}
