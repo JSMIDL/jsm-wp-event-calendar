@@ -1025,6 +1025,7 @@
   position: absolute;
   margin-bottom: 0.5rem;
   z-index: 5;
+  max-width: 90%;
 }
 
 .jsm-weekly-hour-cell {
