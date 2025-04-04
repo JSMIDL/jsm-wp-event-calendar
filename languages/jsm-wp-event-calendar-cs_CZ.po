@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: JSM WordPress Event Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jsm-wp-event-calendar\n"
 "POT-Creation-Date: 2023-07-01T12:00:00+00:00\n"
-"PO-Revision-Date: 2025-03-21 17:45+0100\n"
+"PO-Revision-Date: 2025-04-04 08:55+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: cs_CZ\n"
@@ -644,3 +644,66 @@ msgstr "Březen 2025"
 #: admin/views/admin-settings.php:20
 msgid "Settings Preview"
 msgstr "Náhled nastavení"
+
+msgid "Enable Monthly View"
+msgstr "Povolit měsíční pohled"
+
+msgid "Enable Weekly View"
+msgstr "Povolit týdenní pohled"
+
+msgid "Enable Daily View"
+msgstr "Povolit denní pohled"
+
+msgid "Default Calendar View"
+msgstr "Výchozí pohled kalendáře"
+
+msgid "Monthly"
+msgstr "Měsíční"
+
+msgid "Weekly"
+msgstr "Týdenní"
+
+msgid "Daily"
+msgstr "Denní"
+
+msgid "Day"
+msgstr "Den"
+
+msgid "Week"
+msgstr "Týden"
+
+msgid "Month"
+msgstr "Měsíc"
+
+msgid "Previous Day"
+msgstr "Předchozí den"
+
+msgid "Next Day"
+msgstr "Další den"
+
+msgid "Previous Week"
+msgstr "Předchozí týden"
+
+msgid "Next Week"
+msgstr "Další týden"
+
+msgid "This Week"
+msgstr "Tento týden"
+
+msgid "Time Format"
+msgstr "Formát času"
+
+msgid "24-hour (e.g. 14:30)"
+msgstr "24hodinový (např. 14:30)"
+
+msgid "12-hour (e.g. 2:30 PM)"
+msgstr "12hodinový (např. 2:30 odp.)"
+
+msgid "Calendar Views"
+msgstr "Zobrazení kalendáře"
+
+msgid "Configure which calendar views are enabled and set the default view."
+msgstr "Nastavte, které pohledy kalendáře jsou povoleny a vyberte jeho výchozí zobrazení."
+
+msgid "Allow Navigation to Past Events"
+msgstr "Povolit navigaci k minulým událostem"

@@ -9,6 +9,9 @@
         init: function() {
             //console.log('Initializing JSM Event Calendar 2025 - Minimalist Edition');
 
+            // Flag for view switching
+            this.viewSwitchInProgress = false;
+
             // Set up navigation and modals
             this.setupCalendarNavigation();
             this.setupEventModals();
@@ -58,20 +61,188 @@
         setupCalendarNavigation: function() {
             // Event delegation for better performance and compatibility with dynamically created elements
             $(document).off('click', '.jsm-event-calendar-prev').on('click', '.jsm-event-calendar-prev', function() {
-                JSMEventCalendar.changeMonth($(this).data('calendar-id'), -1);
+                const $calendar = $('#' + $(this).data('calendar-id'));
+                const view = $calendar.data('view') || 'monthly';
+
+                // Remove focus after click
+                $(this).blur();
+
+                switch(view) {
+                    case 'daily':
+                        JSMEventCalendar.changeDay($(this).data('calendar-id'), -1);
+                        break;
+                    case 'weekly':
+                        JSMEventCalendar.changeWeek($(this).data('calendar-id'), -1);
+                        break;
+                    default: // monthly
+                        JSMEventCalendar.changeMonth($(this).data('calendar-id'), -1);
+                        break;
+                }
             });
 
             $(document).off('click', '.jsm-event-calendar-next').on('click', '.jsm-event-calendar-next', function() {
-                JSMEventCalendar.changeMonth($(this).data('calendar-id'), 1);
+                const $calendar = $('#' + $(this).data('calendar-id'));
+                const view = $calendar.data('view') || 'monthly';
+
+                // Remove focus after click
+                $(this).blur();
+
+                switch(view) {
+                    case 'daily':
+                        JSMEventCalendar.changeDay($(this).data('calendar-id'), 1);
+                        break;
+                    case 'weekly':
+                        JSMEventCalendar.changeWeek($(this).data('calendar-id'), 1);
+                        break;
+                    default: // monthly
+                        JSMEventCalendar.changeMonth($(this).data('calendar-id'), 1);
+                        break;
+                }
             });
 
             $(document).off('click', '.jsm-event-calendar-today').on('click', '.jsm-event-calendar-today', function() {
-                JSMEventCalendar.goToToday($(this).data('calendar-id'));
+                const $calendar = $('#' + $(this).data('calendar-id'));
+                const view = $calendar.data('view') || 'monthly';
+
+                // Remove focus after click
+                $(this).blur();
+
+                switch(view) {
+                    case 'daily':
+                        JSMEventCalendar.goToToday($(this).data('calendar-id'), 'daily');
+                        break;
+                    case 'weekly':
+                        JSMEventCalendar.goToToday($(this).data('calendar-id'), 'weekly');
+                        break;
+                    default: // monthly
+                        JSMEventCalendar.goToToday($(this).data('calendar-id'), 'monthly');
+                        break;
+                }
             });
+
+            // View switching buttons
+            $(document).off('click', '.jsm-event-calendar-view-button').on('click', '.jsm-event-calendar-view-button', function() {
+                const calendarId = $(this).data('calendar-id');
+                const view = $(this).data('view');
+
+                // Remove focus after click
+                $(this).blur();
+
+                // Update active button
+                $(this).siblings('.jsm-event-calendar-view-button').removeClass('active');
+                $(this).addClass('active');
+
+                JSMEventCalendar.switchCalendarView(calendarId, view);
+            });
+        },
+        /**
+         * Change day in calendar
+         */
+        changeDay: function(calendarId, direction) {
+            const $calendar = $('#' + calendarId);
+            if (!$calendar.length) {
+                console.error('Calendar not found:', calendarId);
+                return;
+            }
+
+            const currentDay = parseInt($calendar.data('day'));
+            const currentMonth = parseInt($calendar.data('month'));
+            const currentYear = parseInt($calendar.data('year'));
+
+            // Create date object and add/subtract days
+            const currentDate = new Date(currentYear, currentMonth - 1, currentDay);
+
+            // Check if past navigation is allowed
+            const allowPastNavigation = jsmEventCalendar.allowPastNavigation === 'yes';
+
+            // Check if we're trying to navigate to the past
+            if (direction < 0 && !allowPastNavigation) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Reset time part for proper comparison
+
+                const targetDate = new Date(currentDate);
+                targetDate.setDate(targetDate.getDate() + direction);
+                targetDate.setHours(0, 0, 0, 0); // Reset time part
+
+                if (targetDate < today) {
+                    // Add "disabled" button effect
+                    const $prevButton = $('.jsm-event-calendar-prev[data-calendar-id="' + calendarId + '"]');
+                    $prevButton.addClass('disabled').delay(300).queue(function(next) {
+                        $(this).removeClass('disabled');
+                        next();
+                    });
+                    return; // Don't allow navigation to the past
+                }
+            }
+
+            // Proceed with navigation
+            currentDate.setDate(currentDate.getDate() + direction);
+
+            // Update calendar with new date
+            this.updateCalendar(
+                calendarId,
+                currentDate.getMonth() + 1,
+                currentDate.getFullYear(),
+                currentDate.getDate(),
+                'daily'
+            );
         },
 
         /**
-         * Change month in calendar - forward only
+         * Change week in calendar
+         */
+        changeWeek: function(calendarId, direction) {
+            const $calendar = $('#' + calendarId);
+            if (!$calendar.length) {
+                console.error('Calendar not found:', calendarId);
+                return;
+            }
+
+            const currentDay = parseInt($calendar.data('day'));
+            const currentMonth = parseInt($calendar.data('month'));
+            const currentYear = parseInt($calendar.data('year'));
+
+            // Create date object and calculate week start
+            const currentDate = new Date(currentYear, currentMonth - 1, currentDay);
+
+            // Check if past navigation is allowed
+            const allowPastNavigation = jsmEventCalendar.allowPastNavigation === 'yes';
+
+            // Check if we're trying to navigate to the past
+            if (direction < 0 && !allowPastNavigation) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Reset time part for proper comparison
+
+                const targetDate = new Date(currentDate);
+                targetDate.setDate(targetDate.getDate() + (direction * 7));
+                targetDate.setHours(0, 0, 0, 0); // Reset time part
+
+                if (targetDate < today) {
+                    // Add "disabled" button effect
+                    const $prevButton = $('.jsm-event-calendar-prev[data-calendar-id="' + calendarId + '"]');
+                    $prevButton.addClass('disabled').delay(300).queue(function(next) {
+                        $(this).removeClass('disabled');
+                        next();
+                    });
+                    return; // Don't allow navigation to the past
+                }
+            }
+
+            // Proceed with navigation
+            currentDate.setDate(currentDate.getDate() + (direction * 7));
+
+            // Update calendar with new date
+            this.updateCalendar(
+                calendarId,
+                currentDate.getMonth() + 1,
+                currentDate.getFullYear(),
+                currentDate.getDate(),
+                'weekly'
+            );
+        },
+
+        /**
+         * Change month in calendar
          */
         changeMonth: function(calendarId, direction) {
             const $calendar = $('#' + calendarId);
@@ -88,8 +259,11 @@
             const currentRealMonth = today.getMonth() + 1; // +1 because getMonth() returns 0-11
             const currentRealYear = today.getFullYear();
 
+            // Check if past navigation is allowed
+            const allowPastNavigation = jsmEventCalendar.allowPastNavigation === 'yes';
+
             // If going back, check if we're not going into the past
-            if (direction < 0) {
+            if (direction < 0 && !allowPastNavigation) {
                 // If we're in the current month or trying to go to the past, stop
                 if ((currentYear < currentRealYear) ||
                     (currentYear === currentRealYear && currentMonth <= currentRealMonth)) {
@@ -121,20 +295,337 @@
         },
 
         /**
-         * Go to current month
+         * Go to current date
          */
-        goToToday: function(calendarId) {
+        goToToday: function(calendarId, view = 'monthly') {
             const today = new Date();
             const month = today.getMonth() + 1; // JavaScript counts months from 0
             const year = today.getFullYear();
+            const day = today.getDate();
 
-            this.updateCalendar(calendarId, month, year);
+            this.updateCalendar(calendarId, month, year, day, view);
+        },
+        /**
+         * Switch calendar view (monthly, weekly, daily)
+         */
+        switchCalendarView: function(calendarId, view) {
+            const $calendar = $('#' + calendarId);
+            if (!$calendar.length) {
+                console.error('Calendar not found for view switch:', calendarId);
+                return;
+            }
+
+            const currentMonth = parseInt($calendar.data('month'));
+            const currentYear = parseInt($calendar.data('year'));
+            const currentDay = parseInt($calendar.data('day') || new Date().getDate());
+            const currentView = $calendar.data('view');
+            const showList = $calendar.data('show-list');
+            const category = $calendar.data('category');
+
+            // If the view hasn't changed, don't do anything
+            if (currentView === view) {
+                return;
+            }
+
+            // Use a flag to prevent multiple concurrent AJAX requests
+            if (this.viewSwitchInProgress) {
+                return;
+            }
+            this.viewSwitchInProgress = true;
+
+            // Místo kompletního překreslení HTML přes AJAX, zachováme původní kontejner a upravíme obsah
+            // 1. Skryjeme existující obsah a zobrazíme loading
+            const $calendarTable = $('#' + calendarId + '-table');
+
+            // Vytvoříme overlay pro loading, který zakryje celý kalendář bez změny velikosti
+            const $loadingOverlay = $('<div class="jsm-loading-overlay"><div class="jsm-event-loading-spinner"></div><p>' + jsmEventCalendar.i18n.loadingText + '</p></div>');
+            $calendar.append($loadingOverlay);
+
+            // Aktualizace atributů a tříd
+            $calendar.data('view', view);
+            $calendar.attr('data-view', view);
+            $calendar.removeClass('jsm-monthly-view jsm-weekly-view jsm-daily-view');
+            $calendar.addClass('jsm-' + view + '-view');
+
+            // Update navigation button texts based on view
+            const $prevButton = $('.jsm-event-calendar-prev[data-calendar-id="' + calendarId + '"]');
+            const $todayButton = $('.jsm-event-calendar-today[data-calendar-id="' + calendarId + '"]');
+            const $nextButton = $('.jsm-event-calendar-next[data-calendar-id="' + calendarId + '"]');
+
+            switch(view) {
+                case 'daily':
+                    $prevButton.text(jsmEventCalendar.i18n.previousDay || 'Previous Day');
+                    $todayButton.text(jsmEventCalendar.i18n.today || 'Today');
+                    $nextButton.text(jsmEventCalendar.i18n.nextDay || 'Next Day');
+                    break;
+                case 'weekly':
+                    $prevButton.text(jsmEventCalendar.i18n.previousWeek || 'Previous Week');
+                    $todayButton.text(jsmEventCalendar.i18n.thisWeek || 'This Week');
+                    $nextButton.text(jsmEventCalendar.i18n.nextWeek || 'Next Week');
+                    break;
+                default: // monthly
+                    $prevButton.text(jsmEventCalendar.i18n.previous || 'Previous');
+                    $todayButton.text(jsmEventCalendar.i18n.today || 'Today');
+                    $nextButton.text(jsmEventCalendar.i18n.nextMonth || 'Next Month');
+                    break;
+            }
+
+            // 2. Načítáme data bez kompletní změny HTML struktury
+            $.ajax({
+                url: jsmEventCalendar.ajaxurl,
+                type: 'GET',
+                data: {
+                    action: 'get_events_for_calendar',
+                    month: currentMonth,
+                    year: currentYear,
+                    day: currentDay,
+                    view: view,
+                    category: category,
+                    nonce: jsmEventCalendar.nonce,
+                    cache: false
+                },
+                success: function(response) {
+                    // Reset the flag
+                    JSMEventCalendar.viewSwitchInProgress = false;
+
+                    if (response && response.success) {
+                        const events = response.data;
+
+                        // Update calendar title based on view
+                        let titleText = '';
+
+                        switch(view) {
+                            case 'daily':
+                                const dayDate = new Date(currentYear, currentMonth - 1, currentDay);
+                                const weekdayName = jsmEventCalendar.i18n.weekdays[dayDate.getDay()];
+                                const formattedDate = dayDate.toLocaleDateString();
+                                titleText = weekdayName + ', ' + formattedDate;
+                                break;
+                            case 'weekly':
+                                const weekStartDate = new Date(currentYear, currentMonth - 1, currentDay);
+                                const dayOfWeek = weekStartDate.getDay() || 7; // Convert 0 (Sunday) to 7
+                                const mondayOffset = 1 - dayOfWeek; // Calculate days to Monday (1 - day of week)
+
+                                const weekStart = new Date(weekStartDate);
+                                weekStart.setDate(weekStartDate.getDate() + mondayOffset);
+
+                                const weekEnd = new Date(weekStart);
+                                weekEnd.setDate(weekStart.getDate() + 6);
+
+                                const weekStartFormatted = weekStart.toLocaleDateString();
+                                const weekEndFormatted = weekEnd.toLocaleDateString();
+
+                                titleText = weekStartFormatted + ' - ' + weekEndFormatted;
+                                break;
+                            default: // monthly
+                                const monthName = jsmEventCalendar.i18n.months[currentMonth - 1];
+                                titleText = monthName + ' ' + currentYear;
+                                break;
+                        }
+
+                        // Update calendar title
+                        $('#' + calendarId + '-title').text(titleText);
+
+                        // Render appropriate calendar view without loading the complete HTML template
+                        switch(view) {
+                            case 'daily':
+                                JSMEventCalendar.renderDailyCalendarContent($calendarTable, currentYear, currentMonth, currentDay, events);
+                                break;
+                            case 'weekly':
+                                JSMEventCalendar.renderWeeklyCalendarContent($calendarTable, currentYear, currentMonth, currentDay, events);
+                                break;
+                            default: // monthly
+                                JSMEventCalendar.renderCalendar($calendarTable, currentMonth, currentYear, events);
+                                break;
+                        }
+
+                        // Update event list if displayed
+                        if (showList === 'yes') {
+                            JSMEventCalendar.renderEventList($('#' + calendarId + '-list'), events);
+                        }
+
+                        // Update buttons to reflect active view
+                        $('.jsm-event-calendar-view-button').removeClass('active');
+                        $('.jsm-event-calendar-view-button[data-view="' + view + '"]').addClass('active');
+
+                        // Re-setup event handlers
+                        JSMEventCalendar.setupEventModals();
+                    } else {
+                        $calendarTable.html('<div class="jsm-event-no-events">Error loading calendar: ' + (response ? response.data : 'Invalid response') + '</div>');
+                    }
+
+                    // Remove loading overlay
+                    $loadingOverlay.remove();
+                },
+                error: function(xhr, status, error) {
+                    // Reset the flag
+                    JSMEventCalendar.viewSwitchInProgress = false;
+
+                    console.error('AJAX error:', error);
+                    $calendarTable.html('<div class="jsm-event-no-events">Error loading calendar. Please try again.</div>');
+
+                    // Remove loading overlay
+                    $loadingOverlay.remove();
+                }
+            });
+        },
+        /**
+         * Render daily calendar content without reloading the entire template
+         */
+        renderDailyCalendarContent: function($calendarTable, year, month, day, events) {
+            // Check if the structure already exists or create it
+            if (!$calendarTable.find('.jsm-daily-timeline').length) {
+                $calendarTable.html('<div class="jsm-daily-timeline"></div>');
+            }
+
+            const $timeline = $calendarTable.find('.jsm-daily-timeline');
+            $timeline.empty(); // Clear existing content
+
+            // Generate time slots - full day (0-23)
+            for (let hour = 0; hour <= 23; hour++) {
+                const timeDisplay = this.formatTime(hour, 0);
+
+                const $timeSlot = $('<div class="jsm-daily-time-slot"></div>');
+                $timeSlot.append('<div class="jsm-daily-time-label">' + timeDisplay + '</div>');
+
+                const $eventsContainer = $('<div class="jsm-daily-events-container" data-hour="' + hour + '"></div>');
+
+                // Filter events for this day and hour
+                const hourEvents = this.getEventsForHour(events, year, month, day, hour);
+
+                // Sort events
+                const sortedHourEvents = this.sortEventsByTime(hourEvents);
+
+                // Render events for this hour
+                for (let i = 0; i < sortedHourEvents.length; i++) {
+                    $eventsContainer.append(this.renderEventInDailyCell(sortedHourEvents[i]));
+                }
+
+                $timeSlot.append($eventsContainer);
+                $timeline.append($timeSlot);
+            }
+        },
+
+        /**
+         * Render weekly calendar content without reloading the entire template
+         */
+        renderWeeklyCalendarContent: function($calendarTable, year, month, day, events) {
+            // Create a date object for the reference day
+            const refDate = new Date(year, month - 1, day);
+
+            // Get the day of the week (0 = Sunday, 6 = Saturday)
+            let dayOfWeek = refDate.getDay();
+
+            // Adjust to make Monday the first day (0 = Monday, 6 = Sunday)
+            dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+
+            // Calculate the Monday of the week
+            const mondayDate = new Date(refDate);
+            mondayDate.setDate(refDate.getDate() - dayOfWeek);
+
+            // Get today's date for comparison
+            const today = new Date();
+            const todayStr = this.formatDate(today);
+
+            // Check if the structure already exists or create it
+            if (!$calendarTable.find('.jsm-weekly-grid').length) {
+                $calendarTable.html('<div class="jsm-weekly-grid"><div class="jsm-weekly-header"></div><div class="jsm-weekly-body"></div></div>');
+            }
+
+            const $grid = $calendarTable.find('.jsm-weekly-grid');
+            const $header = $grid.find('.jsm-weekly-header');
+            const $body = $grid.find('.jsm-weekly-body');
+
+            // Clear existing content
+            $header.empty();
+            $body.empty();
+
+            // Add time column header
+            $header.append('<div class="jsm-weekly-time-column">&nbsp;</div>');
+
+            // Generate weekday headers
+            const weekDays = [];
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(mondayDate);
+                dayDate.setDate(mondayDate.getDate() + i);
+
+                const dayStr = this.formatDate(dayDate);
+                const isToday = dayStr === todayStr;
+
+                const dayName = jsmEventCalendar.i18n.weekdaysShort[i];
+                const dayNum = dayDate.getDate();
+
+                let headerClass = 'jsm-weekly-day-header';
+                if (isToday) {
+                    headerClass += ' today';
+                }
+
+                const $dayHeader = $('<div class="' + headerClass + '" data-date="' + dayStr + '"></div>');
+                $dayHeader.append('<div class="jsm-weekly-day-name">' + dayName + '</div>');
+                $dayHeader.append('<div class="jsm-weekly-day-number">' + dayNum + '</div>');
+                $header.append($dayHeader);
+
+                weekDays.push({
+                    date: dayDate,
+                    dateStr: dayStr,
+                    isToday: isToday
+                });
+            }
+
+            // Time column
+            const $timeColumn = $('<div class="jsm-weekly-time-column"></div>');
+
+            // Generate time slots - full day (0-23)
+            for (let hour = 0; hour <= 23; hour++) {
+                const timeDisplay = this.formatTime(hour, 0);
+                $timeColumn.append('<div class="jsm-weekly-time-label">' + timeDisplay + '</div>');
+            }
+
+            $body.append($timeColumn);
+
+            // Day columns
+            for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
+                const dayInfo = weekDays[dayIdx];
+
+                let dayClass = 'jsm-weekly-day-column';
+                if (dayInfo.isToday) {
+                    dayClass += ' today';
+                }
+
+                const $dayColumn = $('<div class="' + dayClass + '" data-date="' + dayInfo.dateStr + '"></div>');
+
+                // Hours cells
+                for (let hour = 0; hour <= 23; hour++) {
+                    const $hourCell = $('<div class="jsm-weekly-hour-cell" data-hour="' + hour + '"></div>');
+
+                    // Get events for this day and hour
+                    const dayEvents = this.getEventsForHour(
+                        events,
+                        dayInfo.date.getFullYear(),
+                        dayInfo.date.getMonth() + 1,
+                        dayInfo.date.getDate(),
+                        hour
+                    );
+
+                    // Sort events
+                    const sortedDayEvents = this.sortEventsByTime(dayEvents);
+
+                    // Render events
+                    for (let i = 0; i < sortedDayEvents.length; i++) {
+                        $hourCell.append(this.renderEventInDailyCell(sortedDayEvents[i]));
+                    }
+
+                    $dayColumn.append($hourCell);
+                }
+
+                $body.append($dayColumn);
+            }
         },
 
         /**
          * Update calendar via AJAX - optimized for speed
          */
-        updateCalendar: function(calendarId, month, year) {
+        updateCalendar: function(calendarId, month, year, day = 1, view = null) {
             const $calendar = $('#' + calendarId);
             if (!$calendar.length) {
                 console.error('Calendar not found for update:', calendarId);
@@ -146,6 +637,11 @@
             const showList = $calendar.data('show-list');
             const category = $calendar.data('category');
 
+            // If view is not specified, use the current view from the calendar
+            if (view === null) {
+                view = $calendar.data('view') || 'monthly';
+            }
+
             // Show loading animation
             $calendarTable.html('<div class="jsm-event-loading"><div class="jsm-event-loading-spinner"></div><p>' + jsmEventCalendar.i18n.loadingText + '</p></div>');
 
@@ -154,9 +650,11 @@
                 url: jsmEventCalendar.ajaxurl,
                 type: 'GET',
                 data: {
-                    action: jsmEventCalendar.action,
+                    action: 'get_events_for_calendar',
                     month: month,
                     year: year,
+                    day: day,
+                    view: view,
                     category: category,
                     nonce: jsmEventCalendar.nonce,
                     cache: false // Force bypass browser cache
@@ -165,28 +663,75 @@
                     if (response && response.success) {
                         const events = response.data;
 
-                        // Update month and year in data attributes
+                        // Update month, year, and day in data attributes
                         $calendar.data('month', month);
                         $calendar.data('year', year);
+                        $calendar.data('day', day);
+                        $calendar.data('view', view);
 
-                        // Update calendar title
-                        const monthName = jsmEventCalendar.i18n.months[month - 1];
-                        $calendarTitle.text(monthName + ' ' + year);
+                        // Update calendar title based on view
+                        let titleText = '';
 
-                        // Show/Hide Previous month button based on current month
+                        switch(view) {
+                            case 'daily':
+                                const dayDate = new Date(year, month - 1, day);
+                                const weekdayName = jsmEventCalendar.i18n.weekdays[dayDate.getDay()];
+                                const formattedDate = dayDate.toLocaleDateString();
+                                titleText = weekdayName + ', ' + formattedDate;
+                                break;
+                            case 'weekly':
+                                const weekStartDate = new Date(year, month - 1, day);
+                                const dayOfWeek = weekStartDate.getDay() || 7; // Convert 0 (Sunday) to 7
+                                const mondayOffset = 1 - dayOfWeek; // Calculate days to Monday (1 - day of week)
+
+                                const weekStart = new Date(weekStartDate);
+                                weekStart.setDate(weekStartDate.getDate() + mondayOffset);
+
+                                const weekEnd = new Date(weekStart);
+                                weekEnd.setDate(weekStart.getDate() + 6);
+
+                                const weekStartFormatted = weekStart.toLocaleDateString();
+                                const weekEndFormatted = weekEnd.toLocaleDateString();
+
+                                titleText = weekStartFormatted + ' - ' + weekEndFormatted;
+                                break;
+                            default: // monthly
+                                const monthName = jsmEventCalendar.i18n.months[month - 1];
+                                titleText = monthName + ' ' + year;
+                                break;
+                        }
+
+                        $calendarTitle.text(titleText);
+
+                        // Show/Hide Previous button based on current date
                         const today = new Date();
+                        const currentRealDay = today.getDate();
                         const currentRealMonth = today.getMonth() + 1;
                         const currentRealYear = today.getFullYear();
                         const $prevButton = $('.jsm-event-calendar-prev[data-calendar-id="' + calendarId + '"]');
 
-                        if (month === currentRealMonth && year === currentRealYear) {
+                        if (
+                            (view === 'monthly' && month === currentRealMonth && year === currentRealYear) ||
+                            (view === 'weekly' && new Date(year, month - 1, day) <= today) ||
+                            (view === 'daily' && new Date(year, month - 1, day) < new Date(currentRealYear, currentRealMonth - 1, currentRealDay))
+                        ) {
                             $prevButton.css('visibility', 'hidden');
                         } else {
                             $prevButton.css('visibility', 'visible');
                         }
 
-                        // Render calendar
-                        JSMEventCalendar.renderCalendar($calendarTable, month, year, events);
+                        // Render calendar based on the view
+                        switch(view) {
+                            case 'daily':
+                                JSMEventCalendar.renderDailyCalendar($calendarTable, year, month, day, events);
+                                break;
+                            case 'weekly':
+                                JSMEventCalendar.renderWeeklyCalendar($calendarTable, year, month, day, events);
+                                break;
+                            default: // monthly
+                                JSMEventCalendar.renderCalendar($calendarTable, month, year, events);
+                                break;
+                        }
 
                         // Add timeout to ensure all images and content have loaded
                         setTimeout(function() {
@@ -353,6 +898,305 @@
 
             // Call function to equalize cell heights after rendering
             this.equalizeCalendarCellHeights();
+        },
+        /**
+         * Render daily calendar
+         */
+        renderDailyCalendar: function($calendarTable, year, month, day, events) {
+            // Create a date object for the current day
+            const currentDate = new Date(year, month - 1, day);
+            const dateStr = this.formatDate(currentDate);
+
+            // Get today's date for comparison
+            const today = new Date();
+            const todayStr = this.formatDate(today);
+
+            // Is the current day today?
+            const isToday = dateStr === todayStr;
+
+            let html = '<div class="jsm-daily-timeline">';
+
+            // Generate time slots - from 0 AM to 23 PM
+            const startHour = 0;
+            const endHour = 23;
+
+            for (let hour = startHour; hour <= endHour; hour++) {
+                const timeDisplay = this.formatTime(hour, 0);
+
+                html += '<div class="jsm-daily-time-slot">';
+                html += '<div class="jsm-daily-time-label">' + timeDisplay + '</div>';
+                html += '<div class="jsm-daily-events-container" data-hour="' + hour + '">';
+
+                // Filter events for this day and hour
+                const hourEvents = this.getEventsForHour(events, year, month, day, hour);
+
+                // Sort events
+                const sortedHourEvents = this.sortEventsByTime(hourEvents);
+
+                // Render events for this hour
+                for (let i = 0; i < sortedHourEvents.length; i++) {
+                    html += this.renderEventInDailyCell(sortedHourEvents[i]);
+                }
+
+                html += '</div>'; // end events container
+                html += '</div>'; // end time slot
+            }
+
+            html += '</div>'; // end timeline
+
+            $calendarTable.html(html);
+        },
+
+        /**
+         * Render event in daily cell
+         */
+        renderEventInDailyCell: function(event) {
+            if (!event || !event.id || !event.title) {
+                return '';
+            }
+
+            // Track custom events consistently
+            const isCustomEvent = event.custom === true || (typeof event.id === 'string' && event.id.startsWith('custom-'));
+
+            // Create event element
+            let html = '<div class="jsm-daily-event jsm-event-calendar-event" ' +
+                'data-event-id="' + event.id + '" ' +
+                (isCustomEvent ? 'data-custom="true"' : '') + ' ' +
+                'data-title="' + this.escapeAttr(event.title) + '" ' +
+                'data-date="' + this.escapeAttr(event.dateDisplay || event.startDate) + '" ';
+
+            // Add optional data attributes only if they exist
+            if (event.timeDisplay) {
+                html += 'data-time="' + this.escapeAttr(event.timeDisplay) + '" ';
+            }
+            if (event.allDay) {
+                html += 'data-all-day="true" ';
+            }
+            if (event.excerpt) {
+                // Base64 encode the HTML excerpt to preserve HTML formatting
+                const encodedExcerpt = btoa(encodeURIComponent(event.excerpt));
+                html += 'data-excerpt="' + encodedExcerpt + '" ';
+            }
+            if (event.customUrl || event.url) {
+                html += 'data-url="' + this.escapeAttr(event.customUrl || event.url) + '" ';
+            }
+            if (event.buttonText) {
+                html += 'data-button-text="' + this.escapeAttr(event.buttonText) + '" ';
+            }
+
+            // Close opening tag
+            html += '>';
+
+            // Event content
+            html += '<div class="jsm-event-calendar-event-title">' + event.title + '</div>';
+
+            if (event.timeDisplay && !event.allDay) {
+                html += '<div class="jsm-event-calendar-event-time">' + event.timeDisplay + '</div>';
+            }
+
+            html += '</div>';
+
+            return html;
+        },
+
+        /**
+         * Render weekly calendar
+         */
+        renderWeeklyCalendar: function($calendarTable, year, month, day, events) {
+            // Create a date object for the reference day
+            const refDate = new Date(year, month - 1, day);
+
+            // Get the day of the week (0 = Sunday, 6 = Saturday)
+            let dayOfWeek = refDate.getDay();
+
+            // Adjust to make Monday the first day (0 = Monday, 6 = Sunday)
+            dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+
+            // Calculate the Monday of the week
+            const mondayDate = new Date(refDate);
+            mondayDate.setDate(refDate.getDate() - dayOfWeek);
+
+            // Get today's date for comparison
+            const today = new Date();
+            const todayStr = this.formatDate(today);
+
+            // Generate HTML
+            let html = '<div class="jsm-weekly-grid">';
+
+            // Header with days
+            html += '<div class="jsm-weekly-header">';
+            html += '<div class="jsm-weekly-time-column">&nbsp;</div>';
+
+            // Generate weekday headers
+            const weekDays = [];
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(mondayDate);
+                dayDate.setDate(mondayDate.getDate() + i);
+
+                const dayStr = this.formatDate(dayDate);
+                const isToday = dayStr === todayStr;
+
+                const dayName = jsmEventCalendar.i18n.weekdaysShort[i];
+                const dayNum = dayDate.getDate();
+
+                let headerClass = 'jsm-weekly-day-header';
+                if (isToday) {
+                    headerClass += ' today';
+                }
+
+                html += '<div class="' + headerClass + '" data-date="' + dayStr + '">';
+                html += '<div class="jsm-weekly-day-name">' + dayName + '</div>';
+                html += '<div class="jsm-weekly-day-number">' + dayNum + '</div>';
+                html += '</div>';
+
+                weekDays.push({
+                    date: dayDate,
+                    dateStr: dayStr,
+                    isToday: isToday
+                });
+            }
+
+            html += '</div>'; // End header
+
+            // Body with time slots and events
+            html += '<div class="jsm-weekly-body">';
+
+            // Time column
+            html += '<div class="jsm-weekly-time-column">';
+
+            // Generate time slots - from 6 AM to 9 PM
+            const startHour = 0;
+            const endHour = 23;
+
+            for (let hour = startHour; hour <= endHour; hour++) {
+                const timeDisplay = this.formatTime(hour, 0);
+                html += '<div class="jsm-weekly-time-label">' + timeDisplay + '</div>';
+            }
+
+            html += '</div>'; // End time column
+
+            // Day columns
+            for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
+                const dayInfo = weekDays[dayIdx];
+
+                let dayClass = 'jsm-weekly-day-column';
+                if (dayInfo.isToday) {
+                    dayClass += ' today';
+                }
+
+                html += '<div class="' + dayClass + '" data-date="' + dayInfo.dateStr + '">';
+
+                // Hours cells
+                for (let hour = startHour; hour <= endHour; hour++) {
+                    html += '<div class="jsm-weekly-hour-cell" data-hour="' + hour + '">';
+
+                    // Get events for this day and hour
+                    const dayEvents = this.getEventsForHour(
+                        events,
+                        dayInfo.date.getFullYear(),
+                        dayInfo.date.getMonth() + 1,
+                        dayInfo.date.getDate(),
+                        hour
+                    );
+
+                    // Sort events
+                    const sortedDayEvents = this.sortEventsByTime(dayEvents);
+
+                    // Render events
+                    for (let i = 0; i < sortedDayEvents.length; i++) {
+                        html += this.renderEventInDailyCell(sortedDayEvents[i]);
+                    }
+
+                    html += '</div>'; // End hour cell
+                }
+
+                html += '</div>'; // End day column
+            }
+
+            html += '</div>'; // End weekly body
+            html += '</div>'; // End weekly grid
+
+            $calendarTable.html(html);
+        },
+
+        /**
+         * Get events for a specific hour
+         */
+        getEventsForHour: function(events, year, month, day, hour) {
+            if (!events || !Array.isArray(events)) {
+                return [];
+            }
+
+            const dateString = this.pad(year) + '-' + this.pad(month) + '-' + this.pad(day);
+            const hourEvents = [];
+
+            for (let i = 0; i < events.length; i++) {
+                const event = events[i];
+                if (!event || !event.startDate) continue;
+
+                const startDate = event.startDate;
+                const endDate = event.endDate || event.startDate;
+
+                // Check if event belongs to this day
+                if (dateString >= startDate && dateString <= endDate) {
+                    // All-day events belong to all hours
+                    if (event.allDay) {
+                        hourEvents.push(event);
+                        continue;
+                    }
+
+                    // Check if event happens in this hour
+                    if (event.timeDisplay) {
+                        const eventHour = this.extractHourFromTimeDisplay(event.timeDisplay);
+                        if (eventHour === hour) {
+                            hourEvents.push(event);
+                        }
+                    }
+                }
+            }
+
+            return hourEvents;
+        },
+
+        /**
+         * Extract hour from time display string
+         */
+        extractHourFromTimeDisplay: function(timeDisplay) {
+            if (!timeDisplay) return -1;
+
+            // Try to extract the first time in format HH:MM from the string
+            const timeMatch = timeDisplay.match(/(\d{1,2})[:\.]/);
+            if (timeMatch) {
+                return parseInt(timeMatch[1]);
+            }
+            return -1;
+        },
+
+        /**
+         * Format date as YYYY-MM-DD
+         */
+        formatDate: function(date) {
+            return date.getFullYear() + '-' +
+                   this.pad(date.getMonth() + 1) + '-' +
+                   this.pad(date.getDate());
+        },
+
+        /**
+         * Format time as HH:MM or h:MM AM/PM based on settings
+         */
+        formatTime: function(hours, minutes) {
+            // Check if time format is set in settings
+            const timeFormat = jsmEventCalendar.timeFormat || '24';
+
+            if (timeFormat === '12') {
+                // 12-hour format
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const h = hours % 12 || 12;
+                return h + ':' + this.pad(minutes) + ' ' + ampm;
+            } else {
+                // 24-hour format
+                return hours + ':' + this.pad(minutes);
+            }
         },
 
         /**

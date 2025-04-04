@@ -39,6 +39,12 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
                 </div>
                 <div class="jsm-settings-columns">
                     <div class="jsm-settings-column">
+                         <h3><?php _e('Calendar Views', 'jsm-wp-event-calendar'); ?></h3>
+                        <table class="form-table">
+                            <tbody>
+                                <?php do_settings_fields('wp_event_settings', 'views_section'); ?>
+                            </tbody>
+                        </table>
                         <h3><?php esc_html_e('Color Scheme', 'jsm-wp-event-calendar'); ?></h3>
                         <table class="form-table">
                             <tbody>
@@ -54,6 +60,7 @@ $options = wp_parse_args($options, WP_Event_Settings::get_defaults());
                             </tbody>
                         </table>
                     </div>
+               >
                 </div>
             </div>
 

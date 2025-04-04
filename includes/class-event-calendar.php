@@ -20,101 +20,108 @@ class WP_Event_Calendar
      * Load scripts and styles for frontend
      */
     public function enqueue_scripts()
-        {
-            // Ensure jQuery is loaded
-            wp_enqueue_script("jquery");
+    {
+        // Ensure jQuery is loaded
+        wp_enqueue_script("jquery");
 
-            // Load CSS for calendar with version for cache busting
-            wp_enqueue_style(
-                "jsm-wp-event-calendar",
-                WP_EVENT_CALENDAR_PLUGIN_URL . "assets/css/event-calendar.css",
-                [],
-                WP_EVENT_CALENDAR_VERSION . "." . time()
-            );
+        // Load CSS for calendar with version for cache busting
+        wp_enqueue_style(
+            "jsm-wp-event-calendar",
+            WP_EVENT_CALENDAR_PLUGIN_URL . "assets/css/event-calendar.css",
+            [],
+            WP_EVENT_CALENDAR_VERSION . "." . time()
+        );
 
-            // Responsive styles
-            wp_enqueue_style(
-                "jsm-wp-event-calendar-mobile",
-                WP_EVENT_CALENDAR_PLUGIN_URL .
-                    "assets/css/event-calendar-mobile.css",
-                ["jsm-wp-event-calendar"],
-                WP_EVENT_CALENDAR_VERSION . "." . time(),
-                "only screen and (max-width: 768px)"
-            );
+        // Responsive styles
+        wp_enqueue_style(
+            "jsm-wp-event-calendar-mobile",
+            WP_EVENT_CALENDAR_PLUGIN_URL .
+                "assets/css/event-calendar-mobile.css",
+            ["jsm-wp-event-calendar"],
+            WP_EVENT_CALENDAR_VERSION . "." . time(),
+            "only screen and (max-width: 768px)"
+        );
 
-            // Dynamic CSS from calendar settings
-            $this->enqueue_dynamic_styles();
+        // Dynamic CSS from calendar settings
+        $this->enqueue_dynamic_styles();
 
-            // Load JS for calendar
-            wp_enqueue_script(
-                "jsm-wp-event-calendar",
-                WP_EVENT_CALENDAR_PLUGIN_URL . "assets/js/event-calendar.js",
-                ["jquery"],
-                WP_EVENT_CALENDAR_VERSION . "." . time(),
-                true
-            );
+        // Load JS for calendar
+        wp_enqueue_script(
+            "jsm-wp-event-calendar",
+            WP_EVENT_CALENDAR_PLUGIN_URL . "assets/js/event-calendar.js",
+            ["jquery"],
+            WP_EVENT_CALENDAR_VERSION . "." . time(),
+            true
+        );
 
-            // Default event data
-            $default_event_data = [
-                "ajaxurl" => admin_url("admin-ajax.php"),
-                "action" => "get_events_for_calendar",
-                "nonce" => wp_create_nonce("jsm_event_calendar_nonce"),
-                "allEvents" => [], // Initially empty, will be populated by AJAX
-                "i18n" => [
-                    "loadingText" => __(
-                        "Loading events...",
-                        "jsm-wp-event-calendar"
-                    ),
-                    "noEventsText" => __(
-                        "No events to display",
-                        "jsm-wp-event-calendar"
-                    ),
-                    "eventsListTitle" => __(
-                        "Events List",
-                        "jsm-wp-event-calendar"
-                    ),
-                    "months" => [
-                        __("January", "jsm-wp-event-calendar"),
-                        __("February", "jsm-wp-event-calendar"),
-                        __("March", "jsm-wp-event-calendar"),
-                        __("April", "jsm-wp-event-calendar"),
-                        __("May", "jsm-wp-event-calendar"),
-                        __("June", "jsm-wp-event-calendar"),
-                        __("July", "jsm-wp-event-calendar"),
-                        __("August", "jsm-wp-event-calendar"),
-                        __("September", "jsm-wp-event-calendar"),
-                        __("October", "jsm-wp-event-calendar"),
-                        __("November", "jsm-wp-event-calendar"),
-                        __("December", "jsm-wp-event-calendar"),
-                    ],
-                    "weekdays" => [
-                        __("Monday", "jsm-wp-event-calendar"),
-                        __("Tuesday", "jsm-wp-event-calendar"),
-                        __("Wednesday", "jsm-wp-event-calendar"),
-                        __("Thursday", "jsm-wp-event-calendar"),
-                        __("Friday", "jsm-wp-event-calendar"),
-                        __("Saturday", "jsm-wp-event-calendar"),
-                        __("Sunday", "jsm-wp-event-calendar"),
-                    ],
-                    "weekdaysShort" => [
-                        __("Mo", "jsm-wp-event-calendar"),
-                        __("Tu", "jsm-wp-event-calendar"),
-                        __("We", "jsm-wp-event-calendar"),
-                        __("Th", "jsm-wp-event-calendar"),
-                        __("Fr", "jsm-wp-event-calendar"),
-                        __("Sa", "jsm-wp-event-calendar"),
-                        __("Su", "jsm-wp-event-calendar"),
-                    ],
+        // Get settings
+        $options = get_option('wp_event_calendar_settings', array());
+        $time_format = isset($options['time_format']) ? $options['time_format'] : '24';
+        $allow_past_navigation = isset($options['allow_past_navigation']) ? $options['allow_past_navigation'] : 'yes';
+
+        // Default event data
+        $default_event_data = [
+            "ajaxurl" => admin_url("admin-ajax.php"),
+            "action" => "get_events_for_calendar",
+            "nonce" => wp_create_nonce("jsm_event_calendar_nonce"),
+            "allEvents" => [], // Initially empty, will be populated by AJAX
+            "timeFormat" => $time_format,
+            "allowPastNavigation" => $allow_past_navigation, // Přidáno nastavení pro navigaci do minulosti
+            "i18n" => [
+                "loadingText" => __(
+                    "Loading events...",
+                    "jsm-wp-event-calendar"
+                ),
+                "noEventsText" => __(
+                    "No events to display",
+                    "jsm-wp-event-calendar"
+                ),
+                "eventsListTitle" => __(
+                    "Events List",
+                    "jsm-wp-event-calendar"
+                ),
+                "months" => [
+                    __("January", "jsm-wp-event-calendar"),
+                    __("February", "jsm-wp-event-calendar"),
+                    __("March", "jsm-wp-event-calendar"),
+                    __("April", "jsm-wp-event-calendar"),
+                    __("May", "jsm-wp-event-calendar"),
+                    __("June", "jsm-wp-event-calendar"),
+                    __("July", "jsm-wp-event-calendar"),
+                    __("August", "jsm-wp-event-calendar"),
+                    __("September", "jsm-wp-event-calendar"),
+                    __("October", "jsm-wp-event-calendar"),
+                    __("November", "jsm-wp-event-calendar"),
+                    __("December", "jsm-wp-event-calendar"),
                 ],
-            ];
+                "weekdays" => [
+                    __("Monday", "jsm-wp-event-calendar"),
+                    __("Tuesday", "jsm-wp-event-calendar"),
+                    __("Wednesday", "jsm-wp-event-calendar"),
+                    __("Thursday", "jsm-wp-event-calendar"),
+                    __("Friday", "jsm-wp-event-calendar"),
+                    __("Saturday", "jsm-wp-event-calendar"),
+                    __("Sunday", "jsm-wp-event-calendar"),
+                ],
+                "weekdaysShort" => [
+                    __("Mo", "jsm-wp-event-calendar"),
+                    __("Tu", "jsm-wp-event-calendar"),
+                    __("We", "jsm-wp-event-calendar"),
+                    __("Th", "jsm-wp-event-calendar"),
+                    __("Fr", "jsm-wp-event-calendar"),
+                    __("Sa", "jsm-wp-event-calendar"),
+                    __("Su", "jsm-wp-event-calendar"),
+                ],
+            ],
+        ];
 
-            // Localize variables for JavaScript
-            wp_localize_script(
-                "jsm-wp-event-calendar",
-                "jsmEventCalendar",
-                $default_event_data
-            );
-        }
+        // Localize variables for JavaScript
+        wp_localize_script(
+            "jsm-wp-event-calendar",
+            "jsmEventCalendar",
+            $default_event_data
+        );
+    }
 
     /**
      * Dynamically load styles from admin settings
@@ -276,6 +283,16 @@ class WP_Event_Calendar
             $this,
             "get_event_detail_ajax",
         ]);
+
+        // AJAX for switching calendar views
+        add_action("wp_ajax_switch_calendar_view", [
+            $this,
+            "switch_calendar_view_ajax",
+        ]);
+        add_action("wp_ajax_nopriv_switch_calendar_view", [
+            $this,
+            "switch_calendar_view_ajax",
+        ]);
     }
 
     /**
@@ -326,6 +343,13 @@ class WP_Event_Calendar
         $start_date = $year . "-" . $month . "-01";
         $end_date = gmdate("Y-m-t", strtotime($start_date));
         $today = gmdate("Y-m-d");
+
+        // Získáme nastavení času
+        $options = get_option('wp_event_calendar_settings', array());
+        $time_format = isset($options['time_format']) ? $options['time_format'] : '24';
+
+        // Určíme formát času dle nastavení
+        $wp_time_format = ($time_format === '12') ? get_option('time_format') : 'H:i';
 
         $args = [
             "post_type" => "jsm_wp_event",
@@ -418,9 +442,9 @@ class WP_Event_Calendar
                 $time_display = "";
                 if ("1" !== $all_day) {
                     if (!empty($start_time)) {
-                        $time_display = date_i18n(get_option("time_format"), strtotime($start_time));
+                        $time_display = date_i18n($wp_time_format, strtotime($start_time));
                         if (!empty($end_time)) {
-                            $time_display .= " - " . date_i18n(get_option("time_format"), strtotime($end_time));
+                            $time_display .= " - " . date_i18n($wp_time_format, strtotime($end_time));
                         }
                     }
                 } else {
@@ -478,7 +502,8 @@ class WP_Event_Calendar
         $existing_data = $existing_data ? json_decode(str_replace('var jsmEventCalendar = ', '', $existing_data), true) : [];
 
         $updated_data = array_merge($existing_data, [
-            'allEvents' => $events
+            'allEvents' => $events,
+            'timeFormat' => $time_format
         ]);
 
         wp_localize_script('jsm-wp-event-calendar', 'jsmEventCalendar', $updated_data);
@@ -512,6 +537,13 @@ class WP_Event_Calendar
         ];
 
         $args = wp_parse_args($args, $default_args);
+
+        // Získáme nastavení času
+        $options = get_option('wp_event_calendar_settings', array());
+        $time_format = isset($options['time_format']) ? $options['time_format'] : '24';
+
+        // Určíme formát času dle nastavení
+        $wp_time_format = ($time_format === '12') ? get_option('time_format') : 'H:i';
 
         // Add category filter if specified
         if (!empty($args['category'])) {
@@ -552,6 +584,19 @@ class WP_Event_Calendar
                     );
                 }
 
+                // Časy a datumy
+                $time_display = "";
+                if ("1" !== $all_day) {
+                    if (!empty($start_time)) {
+                        $time_display = date_i18n($wp_time_format, strtotime($start_time));
+                        if (!empty($end_time)) {
+                            $time_display .= " - " . date_i18n($wp_time_format, strtotime($end_time));
+                        }
+                    }
+                } else {
+                    $time_display = __("All Day", "jsm-wp-event-calendar");
+                }
+
                 $events[] = [
                     "id" => $post_id,
                     "title" => get_the_title(),
@@ -563,6 +608,7 @@ class WP_Event_Calendar
                     "start_time" => $start_time,
                     "end_time" => $end_time,
                     "all_day" => "1" === $all_day,
+                    "time_display" => $time_display,
                     "custom_url" => $url,
                     "button_text" => !empty($button_text) ? $button_text : __("More Information", "jsm-wp-event-calendar"),
                     "thumbnail" => has_post_thumbnail() ? get_the_post_thumbnail_url($post_id, "medium") : "",
@@ -594,20 +640,62 @@ class WP_Event_Calendar
      */
     public function render_calendar($atts = [])
     {
+        $options = get_option('wp_event_calendar_settings', array());
+        $options = wp_parse_args($options, array(
+            'enable_daily_view' => 'yes',
+            'enable_weekly_view' => 'yes',
+            'enable_monthly_view' => 'yes',
+            'default_view' => 'monthly',
+        ));
+
         $atts = shortcode_atts(
             [
                 "month" => date("m"),
                 "year" => date("Y"),
+                "day" => date("d"),
                 "show_list" => "yes",
                 "category" => "",
+                "view" => $options['default_view'], // Use default view from settings
             ],
             $atts,
             "event_calendar"
         );
 
-        // Load template
+        // Ensure view is valid based on enabled settings
+        $valid_views = array();
+        if ($options['enable_monthly_view'] === 'yes') {
+            $valid_views[] = 'monthly';
+        }
+        if ($options['enable_weekly_view'] === 'yes') {
+            $valid_views[] = 'weekly';
+        }
+        if ($options['enable_daily_view'] === 'yes') {
+            $valid_views[] = 'daily';
+        }
+
+        // If no views are enabled, force monthly view
+        if (empty($valid_views)) {
+            $valid_views[] = 'monthly';
+        }
+
+        // If requested view is not enabled, use first enabled view
+        if (!in_array($atts['view'], $valid_views)) {
+            $atts['view'] = $valid_views[0];
+        }
+
+        // Load appropriate template based on view
         ob_start();
-        include WP_EVENT_CALENDAR_PLUGIN_DIR . "templates/calendar.php";
+        switch ($atts['view']) {
+            case 'daily':
+                include WP_EVENT_CALENDAR_PLUGIN_DIR . "templates/calendar-daily.php";
+                break;
+            case 'weekly':
+                include WP_EVENT_CALENDAR_PLUGIN_DIR . "templates/calendar-weekly.php";
+                break;
+            default: // monthly
+                include WP_EVENT_CALENDAR_PLUGIN_DIR . "templates/calendar.php";
+                break;
+        }
         return ob_get_clean();
     }
 
@@ -705,32 +793,82 @@ class WP_Event_Calendar
         }
 
         // Build event object
-        $event = [
-            "id" => $post_id,
-            "title" => get_the_title($post_id),
-            "content" => apply_filters("the_content", $post->post_content),
-            "excerpt" => has_excerpt($post_id)
-                ? get_the_excerpt($post_id)
-                : wp_trim_words($post->post_content, 20),
-            "permalink" => get_permalink($post_id),
-            "start_date" => $start_date,
-            "end_date" => $end_date,
-            "start_time" => $start_time,
-            "end_time" => $end_time,
-            "all_day" => "1" === $all_day,
-            "custom_url" => $url,
-            "button_text" => !empty($button_text)
-                ? $button_text
-                : __("More Information", "jsm-wp-event-calendar"),
-            "thumbnail" => has_post_thumbnail($post_id)
-                ? get_the_post_thumbnail_url($post_id, "large")
-                : "",
-            "categories" => $categories
-        ];
+                $event = [
+                    "id" => $post_id,
+                    "title" => get_the_title($post_id),
+                    "content" => apply_filters("the_content", $post->post_content),
+                    "excerpt" => has_excerpt($post_id)
+                        ? get_the_excerpt($post_id)
+                        : wp_trim_words($post->post_content, 20),
+                    "permalink" => get_permalink($post_id),
+                    "start_date" => $start_date,
+                    "end_date" => $end_date,
+                    "start_time" => $start_time,
+                    "end_time" => $end_time,
+                    "all_day" => "1" === $all_day,
+                    "custom_url" => $url,
+                    "button_text" => !empty($button_text)
+                        ? $button_text
+                        : __("More Information", "jsm-wp-event-calendar"),
+                    "thumbnail" => has_post_thumbnail($post_id)
+                        ? get_the_post_thumbnail_url($post_id, "large")
+                        : "",
+                    "categories" => $categories
+                ];
 
-        // Load template
-        ob_start();
-        include WP_EVENT_CALENDAR_PLUGIN_DIR . "templates/event-detail.php";
-        return ob_get_clean();
-    }
-}
+                // Load template
+                ob_start();
+                include WP_EVENT_CALENDAR_PLUGIN_DIR . "templates/event-detail.php";
+                return ob_get_clean();
+            }
+
+            /**
+             * AJAX handler for switching calendar views
+             */
+            public function switch_calendar_view_ajax()
+            {
+                // Check nonce
+                if (
+                    !isset($_POST["nonce"]) ||
+                    !wp_verify_nonce(sanitize_key(wp_unslash($_POST["nonce"])), "jsm_event_calendar_nonce")
+                ) {
+                    wp_send_json_error("Invalid security token");
+                }
+
+                // Required parameters
+                $month = isset($_POST["month"]) ? intval($_POST["month"]) : date("m");
+                $year = isset($_POST["year"]) ? intval($_POST["year"]) : date("Y");
+                $day = isset($_POST["day"]) ? intval($_POST["day"]) : date("d");
+                $view = isset($_POST["view"]) ? sanitize_text_field(wp_unslash($_POST["view"])) : 'monthly';
+                $show_list = isset($_POST["show_list"]) ? sanitize_text_field(wp_unslash($_POST["show_list"])) : 'yes';
+                $category = isset($_POST["category"]) ? sanitize_text_field(wp_unslash($_POST["category"])) : '';
+                $calendar_id = isset($_POST["calendar_id"]) ? sanitize_text_field(wp_unslash($_POST["calendar_id"])) : '';
+
+                // Build attributes for the shortcode
+                $atts = [
+                    'month' => $month,
+                    'year' => $year,
+                    'day' => $day,
+                    'show_list' => $show_list,
+                    'category' => $category,
+                    'view' => $view
+                ];
+
+                // Render the calendar view
+                ob_start();
+                switch ($view) {
+                    case 'daily':
+                        include WP_EVENT_CALENDAR_PLUGIN_DIR . "templates/calendar-daily.php";
+                        break;
+                    case 'weekly':
+                        include WP_EVENT_CALENDAR_PLUGIN_DIR . "templates/calendar-weekly.php";
+                        break;
+                    default: // monthly
+                        include WP_EVENT_CALENDAR_PLUGIN_DIR . "templates/calendar.php";
+                        break;
+                }
+                $calendar_html = ob_get_clean();
+
+                wp_send_json_success($calendar_html);
+            }
+        }

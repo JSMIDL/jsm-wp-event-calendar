@@ -36,6 +36,12 @@ class WP_Event_Settings {
         'border_radius_lg' => '1rem',
         'button_radius' => '0.5rem',
         'calendar_spacing' => '0.5rem',
+        'enable_daily_view' => 'yes',
+        'enable_weekly_view' => 'yes',
+        'enable_monthly_view' => 'yes',
+        'default_view' => 'monthly',
+        'time_format' => '24',
+        'allow_past_navigation' => 'yes',  // Nové nastavení pro navigaci do minulosti
     );
 
     /**
@@ -178,8 +184,16 @@ class WP_Event_Settings {
             'wp_event_settings'
         );
 
+        add_settings_section(
+            'views_section',
+            __('Calendar Views', 'jsm-wp-event-calendar'),
+            array($this, 'views_section_callback'),
+            'wp_event_settings'
+        );
+
         $this->add_color_fields();
         $this->add_dimension_fields();
+        $this->add_view_fields();
     }
 
     /**
@@ -280,9 +294,23 @@ class WP_Event_Settings {
      */
     public function sanitize_settings($input) {
         $sanitized_input = array();
+
+        // Process checkbox fields
+        $checkbox_fields = array('enable_daily_view', 'enable_weekly_view', 'enable_monthly_view', 'allow_past_navigation');
+        foreach ($checkbox_fields as $field) {
+            $sanitized_input[$field] = isset($input[$field]) ? 'yes' : 'no';
+        }
+
+        // Process other fields
         foreach (self::$defaults as $key => $default_value) {
+            // Skip checkbox fields as they were already processed
+            if (in_array($key, $checkbox_fields)) {
+                continue;
+            }
+
             $sanitized_input[$key] = isset($input[$key]) ? sanitize_text_field($input[$key]) : $default_value;
         }
+
         return $sanitized_input;
     }
 
@@ -310,4 +338,97 @@ class WP_Event_Settings {
             exit;
         }
     }
+    /**
+     * Views section description
+     */
+    public function views_section_callback() {
+        echo '<p>' . __('Configure which calendar views are enabled and set the default view.', 'jsm-wp-event-calendar') . '</p>';
+    }
+
+    /**
+         * Add view setting fields
+         */
+        private function add_view_fields() {
+            // Enable/disable fields
+            $view_toggle_fields = array(
+                'enable_monthly_view' => __('Enable Monthly View', 'jsm-wp-event-calendar'),
+                'enable_weekly_view' => __('Enable Weekly View', 'jsm-wp-event-calendar'),
+                'enable_daily_view' => __('Enable Daily View', 'jsm-wp-event-calendar'),
+                'allow_past_navigation' => __('Allow Navigation to Past Events', 'jsm-wp-event-calendar'),
+            );
+
+            foreach ($view_toggle_fields as $id => $label) {
+                add_settings_field(
+                    $id,
+                    $label,
+                    array($this, 'checkbox_field_callback'),
+                    'wp_event_settings',
+                    'views_section',
+                    array('id' => $id, 'label' => $label)
+                );
+            }
+
+            // Default view field
+            add_settings_field(
+                'default_view',
+                __('Default Calendar View', 'jsm-wp-event-calendar'),
+                array($this, 'select_field_callback'),
+                'wp_event_settings',
+                'views_section',
+                array(
+                    'id' => 'default_view',
+                    'label' => __('Default Calendar View', 'jsm-wp-event-calendar'),
+                    'options' => array(
+                        'monthly' => __('Monthly', 'jsm-wp-event-calendar'),
+                        'weekly' => __('Weekly', 'jsm-wp-event-calendar'),
+                        'daily' => __('Daily', 'jsm-wp-event-calendar'),
+                    )
+                )
+            );
+
+            // Time format field
+            add_settings_field(
+                'time_format',
+                __('Time Format', 'jsm-wp-event-calendar'),
+                array($this, 'select_field_callback'),
+                'wp_event_settings',
+                'views_section',
+                array(
+                    'id' => 'time_format',
+                    'label' => __('Time Format', 'jsm-wp-event-calendar'),
+                    'options' => array(
+                        '24' => __('24-hour (e.g. 14:30)', 'jsm-wp-event-calendar'),
+                        '12' => __('12-hour (e.g. 2:30 PM)', 'jsm-wp-event-calendar'),
+                    )
+                )
+            );
+        }
+    /**
+     * Checkbox field callback
+     */
+    public function checkbox_field_callback($args) {
+        $id = $args['id'];
+        $options = get_option('wp_event_calendar_settings', array());
+        $options = wp_parse_args($options, self::$defaults);
+        $checked = isset($options[$id]) && $options[$id] === 'yes' ? 'checked' : '';
+
+        echo '<input type="checkbox" id="' . esc_attr($id) . '" name="wp_event_calendar_settings[' . esc_attr($id) . ']" value="yes" ' . $checked . ' />';
+    }
+
+    /**
+     * Select field callback
+     */
+    public function select_field_callback($args) {
+        $id = $args['id'];
+        $options = get_option('wp_event_calendar_settings', array());
+        $options = wp_parse_args($options, self::$defaults);
+        $current = isset($options[$id]) ? $options[$id] : self::$defaults[$id];
+
+        echo '<select id="' . esc_attr($id) . '" name="wp_event_calendar_settings[' . esc_attr($id) . ']">';
+        foreach ($args['options'] as $value => $label) {
+            echo '<option value="' . esc_attr($value) . '" ' . selected($current, $value, false) . '>' . esc_html($label) . '</option>';
+        }
+        echo '</select>';
+    }
+
 }

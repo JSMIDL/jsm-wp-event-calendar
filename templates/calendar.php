@@ -9,11 +9,13 @@
 $calendar_id = 'jsm-event-calendar-' . uniqid();
 
 // Current month and year - ensure we never display past months
-$current_month = gmdate('m');
-$current_year = gmdate('Y');
+$current_month = date('m');
+$current_year = date('Y');
+$current_day = date('d');
 
 $month = absint($atts['month']);
 $year = absint($atts['year']);
+$day = absint($atts['day']);
 
 // Check for valid month and year
 if ($month < 1 || $month > 12) {
@@ -21,6 +23,9 @@ if ($month < 1 || $month > 12) {
 }
 if ($year < 1970 || $year > 2100) {
     $year = $current_year;
+}
+if ($day < 1 || $day > 31) {
+    $day = $current_day;
 }
 
 // Ensure we don't go into the past
@@ -42,27 +47,34 @@ $weekdays = array(
 );
 
 // Number of days in month
-$days_in_month = gmdate('t', strtotime("$year-$month-01"));
+$days_in_month = date('t', strtotime("$year-$month-01"));
 
 // FIXED: Get first day of month (0 = Monday, 6 = Sunday - European format)
 $first_day_timestamp = strtotime("$year-$month-01");
-$first_day_of_week = gmdate('N', $first_day_timestamp); // 1 (Monday) to 7 (Sunday)
+$first_day_of_week = date('N', $first_day_timestamp); // 1 (Monday) to 7 (Sunday)
 $first_day_of_month = $first_day_of_week - 1; // Convert to 0-6, where 0 is Monday
 
 // Today
-$today = gmdate('Y-m-d');
-$today_day = gmdate('j');
-$today_month = gmdate('m');
-$today_year = gmdate('Y');
+$today = date('Y-m-d');
+$today_day = date('j');
+$today_month = date('m');
+$today_year = date('Y');
 
 // Category for filtering
 $category = !empty($atts['category']) ? $atts['category'] : '';
 
 // Show event list below calendar
 $show_list = ($atts['show_list'] === 'yes');
+
+// Load calendar view settings
+$options = get_option('wp_event_calendar_settings', array());
+$enable_monthly = isset($options['enable_monthly_view']) ? $options['enable_monthly_view'] === 'yes' : true;
+$enable_weekly = isset($options['enable_weekly_view']) ? $options['enable_weekly_view'] === 'yes' : true;
+$enable_daily = isset($options['enable_daily_view']) ? $options['enable_daily_view'] === 'yes' : true;
+$allow_past_navigation = isset($options['allow_past_navigation']) ? $options['allow_past_navigation'] === 'yes' : true;
 ?>
 
-<div id="<?php echo esc_attr($calendar_id); ?>" class="jsm-event-calendar-wrapper" data-month="<?php echo esc_attr($month); ?>" data-year="<?php echo esc_attr($year); ?>" data-show-list="<?php echo esc_attr($atts['show_list']); ?>" data-category="<?php echo esc_attr($category); ?>">
+<div id="<?php echo esc_attr($calendar_id); ?>" class="jsm-event-calendar-wrapper jsm-monthly-view" data-month="<?php echo esc_attr($month); ?>" data-year="<?php echo esc_attr($year); ?>" data-day="<?php echo esc_attr($day); ?>" data-view="monthly" data-show-list="<?php echo esc_attr($atts['show_list']); ?>" data-category="<?php echo esc_attr($category); ?>">
     <!-- Calendar navigation -->
     <div class="jsm-event-calendar-nav">
         <h2 id="<?php echo esc_attr($calendar_id); ?>-title" class="jsm-event-calendar-title"><?php echo esc_html($month_name . ' ' . $year); ?></h2>
@@ -74,86 +86,107 @@ $show_list = ($atts['show_list'] === 'yes');
             if ($show_prev) :
             ?>
             <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-prev" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php esc_html_e('Previous', 'jsm-wp-event-calendar'); ?>
-            </button>
-            <?php endif; ?>
-            <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-today" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php esc_html_e('Today', 'jsm-wp-event-calendar'); ?>
-            </button>
-            <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-next" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php esc_html_e('Next Month', 'jsm-wp-event-calendar'); ?>
-            </button>
-        </div>
-    </div>
+                            <?php _e('Previous', 'jsm-wp-event-calendar'); ?>
+                        </button>
+                        <?php endif; ?>
+                        <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-today" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
+                            <?php _e('Today', 'jsm-wp-event-calendar'); ?>
+                        </button>
+                        <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-next" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
+                            <?php _e('Next Month', 'jsm-wp-event-calendar'); ?>
+                        </button>
 
-    <!-- Calendar -->
-    <div id="<?php echo esc_attr($calendar_id); ?>-table" class="jsm-event-calendar-table-wrapper">
-        <table class="jsm-event-calendar-table">
-            <thead>
-                <tr>
-                    <?php foreach ($weekdays as $weekday) : ?>
-                        <th><?php echo esc_html($weekday); ?></th>
-                    <?php endforeach; ?>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <?php
-                    // Empty cells before first day of month
-                    for ($i = 0; $i < $first_day_of_month; $i++) {
-                        echo '<td class="jsm-event-calendar-day empty other-month"></td>';
-                    }
+                        <!-- View switching buttons -->
+                        <div class="jsm-event-calendar-view-switcher">
+                            <?php if ($enable_daily): ?>
+                            <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-view-button" data-view="daily" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
+                                <?php _e('Day', 'jsm-wp-event-calendar'); ?>
+                            </button>
+                            <?php endif; ?>
 
-                    // Days in month
-                    $day_count = $first_day_of_month;
-                    for ($day = 1; $day <= $days_in_month; $day++) {
-                        // New row after 7 days
-                        if ($day_count % 7 === 0 && $day_count > 0) {
-                            echo '</tr><tr>';
-                        }
+                            <?php if ($enable_weekly): ?>
+                            <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-view-button" data-view="weekly" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
+                                <?php _e('Week', 'jsm-wp-event-calendar'); ?>
+                            </button>
+                            <?php endif; ?>
 
-                        // Date for this day
-                        $date = sprintf('%s-%s-%s', $year, str_pad($month, 2, '0', STR_PAD_LEFT), str_pad($day, 2, '0', STR_PAD_LEFT));
+                            <?php if ($enable_monthly): ?>
+                            <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-view-button active" data-view="monthly" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
+                                <?php _e('Month', 'jsm-wp-event-calendar'); ?>
+                            </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
 
-                        // Class for today
-                        $today_class = '';
-                        if ($day == $today_day && $month == $today_month && $year == $today_year) {
-                            $today_class = ' today';
-                        }
+                <!-- Calendar -->
+                <div id="<?php echo esc_attr($calendar_id); ?>-table" class="jsm-event-calendar-table-wrapper">
+                    <table class="jsm-event-calendar-table">
+                        <thead>
+                            <tr>
+                                <?php foreach ($weekdays as $weekday) : ?>
+                                    <th><?php echo esc_html($weekday); ?></th>
+                                <?php endforeach; ?>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <?php
+                                // Empty cells before first day of month
+                                for ($i = 0; $i < $first_day_of_month; $i++) {
+                                    echo '<td class="jsm-event-calendar-day empty other-month"></td>';
+                                }
 
-                        echo '<td class="jsm-event-calendar-day' . esc_attr($today_class) . '" data-date="' . esc_attr($date) . '">';
-                        echo '<span class="jsm-event-calendar-day-number">' . esc_html($day) . '</span>';
+                                // Days in month
+                                $day_count = $first_day_of_month;
+                                for ($day = 1; $day <= $days_in_month; $day++) {
+                                    // New row after 7 days
+                                    if ($day_count % 7 === 0 && $day_count > 0) {
+                                        echo '</tr><tr>';
+                                    }
 
-                        // Events would go here, but they're loaded dynamically by JavaScript
+                                    // Date for this day
+                                    $date = sprintf('%s-%s-%s', $year, str_pad($month, 2, '0', STR_PAD_LEFT), str_pad($day, 2, '0', STR_PAD_LEFT));
 
-                        echo '</td>';
+                                    // Class for today
+                                    $today_class = '';
+                                    if ($day == $today_day && $month == $today_month && $year == $today_year) {
+                                        $today_class = ' today';
+                                    }
 
-                        $day_count++;
-                    }
+                                    echo '<td class="jsm-event-calendar-day' . esc_attr($today_class) . '" data-date="' . esc_attr($date) . '">';
+                                    echo '<span class="jsm-event-calendar-day-number">' . esc_html($day) . '</span>';
 
-                    // Empty cells after last day of month
-                    while ($day_count % 7 !== 0) {
-                        echo '<td class="jsm-event-calendar-day empty other-month"></td>';
-                        $day_count++;
-                    }
-                    ?>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+                                    // Events would go here, but they're loaded dynamically by JavaScript
 
-    <!-- Event list -->
-    <?php if ($show_list) : ?>
-        <div id="<?php echo esc_attr($calendar_id); ?>-list" class="jsm-event-list-wrapper">
-            <!-- Event list will be populated dynamically by JavaScript -->
-        </div>
-    <?php endif; ?>
+                                    echo '</td>';
 
-</div>
+                                    $day_count++;
+                                }
 
-<!-- Modal for event details -->
-<div id="jsm-event-modal" class="jsm-event-modal">
-    <div id="jsm-event-modal-content" class="jsm-event-modal-content">
-        <!-- Modal content will be populated dynamically -->
-    </div>
-</div>
+                                // Empty cells after last day of month
+                                while ($day_count % 7 !== 0) {
+                                    echo '<td class="jsm-event-calendar-day empty other-month"></td>';
+                                    $day_count++;
+                                }
+                                ?>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Event list -->
+                <?php if ($show_list) : ?>
+                    <div id="<?php echo esc_attr($calendar_id); ?>-list" class="jsm-event-list-wrapper">
+                        <!-- Event list will be populated dynamically by JavaScript -->
+                    </div>
+                <?php endif; ?>
+
+            </div>
+
+            <!-- Modal for event details -->
+            <div id="jsm-event-modal" class="jsm-event-modal">
+                <div id="jsm-event-modal-content" class="jsm-event-modal-content">
+                    <!-- Modal content will be populated dynamically -->
+                </div>
+            </div>
