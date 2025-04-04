@@ -354,62 +354,74 @@ class WP_Event_Calendar
         // Určíme formát času dle nastavení
         $wp_time_format = ($time_format === '12') ? get_option('time_format') : 'H:i';
 
+        // Determine if past navigation is allowed
+        $allow_past_navigation = isset($options['allow_past_navigation']) ? $options['allow_past_navigation'] === 'yes' : true;
+
+
         $args = [
             "post_type" => "jsm_wp_event",
             "posts_per_page" => -1,
             "post_status" => "publish",
             "meta_query" => [
+                // Past events check is conditionally added
+                "relation" => "AND",
+            ]
+        ];
+
+        // If past navigation is not allowed, add filter for current and future events
+        if (!$allow_past_navigation) {
+            $args["meta_query"][] = [
+                "relation" => "OR",
+                [
+                    "key" => "_event_start_date",
+                    "value" => $today,
+                    "compare" => ">=",
+                    "type" => "DATE",
+                ],
+                [
+                    "key" => "_event_end_date",
+                    "value" => $today,
+                    "compare" => ">=",
+                    "type" => "DATE",
+                ]
+            ];
+        }
+
+        // Add main date range queries
+        $args["meta_query"][] = [
+            "relation" => "OR",
+            [
+                "key" => "_event_start_date",
+                "value" => [$start_date, $end_date],
+                "compare" => "BETWEEN",
+                "type" => "DATE",
+            ],
+            [
+                "key" => "_event_end_date",
+                "value" => [$start_date, $end_date],
+                "compare" => "BETWEEN",
+                "type" => "DATE",
+            ],
+            [
                 "relation" => "AND",
                 [
-                    "relation" => "OR",
-                    [
-                        "key" => "_event_start_date",
-                        "value" => $today,
-                        "compare" => ">=",
-                        "type" => "DATE",
-                    ],
-                    [
-                        "key" => "_event_end_date",
-                        "value" => $today,
-                        "compare" => ">=",
-                        "type" => "DATE",
-                    ],
+                    "key" => "_event_start_date",
+                    "value" => $start_date,
+                    "compare" => "<=",
+                    "type" => "DATE",
                 ],
                 [
-                    "relation" => "OR",
-                    [
-                        "key" => "_event_start_date",
-                        "value" => [$start_date, $end_date],
-                        "compare" => "BETWEEN",
-                        "type" => "DATE",
-                    ],
-                    [
-                        "key" => "_event_end_date",
-                        "value" => [$start_date, $end_date],
-                        "compare" => "BETWEEN",
-                        "type" => "DATE",
-                    ],
-                    [
-                        "relation" => "AND",
-                        [
-                            "key" => "_event_start_date",
-                            "value" => $start_date,
-                            "compare" => "<",
-                            "type" => "DATE",
-                        ],
-                        [
-                            "key" => "_event_end_date",
-                            "value" => $end_date,
-                            "compare" => ">",
-                            "type" => "DATE",
-                        ],
-                    ],
+                    "key" => "_event_end_date",
+                    "value" => $end_date,
+                    "compare" => ">=",
+                    "type" => "DATE",
                 ],
             ],
-            "orderby" => "meta_value",
-            "meta_key" => "_event_start_date",
-            "order" => "ASC",
         ];
+
+        $args["orderby"] = "meta_value";
+        $args["meta_key"] = "_event_start_date";
+        $args["order"] = "ASC";
 
         // Add category filter if specified
         if (!empty($category)) {
