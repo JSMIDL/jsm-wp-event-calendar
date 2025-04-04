@@ -235,12 +235,8 @@
     overflow-y: auto;
     position: relative;
     box-sizing: border-box;
-    word-wrap: break-word
+    word-wrap: break-word;
     overflow-x: hidden;
-    box-sizing: border-box;
-    word-wrap: break-word
-    overflow-x: hidden;
-
   }
 
   .jsm-event-detail-title {

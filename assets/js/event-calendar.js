@@ -1501,90 +1501,7 @@ renderEventInMonthCell: function(event, index) {
 
             return html;
         },
-        /**
-         * Render daily calendar
-         */
-        renderDailyCalendar: function($calendarTable, year, month, day, events) {
-            // Create a date object for the current day
-            const currentDate = new Date(year, month - 1, day);
-            const dateStr = this.formatDate(currentDate);
-
-            // Get today's date for comparison
-            const today = new Date();
-            const todayStr = this.formatDate(today);
-
-            // Is the current day today?
-            const isToday = dateStr === todayStr;
-
-            let html = '<div class="jsm-daily-timeline">';
-
-            // First, render all-day events at the top
-            html += '<div class="jsm-daily-time-slot jsm-all-day-slot">';
-            html += '<div class="jsm-daily-time-label">' + jsmEventCalendar.i18n.allDay + '</div>';
-            html += '<div class="jsm-daily-events-container" data-hour="all-day">';
-            
-            // Get all-day events
-            const allDayEvents = events.filter(event => 
-                event.allDay && 
-                dateStr >= event.startDate && 
-                dateStr <= (event.endDate || event.startDate)
-            );
-            
-            // Sort and render all-day events
-            const sortedAllDayEvents = this.sortEventsByTime(allDayEvents);
-            for (let i = 0; i < sortedAllDayEvents.length; i++) {
-                html += this.renderEventInDailyCell(sortedAllDayEvents[i]);
-            }
-            
-            html += '</div>'; // end all-day events container
-            html += '</div>'; // end all-day time slot
-
-            // Generate time slots - from 0 AM to 23 PM
-            const startHour = 0;
-            const endHour = 23;
-
-            for (let hour = startHour; hour <= endHour; hour++) {
-                const timeDisplay = this.formatTime(hour, 0);
-
-                html += '<div class="jsm-daily-time-slot">';
-                html += '<div class="jsm-daily-time-label">' + timeDisplay + '</div>';
-                html += '<div class="jsm-daily-events-container" data-hour="' + hour + '">';
-
-                // Filter events for this day and hour
-                const hourEvents = this.getEventsForHour(events, year, month, day, hour);
-
-                // Sort events
-                const sortedHourEvents = this.sortEventsByTime(hourEvents);
-
-                // Render events for this hour
-                for (let i = 0; i < sortedHourEvents.length; i++) {
-                    const event = sortedHourEvents[i];
-                    
-                    // Calculate top position based on minutes
-                    let topPosition = 0;
-                    if (event.timeDisplay && !event.allDay) {
-                        const minutesMatch = event.timeDisplay.match(/(\d{1,2}):(\d{2})/);
-                        if (minutesMatch && minutesMatch[2]) {
-                            const minutes = parseInt(minutesMatch[2]);
-                            topPosition = (minutes / 60) * 100;
-                        }
-                    }
-                    
-                    // Add inline style for positioning
-                    const eventHtml = this.renderEventInDailyCell(event)
-                        .replace('style="', `style="top: ${topPosition}%; `);
-                    
-                    html += eventHtml;
-                }
-
-                html += '</div>'; // end events container
-                html += '</div>'; // end time slot
-            }
-
-            html += '</div>'; // end timeline
-
-            $calendarTable.html(html);
-        },
+        // This function is no longer needed as it's replaced by renderDailyCalendarContent
 
         /**
          * Render event in daily cell - zcela přepracováno pro lepší trvání událostí
@@ -2280,38 +2197,36 @@ renderEventInMonthCell: function(event, index) {
             // Add class to restrict scrolling on page under modal
             $('body').addClass('modal-open');
 
-            //console.log('Rendering event in modal:', event);
-
             // Render modal HTML
             let modalHtml = `
-                                       <div class="jsm-event-detail">
-                                           <div class="jsm-event-detail-header">
-                                               <h1 class="jsm-event-detail-title">${event.title || ''}</h1>
-                                               <div class="jsm-event-detail-meta">
-                                                   <div class="jsm-event-detail-date">${event.dateDisplay || event.startDate}</div>
-                                                   <div class="jsm-event-detail-time">${event.timeDisplay || (event.allDay ? 'Celý den' : '')}</div>
-                                               </div>
-                                           </div>
-                                   `;
+                <div class="jsm-event-detail">
+                    <div class="jsm-event-detail-header">
+                        <h1 class="jsm-event-detail-title">${event.title || ''}</h1>
+                        <div class="jsm-event-detail-meta">
+                            <div class="jsm-event-detail-date">${event.dateDisplay || event.startDate}</div>
+                            <div class="jsm-event-detail-time">${event.timeDisplay || (event.allDay ? jsmEventCalendar.i18n.allDay : '')}</div>
+                        </div>
+                    </div>
+            `;
 
             // Add excerpt if available
             if (event.excerpt) {
                 modalHtml += `
-                                           <div class="jsm-event-detail-content">
-                                               ${event.excerpt}
-                                           </div>
-                                       `;
+                    <div class="jsm-event-detail-content">
+                        ${event.excerpt}
+                    </div>
+                `;
             }
 
             // Add custom URL button
             if (event.customUrl || event.url) {
                 modalHtml += `
-                                           <div class="jsm-event-detail-footer">
-                                               <a href="${event.customUrl || event.url}" class="jsm-event-button" target="_blank">
-                                                   ${event.buttonText || 'Více informací'}
-                                               </a>
-                                           </div>
-                                       `;
+                    <div class="jsm-event-detail-footer">
+                        <a href="${event.customUrl || event.url}" class="jsm-event-button" target="_blank">
+                            ${event.buttonText || jsmEventCalendar.i18n.moreInformation}
+                        </a>
+                    </div>
+                `;
             }
 
             modalHtml += '</div>';
@@ -2381,7 +2296,7 @@ renderEventInMonthCell: function(event, index) {
                     modalHtml += `
                                                <div class="jsm-event-detail-footer">
                                                    <a href="${event.customUrl || event.url}" class="jsm-event-button" target="_blank">
-                                                       ${event.buttonText || 'Více informací'}
+                                                       ${event.buttonText || jsmEventCalendar.i18n.moreInformation}
                                                    </a>
                                                </div>
                                            `;
@@ -2462,8 +2377,6 @@ renderEventInMonthCell: function(event, index) {
          * Render external event modal content
          */
         renderExternalEventModal: function(event) {
-            //console.log('Rendering external event', event);
-
             // Prepare start date
             const startDate = event.startDate ?
                 new Date(event.startDate).toLocaleDateString(undefined, {
@@ -2485,31 +2398,31 @@ renderEventInMonthCell: function(event, index) {
 
             // HTML for modal
             return `
-                                       <div class="jsm-event-detail">
-                                           <div class="jsm-event-detail-header">
-                                               <h1 class="jsm-event-detail-title">${event.title}</h1>
+                <div class="jsm-event-detail">
+                    <div class="jsm-event-detail-header">
+                        <h1 class="jsm-event-detail-title">${event.title}</h1>
 
-                                               <div class="jsm-event-detail-meta">
-                                                   <div class="jsm-event-detail-date">${dateDisplay}</div>
-                                                   <div class="jsm-event-detail-time">
-                                                       ${event.timeDisplay || (event.allDay ? 'Celý den' : '')}
-                                                   </div>
-                                               </div>
-                                           </div>
+                        <div class="jsm-event-detail-meta">
+                            <div class="jsm-event-detail-date">${dateDisplay}</div>
+                            <div class="jsm-event-detail-time">
+                                ${event.timeDisplay || (event.allDay ? jsmEventCalendar.i18n.allDay : '')}
+                            </div>
+                        </div>
+                    </div>
 
-                                           <div class="jsm-event-detail-content">
-                                               ${event.excerpt || ''}
-                                           </div>
+                    <div class="jsm-event-detail-content">
+                        ${event.excerpt || ''}
+                    </div>
 
-                                           ${event.customUrl ? `
-                                           <div class="jsm-event-detail-footer">
-                                               <a href="${event.customUrl}" class="jsm-event-button" target="_blank">
-                                                   ${event.buttonText || 'Více informací'}
-                                               </a>
-                                           </div>
-                                           ` : ''}
-                                       </div>
-                                   `;
+                    ${event.customUrl ? `
+                    <div class="jsm-event-detail-footer">
+                        <a href="${event.customUrl}" class="jsm-event-button" target="_blank">
+                            ${event.buttonText || jsmEventCalendar.i18n.moreInformation}
+                        </a>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
         },
 
         /**

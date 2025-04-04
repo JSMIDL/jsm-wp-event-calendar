@@ -82,7 +82,7 @@
   z-index: 1;
 }
 
-/* Vertikální rozložení navigace - modernější a minimalistický design */
+/* Vertical navigation layout - modern and minimalist design */
 .jsm-nav-vertical-layout {
     padding: 1.25rem 1rem 0.75rem;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
@@ -1281,7 +1281,7 @@
         justify-content: center;
     }
 }
-/* Vertical navigation layout - more modern and minimalist design */
+/* Vertical navigation layout - modern and minimalist design */
 .jsm-event-calendar-nav {
     padding: 1.25rem 1rem;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
@@ -1291,31 +1291,7 @@
     border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
 }
 
-.jsm-nav-vertical-layout {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1.25rem 1rem 1rem;
-}
-
-.jsm-event-calendar-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    letter-spacing: 0.01em;
-}
-
-.jsm-nav-buttons-vertical {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-}
+/* This is already defined elsewhere in the file */
 
 /* Consistent, smaller and more modern buttons */
 .jsm-event-calendar-nav-button {
