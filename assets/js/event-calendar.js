@@ -60,8 +60,11 @@
                 
                 // Equalize heights after resize
                 JSMEventCalendar.equalizeCalendarCellHeights();
-                // Also equalize all-day cell heights
-                JSMEventCalendar.equalizeAllDayCellHeights();
+                
+                // Also equalize all-day cell heights - with a slight delay to ensure content is fully rendered
+                setTimeout(() => {
+                    JSMEventCalendar.equalizeAllDayCellHeights();
+                }, 50);
             }, 250);
         },
 
@@ -465,6 +468,13 @@
 
                         // Re-setup event handlers
                         JSMEventCalendar.setupEventModals();
+                        
+                        // Equalize all-day cell heights if in weekly view
+                        if (view === 'weekly') {
+                            setTimeout(() => {
+                                JSMEventCalendar.equalizeAllDayCellHeights();
+                            }, 200);
+                        }
                     } else {
                         $calendarTable.html('<div class="jsm-event-no-events">Error loading calendar: ' + (response ? response.data : 'Invalid response') + '</div>');
                     }
@@ -880,10 +890,19 @@
 
             // Reset height for accurate measurement
             $allDayCells.css('height', 'auto');
+            $allDayLabels.css('height', 'auto');
 
             // Find maximum height
             let maxHeight = 0;
             $allDayCells.each(function() {
+                const height = $(this).outerHeight();
+                if (height > maxHeight) {
+                    maxHeight = height;
+                }
+            });
+
+            // Also check the label height
+            $allDayLabels.each(function() {
                 const height = $(this).outerHeight();
                 if (height > maxHeight) {
                     maxHeight = height;
@@ -1109,6 +1128,11 @@
             // Equalize heights of all-day cells after rendering
             setTimeout(() => {
                 this.equalizeAllDayCellHeights();
+                
+                // Force a second equalization after a short delay to handle any dynamic content
+                setTimeout(() => {
+                    this.equalizeAllDayCellHeights();
+                }, 100);
 
                 // Add tooltips to all events
                 $('.jsm-daily-event, .jsm-event-calendar-event').each(function() {
