@@ -481,6 +481,26 @@
             const $timeline = $calendarTable.find('.jsm-daily-timeline');
             $timeline.empty(); // Clear existing content
 
+            // First, add all-day events section
+            const allDayEvents = this.getAllDayEvents(events, year, month, day);
+            if (allDayEvents.length > 0) {
+                const $allDaySlot = $('<div class="jsm-daily-time-slot jsm-all-day-slot"></div>');
+                $allDaySlot.append('<div class="jsm-daily-time-label">' + (jsmEventCalendar.i18n.allDay || 'All Day') + '</div>');
+                
+                const $allDayContainer = $('<div class="jsm-daily-events-container" data-hour="all-day"></div>');
+                
+                // Sort all-day events
+                const sortedAllDayEvents = this.sortEventsByTime(allDayEvents);
+                
+                // Render all-day events
+                for (let i = 0; i < sortedAllDayEvents.length; i++) {
+                    $allDayContainer.append(this.renderEventInDailyCell(sortedAllDayEvents[i], true));
+                }
+                
+                $allDaySlot.append($allDayContainer);
+                $timeline.append($allDaySlot);
+            }
+
             // Generate time slots - full day (0-23)
             for (let hour = 0; hour <= 23; hour++) {
                 const timeDisplay = this.formatTime(hour, 0);
@@ -490,20 +510,57 @@
 
                 const $eventsContainer = $('<div class="jsm-daily-events-container" data-hour="' + hour + '"></div>');
 
-                // Filter events for this day and hour
-                const hourEvents = this.getEventsForHour(events, year, month, day, hour);
+                // Filter events for this hour (excluding all-day events)
+                const hourEvents = this.getEventsForHour(events, year, month, day, hour, false);
 
                 // Sort events
                 const sortedHourEvents = this.sortEventsByTime(hourEvents);
 
-                // Render events for this hour
+                // Render events for this hour with staggered positioning
                 for (let i = 0; i < sortedHourEvents.length; i++) {
-                    $eventsContainer.append(this.renderEventInDailyCell(sortedHourEvents[i]));
+                    const leftOffset = (i * 10) + '%';
+                    const widthAdjust = (sortedHourEvents.length > 1) ? (100 - (i * 10)) + '%' : '100%';
+                    const zIndex = 10 + (sortedHourEvents.length - i);
+                    
+                    $eventsContainer.append(
+                        this.renderEventInDailyCell(
+                            sortedHourEvents[i], 
+                            false, 
+                            { left: leftOffset, width: widthAdjust, zIndex: zIndex }
+                        )
+                    );
                 }
 
                 $timeSlot.append($eventsContainer);
                 $timeline.append($timeSlot);
             }
+        },
+        
+        /**
+         * Get all-day events for a specific day
+         */
+        getAllDayEvents: function(events, year, month, day) {
+            if (!events || !Array.isArray(events)) {
+                return [];
+            }
+
+            const dateString = this.pad(year) + '-' + this.pad(month) + '-' + this.pad(day);
+            const allDayEvents = [];
+
+            for (let i = 0; i < events.length; i++) {
+                const event = events[i];
+                if (!event || !event.startDate) continue;
+
+                const startDate = event.startDate;
+                const endDate = event.endDate || event.startDate;
+
+                // Check if event belongs to this day and is all-day
+                if (dateString >= startDate && dateString <= endDate && event.allDay) {
+                    allDayEvents.push(event);
+                }
+            }
+
+            return allDayEvents;
         },
 
         /**
