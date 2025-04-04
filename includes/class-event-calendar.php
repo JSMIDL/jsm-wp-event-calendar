@@ -71,7 +71,7 @@ class WP_Event_Calendar
                 "loadingText" => __("Loading events...", "jsm-wp-event-calendar"),
                 "noEventsText" => __("No events to display", "jsm-wp-event-calendar"),
                 "eventsListTitle" => __("Events List", "jsm-wp-event-calendar"),
-                "previous" => __("Previous", "jsm-wp-event-calendar"),
+                "previous" => __("Previous Month", "jsm-wp-event-calendar"),
                 "previousDay" => __("Previous Day", "jsm-wp-event-calendar"),
                 "previousWeek" => __("Previous Week", "jsm-wp-event-calendar"),
                 "today" => __("Today", "jsm-wp-event-calendar"),

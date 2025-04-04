@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: JSM WordPress Event Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jsm-wp-event-calendar\n"
 "POT-Creation-Date: 2023-07-01T12:00:00+00:00\n"
-"PO-Revision-Date: 2025-04-04 08:55+0200\n"
+"PO-Revision-Date: 2025-04-04 10:31+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: cs_CZ\n"
@@ -239,8 +239,8 @@ msgid "Su"
 msgstr "Ne"
 
 #: templates/calendar.php:77
-msgid "Previous"
-msgstr "Předchozí"
+msgid "Previous Month"
+msgstr "Předchozí měsíc"
 
 #: templates/calendar.php:80
 msgid "Today"
