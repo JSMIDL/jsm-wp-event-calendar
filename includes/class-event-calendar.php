@@ -698,6 +698,14 @@ class WP_Event_Calendar
             $atts['view'] = $valid_views[0];
         }
 
+        // Check if we're on mobile (this will be detected client-side, but we'll set a default here)
+        $is_mobile = wp_is_mobile();
+        
+        // On mobile, always use monthly view regardless of settings
+        if ($is_mobile) {
+            $atts['view'] = 'monthly';
+        }
+        
         // Load appropriate template based on view
         ob_start();
         switch ($atts['view']) {

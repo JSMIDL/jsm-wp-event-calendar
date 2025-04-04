@@ -316,6 +316,11 @@
                 console.error('Calendar not found for view switch:', calendarId);
                 return;
             }
+            
+            // Check if we're on mobile - if so, force monthly view
+            if (window.innerWidth <= 768) {
+                view = 'monthly';
+            }
 
             const currentMonth = parseInt($calendar.data('month'));
             const currentYear = parseInt($calendar.data('year'));
@@ -2518,27 +2523,43 @@ renderEventInMonthCell: function(event, index) {
 
             $('.jsm-event-calendar-wrapper').toggleClass('jsm-mobile-view', isMobile);
 
-            // Redraw only if needed
-            if (isMobile && $('.jsm-event-calendar-table').is(':visible')) {
+            // On mobile, hide view switcher and force monthly view
+            if (isMobile) {
+                $('.jsm-event-calendar-view-switcher').hide();
+                
+                // Force monthly view for all calendars
                 $('.jsm-event-calendar-wrapper').each(function() {
                     const calendarId = $(this).attr('id');
                     const month = parseInt($(this).data('month'));
                     const year = parseInt($(this).data('year'));
+                    const currentView = $(this).data('view');
 
-                    if (calendarId && month && year) {
+                    // Only update if not already in monthly view
+                    if (calendarId && month && year && currentView !== 'monthly') {
+                        $(this).data('view', 'monthly');
+                        JSMEventCalendar.updateCalendar(calendarId, month, year, 1, 'monthly');
+                    } else if (calendarId && month && year && $('.jsm-event-calendar-list-view').is(':visible')) {
+                        // If showing list view, update to table view
                         JSMEventCalendar.updateCalendar(calendarId, month, year);
                     }
                 });
-            } else if (!isMobile && $('.jsm-event-calendar-list-view').is(':visible')) {
-                $('.jsm-event-calendar-wrapper').each(function() {
-                    const calendarId = $(this).attr('id');
-                    const month = parseInt($(this).data('month'));
-                    const year = parseInt($(this).data('year'));
+            } else {
+                // On desktop, show view switcher
+                $('.jsm-event-calendar-view-switcher').show();
+                
+                // If we're coming from mobile to desktop and showing list view, update to proper view
+                if ($('.jsm-event-calendar-list-view').is(':visible')) {
+                    $('.jsm-event-calendar-wrapper').each(function() {
+                        const calendarId = $(this).attr('id');
+                        const month = parseInt($(this).data('month'));
+                        const year = parseInt($(this).data('year'));
+                        const view = $(this).data('view');
 
-                    if (calendarId && month && year) {
-                        JSMEventCalendar.updateCalendar(calendarId, month, year);
-                    }
-                });
+                        if (calendarId && month && year) {
+                            JSMEventCalendar.updateCalendar(calendarId, month, year, 1, view);
+                        }
+                    });
+                }
             }
         },
 
@@ -2553,6 +2574,16 @@ renderEventInMonthCell: function(event, index) {
     // Initialize after document loads
     $(document).ready(function() {
         JSMEventCalendar.init();
+        
+        // Run detectMobileView immediately to handle initial state
+        JSMEventCalendar.detectMobileView();
+        
+        // Also run on orientation change for mobile devices
+        window.addEventListener('orientationchange', function() {
+            setTimeout(function() {
+                JSMEventCalendar.detectMobileView();
+            }, 200);
+        });
     });
 
 })(jQuery);
