@@ -955,6 +955,27 @@
 
             let html = '<div class="jsm-daily-timeline">';
 
+            // First, render all-day events at the top
+            html += '<div class="jsm-daily-time-slot jsm-all-day-slot">';
+            html += '<div class="jsm-daily-time-label">' + jsmEventCalendar.i18n.allDay + '</div>';
+            html += '<div class="jsm-daily-events-container" data-hour="all-day">';
+            
+            // Get all-day events
+            const allDayEvents = events.filter(event => 
+                event.allDay && 
+                dateStr >= event.startDate && 
+                dateStr <= (event.endDate || event.startDate)
+            );
+            
+            // Sort and render all-day events
+            const sortedAllDayEvents = this.sortEventsByTime(allDayEvents);
+            for (let i = 0; i < sortedAllDayEvents.length; i++) {
+                html += this.renderEventInDailyCell(sortedAllDayEvents[i]);
+            }
+            
+            html += '</div>'; // end all-day events container
+            html += '</div>'; // end all-day time slot
+
             // Generate time slots - from 0 AM to 23 PM
             const startHour = 0;
             const endHour = 23;
@@ -974,7 +995,23 @@
 
                 // Render events for this hour
                 for (let i = 0; i < sortedHourEvents.length; i++) {
-                    html += this.renderEventInDailyCell(sortedHourEvents[i]);
+                    const event = sortedHourEvents[i];
+                    
+                    // Calculate top position based on minutes
+                    let topPosition = 0;
+                    if (event.timeDisplay && !event.allDay) {
+                        const minutesMatch = event.timeDisplay.match(/(\d{1,2}):(\d{2})/);
+                        if (minutesMatch && minutesMatch[2]) {
+                            const minutes = parseInt(minutesMatch[2]);
+                            topPosition = (minutes / 60) * 100;
+                        }
+                    }
+                    
+                    // Add inline style for positioning
+                    const eventHtml = this.renderEventInDailyCell(event)
+                        .replace('style="', `style="top: ${topPosition}%; `);
+                    
+                    html += eventHtml;
                 }
 
                 html += '</div>'; // end events container
@@ -996,13 +1033,37 @@
 
             // Track custom events consistently
             const isCustomEvent = event.custom === true || (typeof event.id === 'string' && event.id.startsWith('custom-'));
+            
+            // Calculate event duration for multi-hour events
+            let startHour = 0;
+            let endHour = 0;
+            let durationHours = 1; // Default to 1 hour
+            
+            if (event.timeDisplay && !event.allDay) {
+                // Extract start and end times
+                const timeMatch = event.timeDisplay.match(/(\d{1,2}):(\d{2})(?:\s*-\s*(\d{1,2}):(\d{2}))?/);
+                if (timeMatch) {
+                    startHour = parseInt(timeMatch[1]);
+                    if (timeMatch[3]) {
+                        endHour = parseInt(timeMatch[3]);
+                        durationHours = endHour - startHour;
+                        if (durationHours <= 0) durationHours = 1; // Ensure minimum 1 hour
+                        if (durationHours > 8) durationHours = 8; // Cap at 8 hours for display
+                    }
+                }
+            }
+            
+            // Set height based on duration
+            const heightStyle = event.allDay ? '' : `height: ${Math.max(durationHours * 60 - 10, 50)}px;`;
 
             // Create event element
             let html = '<div class="jsm-daily-event jsm-event-calendar-event" ' +
                 'data-event-id="' + event.id + '" ' +
                 (isCustomEvent ? 'data-custom="true"' : '') + ' ' +
                 'data-title="' + this.escapeAttr(event.title) + '" ' +
-                'data-date="' + this.escapeAttr(event.dateDisplay || event.startDate) + '" ';
+                'data-date="' + this.escapeAttr(event.dateDisplay || event.startDate) + '" ' +
+                'data-duration="' + durationHours + '" ' +
+                'style="' + heightStyle + '" ';
 
             // Add optional data attributes only if they exist
             if (event.timeDisplay) {
@@ -1180,14 +1241,20 @@
                 if (dateString >= startDate && dateString <= endDate) {
                     // All-day events belong to all hours
                     if (event.allDay) {
-                        hourEvents.push(event);
+                        // Only add all-day events to the first hour (to avoid duplicates)
+                        if (hour === 0) {
+                            hourEvents.push(event);
+                        }
                         continue;
                     }
 
                     // Check if event happens in this hour
                     if (event.timeDisplay) {
-                        const eventHour = this.extractHourFromTimeDisplay(event.timeDisplay);
-                        if (eventHour === hour) {
+                        const eventStartHour = this.extractHourFromTimeDisplay(event.timeDisplay);
+                        const eventEndHour = this.extractEndHourFromTimeDisplay(event.timeDisplay);
+                        
+                        // Only add the event to its start hour
+                        if (eventStartHour === hour) {
                             hourEvents.push(event);
                         }
                     }
@@ -1195,6 +1262,20 @@
             }
 
             return hourEvents;
+        },
+        
+        /**
+         * Extract end hour from time display string
+         */
+        extractEndHourFromTimeDisplay: function(timeDisplay) {
+            if (!timeDisplay) return -1;
+            
+            // Try to extract the end time in format HH:MM from the string
+            const timeMatch = timeDisplay.match(/(\d{1,2})[:\.]\d{2}\s*-\s*(\d{1,2})[:\.]/);
+            if (timeMatch && timeMatch[2]) {
+                return parseInt(timeMatch[2]);
+            }
+            return -1;
         },
 
         /**

@@ -768,7 +768,7 @@
   gap: 0.375rem;
   justify-content: center;
   width: 100%;
-  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
   overflow-x: auto;
   padding-bottom: 0.25rem;
   -webkit-overflow-scrolling: touch;
@@ -792,6 +792,13 @@
   font-weight: 600;
 }
 
+.jsm-event-calendar-nav-main-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  width: 100%;
+}
+
 /* Daily view styles */
 .jsm-daily-view .jsm-event-calendar-table-wrapper {
   display: flex;
@@ -809,6 +816,25 @@
   display: flex;
   border-bottom: 1px solid var(--border-color);
   min-height: 5rem;
+  position: relative;
+}
+
+.jsm-daily-time-slot.jsm-all-day-slot {
+  background-color: rgba(37, 99, 235, 0.05);
+  min-height: auto;
+}
+
+.jsm-all-day-slot .jsm-daily-events-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 0.5rem;
+}
+
+.jsm-all-day-slot .jsm-daily-event {
+  position: relative;
+  left: auto;
+  right: auto;
 }
 
 .jsm-daily-time-label {
@@ -827,9 +853,7 @@
   flex-grow: 1;
   padding: 0.5rem;
   min-height: 5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  position: relative;
 }
 
 .jsm-daily-event {
@@ -842,12 +866,36 @@
   cursor: pointer;
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  z-index: 5;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.jsm-daily-event[data-all-day="true"] {
+  position: relative;
+  margin-bottom: 0.5rem;
 }
 
 .jsm-daily-event:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   background-color: var(--primary-hover);
+  z-index: 10;
+}
+
+.jsm-daily-event .jsm-event-calendar-event-title {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jsm-daily-event:hover .jsm-event-calendar-event-title {
+  white-space: normal;
 }
 
 /* Weekly view styles */
@@ -914,6 +962,7 @@
   flex: 1;
   border-right: 1px solid var(--border-color);
   min-width: 8rem;
+  position: relative;
 }
 
 .jsm-weekly-day-column:last-child {
@@ -938,11 +987,17 @@
   height: 5rem;
   border-bottom: 1px solid var(--border-color);
   padding: 0.25rem;
-  overflow: hidden;
+  position: relative;
 }
 
 .jsm-weekly-hour-cell:last-child {
   border-bottom: none;
+}
+
+.jsm-weekly-hour-cell .jsm-daily-event {
+  position: absolute;
+  left: 0.25rem;
+  right: 0.25rem;
 }
 
 /* Add some responsive adjustments for mobile */

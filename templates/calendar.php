@@ -80,22 +80,6 @@ $allow_past_navigation = isset($options['allow_past_navigation']) ? $options['al
         <h2 id="<?php echo esc_attr($calendar_id); ?>-title" class="jsm-event-calendar-title"><?php echo esc_html($month_name . ' ' . $year); ?></h2>
 
         <div class="jsm-event-calendar-nav-buttons jsm-nav-buttons-vertical">
-           <?php
-           // Show Previous button based on allow_past_navigation setting or if we're not in the current month
-           $show_prev = $allow_past_navigation;
-           if ($show_prev) :
-           ?>
-            <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-prev" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php _e('Previous', 'jsm-wp-event-calendar'); ?>
-            </button>
-            <?php endif; ?>
-            <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-today" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php _e('Today', 'jsm-wp-event-calendar'); ?>
-            </button>
-            <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-next" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
-                <?php _e('Next Month', 'jsm-wp-event-calendar'); ?>
-            </button>
-
             <!-- View switching buttons -->
             <div class="jsm-event-calendar-view-switcher">
                 <?php if ($enable_daily): ?>
@@ -115,6 +99,24 @@ $allow_past_navigation = isset($options['allow_past_navigation']) ? $options['al
                     <?php _e('Month', 'jsm-wp-event-calendar'); ?>
                 </button>
                 <?php endif; ?>
+            </div>
+            
+            <div class="jsm-event-calendar-nav-main-buttons">
+               <?php
+               // Show Previous button based on allow_past_navigation setting or if we're not in the current month
+               $show_prev = $allow_past_navigation;
+               if ($show_prev) :
+               ?>
+                <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-prev" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
+                    <?php _e('Previous', 'jsm-wp-event-calendar'); ?>
+                </button>
+                <?php endif; ?>
+                <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-today" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
+                    <?php _e('Today', 'jsm-wp-event-calendar'); ?>
+                </button>
+                <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-next" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
+                    <?php _e('Next Month', 'jsm-wp-event-calendar'); ?>
+                </button>
             </div>
         </div>
     </div>
