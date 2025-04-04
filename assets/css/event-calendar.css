@@ -1043,10 +1043,23 @@
   left: 0.25rem;
   right: 0.25rem;
   transition: var(--transition);
+  max-width: 90%;
 }
 
 .jsm-weekly-hour-cell .jsm-daily-event:hover {
   z-index: 20 !important;
+}
+
+/* Improve display of overlapping events */
+.jsm-weekly-hour-cell {
+  position: relative;
+  overflow: visible;
+}
+
+.jsm-weekly-all-day-cell {
+  position: relative;
+  overflow: visible;
+  min-height: 4rem;
 }
 
 /* Add some responsive adjustments for mobile */
