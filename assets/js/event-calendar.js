@@ -6,6 +6,9 @@
 
     // Global object for our functions
     window.JSMEventCalendar = {
+        // Track window width to avoid unnecessary reloads
+        lastWindowWidth: 0,
+        
         init: function() {
             //console.log('Initializing JSM Event Calendar 2025 - Minimalist Edition');
 
@@ -49,7 +52,12 @@
         handleResize: function() {
             clearTimeout(this.resizeTimer);
             this.resizeTimer = setTimeout(function() {
-                JSMEventCalendar.detectMobileView();
+                // Only detect mobile view if window width actually changed
+                if (JSMEventCalendar.lastWindowWidth !== window.innerWidth) {
+                    JSMEventCalendar.lastWindowWidth = window.innerWidth;
+                    JSMEventCalendar.detectMobileView();
+                }
+                
                 // Equalize heights after resize
                 JSMEventCalendar.equalizeCalendarCellHeights();
                 // Also equalize all-day cell heights
@@ -2573,6 +2581,9 @@ renderEventInMonthCell: function(event, index) {
 
     // Initialize after document loads
     $(document).ready(function() {
+        // Store initial window width to avoid unnecessary reloads
+        JSMEventCalendar.lastWindowWidth = window.innerWidth;
+        
         JSMEventCalendar.init();
         
         // Run detectMobileView immediately to handle initial state
@@ -2581,6 +2592,7 @@ renderEventInMonthCell: function(event, index) {
         // Also run on orientation change for mobile devices
         window.addEventListener('orientationchange', function() {
             setTimeout(function() {
+                JSMEventCalendar.lastWindowWidth = window.innerWidth;
                 JSMEventCalendar.detectMobileView();
             }, 200);
         });
