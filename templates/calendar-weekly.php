@@ -65,15 +65,15 @@ $allow_past_navigation = isset($options['allow_past_navigation']) ? $options['al
 
 <div id="<?php echo esc_attr($calendar_id); ?>" class="jsm-event-calendar-wrapper jsm-weekly-view" data-month="<?php echo esc_attr($month); ?>" data-year="<?php echo esc_attr($year); ?>" data-day="<?php echo esc_attr($day); ?>" data-view="weekly" data-show-list="<?php echo esc_attr($atts['show_list']); ?>" data-category="<?php echo esc_attr($category); ?>">
     <!-- Calendar navigation -->
-    <div class="jsm-event-calendar-nav">
+    <div class="jsm-event-calendar-nav jsm-nav-vertical-layout">
         <h2 id="<?php echo esc_attr($calendar_id); ?>-title" class="jsm-event-calendar-title"><?php echo esc_html($week_start_date . ' - ' . $week_end_date); ?></h2>
 
-        <div class="jsm-event-calendar-nav-buttons">
+        <div class="jsm-event-calendar-nav-buttons jsm-nav-buttons-vertical">
             <?php
-                    // Show Previous button based on allow_past_navigation setting or if we're not in the current month
-                    $show_prev = $allow_past_navigation;
-                    if ($show_prev) :
-                    ?>
+            // Show Previous button based on allow_past_navigation setting or if we're not in the current month
+            $show_prev = $allow_past_navigation;
+            if ($show_prev) :
+            ?>
             <button type="button" class="jsm-event-calendar-nav-button jsm-event-calendar-prev" data-calendar-id="<?php echo esc_attr($calendar_id); ?>">
                 <?php _e('Previous Week', 'jsm-wp-event-calendar'); ?>
             </button>
