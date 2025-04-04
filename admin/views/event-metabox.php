@@ -54,7 +54,6 @@
     <div class="event-meta-field">
         <label for="event_end_date"><?php esc_html_e('End Date', 'jsm-wp-event-calendar'); ?></label>
         <input type="date" id="event_end_date" name="_event_end_date" value="<?php echo esc_attr($end_date); ?>">
-        <p class="description"><?php esc_html_e('Optional. Leave empty if the event ends on the same day it starts.', 'jsm-wp-event-calendar'); ?></p>
     </div>
 
     <div class="event-meta-field">

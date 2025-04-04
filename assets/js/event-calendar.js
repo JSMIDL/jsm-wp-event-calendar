@@ -472,7 +472,7 @@
             });
         },
         /**
-         * Render daily calendar content without reloading the entire template
+         * Render daily calendar content - zcela přepracováno
          */
         renderDailyCalendarContent: function($calendarTable, year, month, day, events) {
             // Check if the structure already exists or create it
@@ -483,61 +483,203 @@
             const $timeline = $calendarTable.find('.jsm-daily-timeline');
             $timeline.empty(); // Clear existing content
 
+            // Create date object for current day - FIX: Correctly create date object for day display
+            const currentDate = new Date(year, month - 1, day);
+            // Get correct day name using the i18n weekdays array
+            // JavaScript getDay() returns 0-6 (Sunday-Saturday)
+            const dayIndex = currentDate.getDay();
+            const weekdayName = jsmEventCalendar.i18n.weekdays[dayIndex === 0 ? 6 : dayIndex - 1]; // Adjust to European format
+            const formattedDate = currentDate.toLocaleDateString();
+
+            // Update calendar title if it exists
+            const $calendarTitle = $('#' + $calendarTable.closest('.jsm-event-calendar-wrapper').attr('id') + '-title');
+            if ($calendarTitle.length) {
+                $calendarTitle.text(weekdayName + ', ' + formattedDate);
+            }
+
             // First, add all-day events section
             const allDayEvents = this.getAllDayEvents(events, year, month, day);
             if (allDayEvents.length > 0) {
                 const $allDaySlot = $('<div class="jsm-daily-time-slot jsm-all-day-slot"></div>');
-                $allDaySlot.append('<div class="jsm-daily-time-label">' + (jsmEventCalendar.i18n.allDay || 'All Day') + '</div>');
-                
+                $allDaySlot.append('<div class="jsm-daily-time-label jsm-all-day-label">' + (jsmEventCalendar.i18n.allDay || 'All Day') + '</div>');
+
                 const $allDayContainer = $('<div class="jsm-daily-events-container" data-hour="all-day"></div>');
-                
+
                 // Sort all-day events
                 const sortedAllDayEvents = this.sortEventsByTime(allDayEvents);
-                
-                // Render all-day events
+
+                // Calculate event positioning for side-by-side display
+                const totalEvents = sortedAllDayEvents.length;
+                // Calculate width based on number of events (with min width)
+                const eventWidth = Math.max(90 / totalEvents, 40); // Min 40% width for readability
+
                 for (let i = 0; i < sortedAllDayEvents.length; i++) {
-                    $allDayContainer.append(this.renderEventInDailyCell(sortedAllDayEvents[i], true));
-                }
-                
-                $allDaySlot.append($allDayContainer);
-                $timeline.append($allDaySlot);
-            }
+                    // Position events side by side
+                    const leftOffset = (i * (90 / totalEvents)) + '%';
+                    const widthValue = eventWidth - 2 + '%'; // 2% for gap
 
-            // Generate time slots - full day (0-23)
-            for (let hour = 0; hour <= 23; hour++) {
-                const timeDisplay = this.formatTime(hour, 0);
-
-                const $timeSlot = $('<div class="jsm-daily-time-slot"></div>');
-                $timeSlot.append('<div class="jsm-daily-time-label">' + timeDisplay + '</div>');
-
-                const $eventsContainer = $('<div class="jsm-daily-events-container" data-hour="' + hour + '"></div>');
-
-                // Filter events for this hour (excluding all-day events)
-                const hourEvents = this.getEventsForHour(events, year, month, day, hour, false);
-
-                // Sort events
-                const sortedHourEvents = this.sortEventsByTime(hourEvents);
-
-                // Render events for this hour with staggered positioning
-                for (let i = 0; i < sortedHourEvents.length; i++) {
-                    const leftOffset = (i * 10) + '%';
-                    const widthAdjust = (sortedHourEvents.length > 1) ? (100 - (i * 10)) + '%' : '100%';
-                    const zIndex = 10 + (sortedHourEvents.length - i);
-                    
-                    $eventsContainer.append(
+                    $allDayContainer.append(
                         this.renderEventInDailyCell(
-                            sortedHourEvents[i], 
-                            false, 
-                            { left: leftOffset, width: widthAdjust, zIndex: zIndex }
+                            sortedAllDayEvents[i],
+                            true,
+                            {
+                                left: leftOffset,
+                                width: widthValue,
+                                position: 'absolute',
+                                zIndex: 5 + i
+                            }
                         )
                     );
                 }
 
-                $timeSlot.append($eventsContainer);
-                $timeline.append($timeSlot);
+                $allDaySlot.append($allDayContainer);
+                $timeline.append($allDaySlot);
+            } else {
+                // Add empty all-day slot with minimum height
+                const $allDaySlot = $('<div class="jsm-daily-time-slot jsm-all-day-slot" style="min-height: 60px;"></div>');
+                $allDaySlot.append('<div class="jsm-daily-time-label jsm-all-day-label">' + (jsmEventCalendar.i18n.allDay || 'All Day') + '</div>');
+                $allDaySlot.append('<div class="jsm-daily-events-container" data-hour="all-day"></div>');
+                $timeline.append($allDaySlot);
             }
+
+            // Připravit časové sloty - 24 hodin po 15 minutách = 96 slotů
+            const timeSlots = [];
+            for (let hour = 0; hour < 24; hour++) {
+                for (let minute = 0; minute < 60; minute += 15) {
+                    const slotIndex = (hour * 4) + (minute / 15);
+                    const timeDisplay = this.formatTime(hour, minute);
+
+                    // Vytvořit časový slot
+                    const $timeSlot = $('<div class="jsm-daily-time-slot jsm-time-slot-15min" data-hour="' + hour + '" data-minute="' + minute + '" data-slot="' + slotIndex + '"></div>');
+                    $timeSlot.append('<div class="jsm-daily-time-label">' + timeDisplay + '</div>');
+                    $timeSlot.append('<div class="jsm-daily-events-container" data-slot="' + slotIndex + '"></div>');
+
+                    timeSlots.push($timeSlot);
+                    $timeline.append($timeSlot);
+                }
+            }
+
+            // Připravit události pro tento den
+            const timeEvents = this.prepareEventsForTimeView(events, year, month, day);
+
+            // Rozmístit události do příslušných časových slotů
+            if (timeEvents.length > 0) {
+                // Najít překrývající se události a určit sloupce
+                const eventColumns = this.calculateEventColumns(timeEvents);
+
+                // Vykreslit každou událost do časového slotu, kde začíná
+                for (let i = 0; i < timeEvents.length; i++) {
+                    const event = timeEvents[i];
+                    const column = eventColumns[i];
+                    const totalColumns = eventColumns.maxColumns || 1;
+
+                    // Pro každou událost vypočítat pozici
+                    const leftOffset = (column * (100 / totalColumns)) + '%';
+                    const widthValue = (100 / totalColumns) - 2 + '%'; // 2% mezera
+
+                    // Získat správný slot pro začátek události
+                    const startSlotIndex = event._startTimeSlot;
+                    if (startSlotIndex >= 0 && startSlotIndex < timeSlots.length) {
+                        const $container = timeSlots[startSlotIndex].find('.jsm-daily-events-container');
+
+                        // Výška události - v minutách krát poměr výšky (např. 22px / 15min)
+                        const heightPixels = event._durationMinutes * (22 / 15);
+
+                        // Vykreslit událost s vypočtenými parametry
+                        $container.append(
+                            this.renderEventInDailyCell(
+                                event,
+                                false,
+                                {
+                                    left: leftOffset,
+                                    width: widthValue,
+                                    height: heightPixels + 'px',
+                                    position: 'absolute',
+                                    zIndex: 5 + column
+                                }
+                            )
+                        );
+                    }
+                }
+            }
+
+            // Add tooltip functionality for events
+            setTimeout(() => {
+                $('.jsm-daily-event').each(function() {
+                    const $event = $(this);
+                    const title = $event.data('title');
+                    const time = $event.data('time') || '';
+                    const date = $event.data('date') || '';
+
+                    // Create tooltip content
+                    const tooltipContent = `${title} - ${date} ${time}`;
+
+                    // Add title attribute for native tooltip
+                    $event.attr('title', tooltipContent);
+                });
+            }, 200);
         },
-        
+        /**
+         * Vypočítá sloupce pro události, aby se nepřekrývaly
+         * Vrací pole index sloupce pro každou událost
+         */
+        calculateEventColumns: function(events) {
+            if (!events || events.length === 0) {
+                return [];
+            }
+
+            // Příprava pole výsledků
+            const columns = [];
+            let maxColumn = 0;
+
+            // Pro každou událost
+            for (let i = 0; i < events.length; i++) {
+                const currentEvent = events[i];
+
+                // Najít všechny události, které se překrývají s aktuální
+                const overlapping = [];
+
+                for (let j = 0; j < i; j++) {
+                    const previousEvent = events[j];
+
+                    // Kontrola překrytí
+                    if (
+                        (currentEvent._startTimeSlot <= previousEvent._endTimeSlot) &&
+                        (currentEvent._endTimeSlot >= previousEvent._startTimeSlot)
+                    ) {
+                        overlapping.push(j);
+                    }
+                }
+
+                // Najít první volný sloupec
+                let column = 0;
+                let columnTaken;
+
+                do {
+                    columnTaken = false;
+                    for (let j = 0; j < overlapping.length; j++) {
+                        if (columns[overlapping[j]] === column) {
+                            columnTaken = true;
+                            column++;
+                            break;
+                        }
+                    }
+                } while (columnTaken);
+
+                // Uložit sloupec pro aktuální událost
+                columns[i] = column;
+
+                // Aktualizovat maximální sloupec
+                if (column > maxColumn) {
+                    maxColumn = column;
+                }
+            }
+
+            // Přidat informaci o maximálním počtu sloupců
+            columns.maxColumns = maxColumn + 1;
+
+            return columns;
+        },
         /**
          * Get all-day events for a specific day
          */
@@ -564,9 +706,153 @@
 
             return allDayEvents;
         },
+        /**
+         * Příprava událostí pro denní a týdenní pohled - zcela nová funkce
+         * Vrací události seřazené podle začátku, každá událost se objeví jen jednou
+         */
+        prepareEventsForTimeView: function(events, year, month, day) {
+            if (!events || !Array.isArray(events)) {
+                return [];
+            }
+
+            const dateString = this.pad(year) + '-' + this.pad(month) + '-' + this.pad(day);
+            const dayEvents = [];
+
+            // Získáme všechny události pro tento den (kromě celodenních)
+            for (let i = 0; i < events.length; i++) {
+                const event = events[i];
+                if (!event || !event.startDate) continue;
+
+                const startDate = event.startDate;
+                const endDate = event.endDate || event.startDate;
+
+                // Kontrola, zda událost patří do tohoto dne
+                if (dateString >= startDate && dateString <= endDate) {
+                    // Přeskočit celodenní události
+                    if (event.allDay) {
+                        continue;
+                    }
+
+                    // Zpracování začátku a konce události
+                    if (event.timeDisplay) {
+                        let eventStartMinutes = -1;
+                        let eventEndMinutes = -1;
+
+                        // Extrahovat začátek a konec události
+                        const timeMatch = event.timeDisplay.match(/(\d{1,2}):(\d{2})(?:\s*-\s*(\d{1,2}):(\d{2}))?/);
+                        if (timeMatch) {
+                            // Začátek události
+                            const startHour = parseInt(timeMatch[1]);
+                            const startMinute = parseInt(timeMatch[2]);
+                            eventStartMinutes = startHour * 60 + startMinute;
+
+                            // Konec události - pokud existuje, jinak předpokládáme +1 hodinu
+                            if (timeMatch[3] && timeMatch[4]) {
+                                const endHour = parseInt(timeMatch[3]);
+                                const endMinute = parseInt(timeMatch[4]);
+                                eventEndMinutes = endHour * 60 + endMinute;
+                            } else {
+                                // Default trvání 1 hodina, pokud není konec specifikován
+                                eventEndMinutes = eventStartMinutes + 60;
+                            }
+
+                            // Vytvoříme kopii události s přidanými údaji o čase
+                            const eventCopy = { ...event };
+                            eventCopy._startMinutes = eventStartMinutes;
+                            eventCopy._startTimeSlot = Math.floor(eventStartMinutes / 15); // Slot pro daný čas (0-95)
+                            eventCopy._endMinutes = eventEndMinutes;
+                            eventCopy._endTimeSlot = Math.floor(eventEndMinutes / 15);
+                            eventCopy._durationMinutes = eventEndMinutes - eventStartMinutes;
+
+                            dayEvents.push(eventCopy);
+                        }
+                    }
+                }
+            }
+
+            // Seřadit události podle začátku
+            return dayEvents.sort((a, b) => a._startMinutes - b._startMinutes);
+        },
+        /**
+         * Get events for a specific 15-minute time slot - zcela přepracováno
+         */
+        getEventsForTimeSlot: function(events, year, month, day, hour, minute) {
+            if (!events || !Array.isArray(events)) {
+                return [];
+            }
+
+            const dateString = this.pad(year) + '-' + this.pad(month) + '-' + this.pad(day);
+            const slotEvents = [];
+
+            // Aktuální slot začíná v X:00, X:15, X:30 nebo X:45
+            const slotStartMinutes = hour * 60 + minute;
+
+            // Aktuální slot končí o 15 minut později
+            const slotEndMinutes = slotStartMinutes + 15;
+
+            for (let i = 0; i < events.length; i++) {
+                const event = events[i];
+                if (!event || !event.startDate) continue;
+
+                const startDate = event.startDate;
+                const endDate = event.endDate || event.startDate;
+
+                // Kontrola, zda událost patří do tohoto dne
+                if (dateString >= startDate && dateString <= endDate) {
+                    // Přeskočit celodenní události
+                    if (event.allDay) {
+                        continue;
+                    }
+
+                    // Kontrola, zda událost zasahuje do tohoto časového slotu
+                    if (event.timeDisplay) {
+                        let eventStartMinutes = -1;
+                        let eventEndMinutes = -1;
+
+                        // Extrahovat začátek a konec události
+                        const timeMatch = event.timeDisplay.match(/(\d{1,2}):(\d{2})(?:\s*-\s*(\d{1,2}):(\d{2}))?/);
+                        if (timeMatch) {
+                            // Začátek události
+                            const startHour = parseInt(timeMatch[1]);
+                            const startMinute = parseInt(timeMatch[2]);
+                            eventStartMinutes = startHour * 60 + startMinute;
+
+                            // Konec události - pokud existuje, jinak předpokládáme +1 hodinu
+                            if (timeMatch[3] && timeMatch[4]) {
+                                const endHour = parseInt(timeMatch[3]);
+                                const endMinute = parseInt(timeMatch[4]);
+                                eventEndMinutes = endHour * 60 + endMinute;
+                            } else {
+                                // Default trvání 1 hodina, pokud není konec specifikován
+                                eventEndMinutes = eventStartMinutes + 60;
+                            }
+
+                            // Podmínky pro zařazení události do slotu:
+                            // 1. Událost začíná přesně v tomto slotu, NEBO
+                            // 2. Událost začala dříve, ale ještě neskončila (pokračuje přes tento slot)
+                            if (
+                                // Začátek události padá přesně do tohoto slotu
+                                (eventStartMinutes >= slotStartMinutes && eventStartMinutes < slotEndMinutes) ||
+                                // Událost už běží a zasahuje do tohoto slotu
+                                (eventStartMinutes < slotStartMinutes && eventEndMinutes > slotStartMinutes)
+                            ) {
+                                // Zkopírujeme událost a přidáme informace o trvání
+                                const eventCopy = { ...event };
+                                eventCopy._startMinutes = eventStartMinutes;
+                                eventCopy._endMinutes = eventEndMinutes;
+                                eventCopy._duration = eventEndMinutes - eventStartMinutes;
+                                slotEvents.push(eventCopy);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return slotEvents;
+        },
 
         /**
-         * Equalize heights of all-day cells in weekly view
+         * Improved function to equalize all-day cell heights
          */
         equalizeAllDayCellHeights: function() {
             // Skip on mobile devices
@@ -575,6 +861,8 @@
             }
 
             const $allDayCells = $('.jsm-weekly-all-day-cell');
+            const $allDayLabels = $('.jsm-weekly-time-label.jsm-all-day-label');
+
             if ($allDayCells.length === 0) return;
 
             // Reset height for accurate measurement
@@ -589,14 +877,18 @@
                 }
             });
 
-            // Apply same height to all cells
+            // Ensure minimum height
+            maxHeight = Math.max(maxHeight, 80);
+
+            // Apply same height to all cells and labels
             if (maxHeight > 0) {
                 $allDayCells.css('height', maxHeight + 'px');
+                $allDayLabels.css('height', maxHeight + 'px');
             }
         },
 
         /**
-         * Render weekly calendar content without reloading the entire template
+         * Render weekly calendar content - zcela přepracováno pro správné zobrazení událostí
          */
         renderWeeklyCalendarContent: function($calendarTable, year, month, day, events) {
             // Create a date object for the reference day
@@ -663,14 +955,18 @@
 
             // Time column
             const $timeColumn = $('<div class="jsm-weekly-time-column"></div>');
-            
-            // Add all-day row label - use translation from i18n
-            $timeColumn.append('<div class="jsm-weekly-time-label jsm-all-day-label">' + (jsmEventCalendar.i18n.allDay || 'All Day') + '</div>');
 
-            // Generate time slots - full day (0-23)
-            for (let hour = 0; hour <= 23; hour++) {
-                const timeDisplay = this.formatTime(hour, 0);
-                $timeColumn.append('<div class="jsm-weekly-time-label">' + timeDisplay + '</div>');
+            // Add all-day row label with fixed minimum height
+            $timeColumn.append('<div class="jsm-weekly-time-label jsm-all-day-label" style="min-height: 80px;">' +
+                              (jsmEventCalendar.i18n.allDay || 'All Day') + '</div>');
+
+            // Generate time labels - 96 15-minutových časových slotů
+            for (let hour = 0; hour < 24; hour++) {
+                for (let minute = 0; minute < 60; minute += 15) {
+                    const slotIndex = (hour * 4) + (minute / 15);
+                    const timeDisplay = this.formatTime(hour, minute);
+                    $timeColumn.append('<div class="jsm-weekly-time-label" data-hour="' + hour + '" data-minute="' + minute + '" data-slot="' + slotIndex + '">' + timeDisplay + '</div>');
+                }
             }
 
             $body.append($timeColumn);
@@ -678,6 +974,9 @@
             // Day columns
             for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
                 const dayInfo = weekDays[dayIdx];
+                const dayYear = dayInfo.date.getFullYear();
+                const dayMonth = dayInfo.date.getMonth() + 1;
+                const dayDate = dayInfo.date.getDate();
 
                 let dayClass = 'jsm-weekly-day-column';
                 if (dayInfo.isToday) {
@@ -685,79 +984,133 @@
                 }
 
                 const $dayColumn = $('<div class="' + dayClass + '" data-date="' + dayInfo.dateStr + '"></div>');
-                
-                // Add all-day events cell first
-                const $allDayCell = $('<div class="jsm-weekly-all-day-cell" data-hour="all-day"></div>');
-                
+
+                // All-day events cell
+                const $allDayCell = $('<div class="jsm-weekly-all-day-cell" data-hour="all-day" style="min-height: 80px;"></div>');
+
                 // Get all-day events for this day
                 const allDayEvents = this.getAllDayEvents(
                     events,
-                    dayInfo.date.getFullYear(),
-                    dayInfo.date.getMonth() + 1,
-                    dayInfo.date.getDate()
+                    dayYear,
+                    dayMonth,
+                    dayDate
                 );
-                
-                // Sort and render all-day events
+
+                // Sort all-day events
                 const sortedAllDayEvents = this.sortEventsByTime(allDayEvents);
-                for (let i = 0; i < sortedAllDayEvents.length; i++) {
-                    // Apply staggered positioning for all-day events
-                    const leftOffset = (i * 10) + '%';
-                    const widthAdjust = (sortedAllDayEvents.length > 1) ? (100 - (i * 10)) + '%' : '100%';
-                    const zIndex = 10 + (sortedAllDayEvents.length - i);
-                    
-                    $allDayCell.append(
-                        this.renderEventInDailyCell(
-                            sortedAllDayEvents[i], 
-                            true, 
-                            { left: leftOffset, width: widthAdjust, zIndex: zIndex }
-                        )
-                    );
-                }
-                
-                $dayColumn.append($allDayCell);
 
-                // Hours cells
-                for (let hour = 0; hour <= 23; hour++) {
-                    const $hourCell = $('<div class="jsm-weekly-hour-cell" data-hour="' + hour + '"></div>');
+                if (sortedAllDayEvents.length > 0) {
+                    // Adjust height based on number of events
+                    if (sortedAllDayEvents.length > 1) {
+                        $allDayCell.css('min-height', (80 + (sortedAllDayEvents.length - 1) * 25) + 'px');
+                    }
 
-                    // Get events for this day and hour (excluding all-day events)
-                    const dayEvents = this.getEventsForHour(
-                        events,
-                        dayInfo.date.getFullYear(),
-                        dayInfo.date.getMonth() + 1,
-                        dayInfo.date.getDate(),
-                        hour,
-                        false
-                    );
+                    // Positioning for side-by-side display
+                    const eventWidth = Math.max(90 / sortedAllDayEvents.length, 40); // Min 40% width
 
-                    // Sort events
-                    const sortedDayEvents = this.sortEventsByTime(dayEvents);
+                    for (let i = 0; i < sortedAllDayEvents.length; i++) {
+                        const leftOffset = (i * (90 / sortedAllDayEvents.length)) + '%';
+                        const widthValue = eventWidth - 2 + '%'; // 2% gap
 
-                    // Render events with staggered positioning
-                    for (let i = 0; i < sortedDayEvents.length; i++) {
-                        const leftOffset = (i * 10) + '%';
-                        const widthAdjust = (sortedDayEvents.length > 1) ? (100 - (i * 10)) + '%' : '100%';
-                        const zIndex = 10 + (sortedDayEvents.length - i);
-                        
-                        $hourCell.append(
+                        $allDayCell.append(
                             this.renderEventInDailyCell(
-                                sortedDayEvents[i], 
-                                false, 
-                                { left: leftOffset, width: widthAdjust, zIndex: zIndex }
+                                sortedAllDayEvents[i],
+                                true,
+                                {
+                                    left: leftOffset,
+                                    width: widthValue,
+                                    position: 'absolute',
+                                    zIndex: 5 + i
+                                }
                             )
                         );
                     }
+                }
 
-                    $dayColumn.append($hourCell);
+                $dayColumn.append($allDayCell);
+
+                // Create time slots - 96 slots
+                const $timeSlots = [];
+                for (let hour = 0; hour < 24; hour++) {
+                    for (let minute = 0; minute < 60; minute += 15) {
+                        const slotIndex = (hour * 4) + (minute / 15);
+
+                        let slotClass = 'jsm-weekly-hour-cell jsm-time-slot-15min';
+                        if (minute === 0) {
+                            slotClass += ' jsm-hour-start';
+                        }
+
+                        const $slot = $('<div class="' + slotClass + '" data-hour="' + hour + '" data-minute="' + minute + '" data-slot="' + slotIndex + '"></div>');
+                        $timeSlots.push($slot);
+                        $dayColumn.append($slot);
+                    }
+                }
+
+                // Připravit události pro tento den
+                const timeEvents = this.prepareEventsForTimeView(events, dayYear, dayMonth, dayDate);
+
+                // Rozmístit události
+                if (timeEvents.length > 0) {
+                    // Najít překrývající se události a určit sloupce
+                    const eventColumns = this.calculateEventColumns(timeEvents);
+
+                    // Vykreslit každou událost
+                    for (let i = 0; i < timeEvents.length; i++) {
+                        const event = timeEvents[i];
+                        const column = eventColumns[i];
+                        const totalColumns = eventColumns.maxColumns || 1;
+
+                        // Pro každou událost vypočítat pozici
+                        const leftOffset = (column * (100 / totalColumns)) + '%';
+                        const widthValue = (100 / totalColumns) - 2 + '%'; // 2% mezera
+
+                        // Získat správný slot pro začátek události
+                        const startSlotIndex = event._startTimeSlot;
+                        if (startSlotIndex >= 0 && startSlotIndex < $timeSlots.length) {
+                            const $slot = $timeSlots[startSlotIndex];
+
+                            // Výška události - v minutách krát poměr výšky (např. 22px / 15min)
+                            const heightPixels = event._durationMinutes * (22 / 15);
+
+                            // Vykreslit událost s vypočtenými parametry
+                            $slot.append(
+                                this.renderEventInDailyCell(
+                                    event,
+                                    false,
+                                    {
+                                        left: leftOffset,
+                                        width: widthValue,
+                                        height: heightPixels + 'px',
+                                        position: 'absolute',
+                                        zIndex: 5 + column
+                                    }
+                                )
+                            );
+                        }
+                    }
                 }
 
                 $body.append($dayColumn);
             }
-            
+
             // Equalize heights of all-day cells after rendering
             setTimeout(() => {
                 this.equalizeAllDayCellHeights();
-            }, 100);
+
+                // Add tooltips to all events
+                $('.jsm-daily-event, .jsm-event-calendar-event').each(function() {
+                    const $event = $(this);
+                    const title = $event.data('title');
+                    const time = $event.data('time') || '';
+                    const date = $event.data('date') || '';
+
+                    // Create tooltip content
+                    const tooltipContent = `${title} - ${date} ${time}`;
+
+                    // Add title attribute for native tooltip
+                    $event.attr('title', tooltipContent);
+                });
+            }, 200);
         },
 
         /**
@@ -892,10 +1245,10 @@
                         // Render calendar based on the view
                         switch(view) {
                             case 'daily':
-                                JSMEventCalendar.renderDailyCalendar($calendarTable, year, month, day, events);
+                                JSMEventCalendar.renderDailyCalendarContent($calendarTable, year, month, day, events);
                                 break;
                             case 'weekly':
-                                JSMEventCalendar.renderWeeklyCalendar($calendarTable, year, month, day, events);
+                                JSMEventCalendar.renderWeeklyCalendarContent($calendarTable, year, month, day, events);
                                 break;
                             default: // monthly
                                 JSMEventCalendar.renderCalendar($calendarTable, month, year, events);
@@ -981,6 +1334,7 @@
 
         /**
          * Render calendar - European format (Monday as first day)
+         * Upraveno pro zobrazení událostí pod sebou namísto překrývání
          */
         renderCalendar: function($calendarTable, month, year, events) {
             const daysInMonth = new Date(year, month, 0).getDate();
@@ -1047,16 +1401,19 @@
                 html += '<td>';
                 html += '<div class="' + dayClasses + '" data-date="' + dateStr + '">';
                 html += '<span class="jsm-event-calendar-day-number">' + i + '</span>';
+                html += '<div class="jsm-event-calendar-events-container">'; // Nový kontejner pro události
 
                 // Get and sort events for this day
                 const dayEvents = this.getEventsForDay(events, year, month, i);
                 // Sort events - all-day events first, then by start time
                 const sortedDayEvents = this.sortEventsByTime(dayEvents);
 
+                // Render events as samostatné elementy
                 for (let j = 0; j < sortedDayEvents.length; j++) {
-                    html += this.renderEventInCell(sortedDayEvents[j]);
+                    html += this.renderEventInMonthCell(sortedDayEvents[j], j);
                 }
 
+                html += '</div>'; // Uzavření kontejneru pro události
                 html += '</div>';
                 html += '</td>';
 
@@ -1075,6 +1432,40 @@
 
             // Call function to equalize cell heights after rendering
             this.equalizeCalendarCellHeights();
+        },
+        /**
+         * Render event in monthly calendar cell
+         * @param {Object} event - The event to render
+         * @param {number} index - Index of the event in the cell (for stacking)
+         */
+        renderEventInMonthCell: function(event, index) {
+            if (!event || !event.id || !event.title) {
+                return '';
+            }
+
+            // Tooltip text - create a descriptive title for hovering
+            const tooltipText = `${event.title} - ${event.dateDisplay || event.startDate} ${event.timeDisplay || ''}`;
+
+            // Add class based on event type (all-day vs. timed)
+            const eventClass = event.allDay ? 'jsm-event-calendar-event jsm-all-day-event' : 'jsm-event-calendar-event';
+
+            // Create event element
+            let html = '<div class="' + eventClass + '" ' +
+                'data-event-id="' + event.id + '" ' +
+                'data-title="' + this.escapeAttr(event.title) + '" ' +
+                'data-date="' + this.escapeAttr(event.dateDisplay || event.startDate) + '" ' +
+                'title="' + this.escapeAttr(tooltipText) + '" ' +
+                '>';
+
+            // Event content - show time + title
+            if (event.timeDisplay && !event.allDay) {
+                html += '<span class="jsm-event-calendar-event-time">' + event.timeDisplay + '</span> ';
+            }
+
+            html += '<span class="jsm-event-calendar-event-title">' + event.title + '</span>';
+            html += '</div>';
+
+            return html;
         },
         /**
          * Render daily calendar
@@ -1162,63 +1553,65 @@
         },
 
         /**
-         * Render event in daily cell
-         * @param {Object} event - The event to render
-         * @param {boolean} isAllDay - Whether this is in the all-day section
-         * @param {Object} positioning - Optional positioning parameters
+         * Render event in daily cell - zcela přepracováno pro lepší trvání událostí
          */
         renderEventInDailyCell: function(event, isAllDay = false, positioning = null) {
             if (!event || !event.id || !event.title) {
                 return '';
             }
 
-            // Track custom events consistently
-            const isCustomEvent = event.custom === true || (typeof event.id === 'string' && event.id.startsWith('custom-'));
-            
-            // Calculate event duration for multi-hour events
-            let startHour = 0;
-            let endHour = 0;
-            let durationHours = 1; // Default to 1 hour
-            
-            if (event.timeDisplay && !event.allDay) {
-                // Extract start and end times
-                const timeMatch = event.timeDisplay.match(/(\d{1,2}):(\d{2})(?:\s*-\s*(\d{1,2}):(\d{2}))?/);
-                if (timeMatch) {
-                    startHour = parseInt(timeMatch[1]);
-                    if (timeMatch[3]) {
-                        endHour = parseInt(timeMatch[3]);
-                        durationHours = endHour - startHour;
-                        if (durationHours <= 0) durationHours = 1; // Ensure minimum 1 hour
-                        if (durationHours > 8) durationHours = 8; // Cap at 8 hours for display
-                    }
+            // Výpočet trvání a pozice
+            let durationMinutes = 60; // Výchozí 1 hodina
+            let topOffset = 0;
+
+            // Pokud máme informace o začátku a konci, použijeme je
+            if (event._startMinutes !== undefined && event._endMinutes !== undefined) {
+                durationMinutes = event._endMinutes - event._startMinutes;
+
+                // Pokud jsme ve slotu, který je uprostřed události, posuneme začátek nahoru
+                if (positioning && positioning.slotMinutes !== undefined &&
+                    event._startMinutes < positioning.slotMinutes) {
+                    // Vypočítat relativní pozici uvnitř buňky (pro události, které začínají dříve)
+                    topOffset = 0;
                 }
             }
-            
+
+            // Minimální výška pro čitelnost
+            const heightInPixels = Math.max(durationMinutes * (22/15), 22); // 22px na 15 minut
+
             // Set styles based on parameters
             let styles = [];
-            
-            // Height for regular events
+
+            // Height for regular events - based on duration
             if (!isAllDay && !event.allDay) {
-                styles.push(`height: ${Math.max(durationHours * 60 - 10, 50)}px`);
+                styles.push(`height: ${heightInPixels}px`);
+
+                // Top offset pokud událost nezačíná přesně na začátku slotu
+                if (topOffset !== 0) {
+                    styles.push(`top: ${topOffset}px`);
+                }
             }
-            
+
             // Apply custom positioning if provided
             if (positioning) {
                 if (positioning.left) styles.push(`left: ${positioning.left}`);
                 if (positioning.width) styles.push(`width: ${positioning.width}`);
                 if (positioning.zIndex) styles.push(`z-index: ${positioning.zIndex}`);
+                if (positioning.position) styles.push(`position: ${positioning.position}`);
             }
-            
+
             // Join all styles
             const styleAttr = styles.length > 0 ? `style="${styles.join('; ')}"` : '';
 
-            // Create event element
+            // Tooltip text - create a descriptive title for hovering
+            const tooltipText = `${event.title} - ${event.dateDisplay || event.startDate} ${event.timeDisplay || ''}`;
+
+            // Create event element with title attribute for tooltip
             let html = '<div class="jsm-daily-event jsm-event-calendar-event' + (isAllDay || event.allDay ? ' jsm-all-day-event' : '') + '" ' +
                 'data-event-id="' + event.id + '" ' +
-                (isCustomEvent ? 'data-custom="true"' : '') + ' ' +
                 'data-title="' + this.escapeAttr(event.title) + '" ' +
                 'data-date="' + this.escapeAttr(event.dateDisplay || event.startDate) + '" ' +
-                'data-duration="' + durationHours + '" ' +
+                'title="' + this.escapeAttr(tooltipText) + '" ' +
                 styleAttr + ' ';
 
             // Add optional data attributes only if they exist
@@ -1244,143 +1637,17 @@
             html += '>';
 
             // Event content
-            html += '<div class="jsm-event-calendar-event-title">' + event.title + '</div>';
-
+            // Nejdřív zobrazíme kompletní čas
             if (event.timeDisplay && !event.allDay) {
                 html += '<div class="jsm-event-calendar-event-time">' + event.timeDisplay + '</div>';
             }
 
+            // Pak zobrazíme název s useknutím textu
+            html += '<div class="jsm-event-calendar-event-title">' + event.title + '</div>';
+
             html += '</div>';
 
             return html;
-        },
-
-        /**
-         * Render weekly calendar
-         */
-        renderWeeklyCalendar: function($calendarTable, year, month, day, events) {
-            // Create a date object for the reference day
-            const refDate = new Date(year, month - 1, day);
-
-            // Get the day of the week (0 = Sunday, 6 = Saturday)
-            let dayOfWeek = refDate.getDay();
-
-            // Adjust to make Monday the first day (0 = Monday, 6 = Sunday)
-            dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-
-            // Calculate the Monday of the week
-            const mondayDate = new Date(refDate);
-            mondayDate.setDate(refDate.getDate() - dayOfWeek);
-
-            // Get today's date for comparison
-            const today = new Date();
-            const todayStr = this.formatDate(today);
-
-            // Generate HTML
-            let html = '<div class="jsm-weekly-grid">';
-
-            // Header with days
-            html += '<div class="jsm-weekly-header">';
-            html += '<div class="jsm-weekly-time-column">&nbsp;</div>';
-
-            // Generate weekday headers
-            const weekDays = [];
-            for (let i = 0; i < 7; i++) {
-                const dayDate = new Date(mondayDate);
-                dayDate.setDate(mondayDate.getDate() + i);
-
-                const dayStr = this.formatDate(dayDate);
-                const isToday = dayStr === todayStr;
-
-                const dayName = jsmEventCalendar.i18n.weekdaysShort[i];
-                const dayNum = dayDate.getDate();
-
-                let headerClass = 'jsm-weekly-day-header';
-                if (isToday) {
-                    headerClass += ' today';
-                }
-
-                html += '<div class="' + headerClass + '" data-date="' + dayStr + '">';
-                html += '<div class="jsm-weekly-day-name">' + dayName + '</div>';
-                html += '<div class="jsm-weekly-day-number">' + dayNum + '</div>';
-                html += '</div>';
-
-                weekDays.push({
-                    date: dayDate,
-                    dateStr: dayStr,
-                    isToday: isToday
-                });
-            }
-
-            html += '</div>'; // End header
-
-            // Body with time slots and events
-            html += '<div class="jsm-weekly-body">';
-
-            // Time column
-            html += '<div class="jsm-weekly-time-column">';
-
-            // Generate time slots - from 6 AM to 9 PM
-            const startHour = 0;
-            const endHour = 23;
-
-            for (let hour = startHour; hour <= endHour; hour++) {
-                const timeDisplay = this.formatTime(hour, 0);
-                html += '<div class="jsm-weekly-time-label">' + timeDisplay + '</div>';
-            }
-
-            html += '</div>'; // End time column
-
-            // Day columns
-            for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
-                const dayInfo = weekDays[dayIdx];
-
-                let dayClass = 'jsm-weekly-day-column';
-                if (dayInfo.isToday) {
-                    dayClass += ' today';
-                }
-
-                html += '<div class="' + dayClass + '" data-date="' + dayInfo.dateStr + '">';
-
-                // Hours cells
-                for (let hour = startHour; hour <= endHour; hour++) {
-                    html += '<div class="jsm-weekly-hour-cell" data-hour="' + hour + '">';
-
-                    // Get events for this day and hour
-                    const dayEvents = this.getEventsForHour(
-                        events,
-                        dayInfo.date.getFullYear(),
-                        dayInfo.date.getMonth() + 1,
-                        dayInfo.date.getDate(),
-                        hour
-                    );
-
-                    // Sort events
-                    const sortedDayEvents = this.sortEventsByTime(dayEvents);
-
-                    // Render events with staggered positioning
-                    for (let i = 0; i < sortedDayEvents.length; i++) {
-                        const leftOffset = (i * 10) + '%';
-                        const widthAdjust = (sortedDayEvents.length > 1) ? (100 - (i * 10)) + '%' : '100%';
-                        const zIndex = 10 + (sortedDayEvents.length - i);
-                        
-                        html += this.renderEventInDailyCell(
-                            sortedDayEvents[i], 
-                            false, 
-                            { left: leftOffset, width: widthAdjust, zIndex: zIndex }
-                        );
-                    }
-
-                    html += '</div>'; // End hour cell
-                }
-
-                html += '</div>'; // End day column
-            }
-
-            html += '</div>'; // End weekly body
-            html += '</div>'; // End weekly grid
-
-            $calendarTable.html(html);
         },
 
         /**
@@ -1417,7 +1684,7 @@
                     if (event.timeDisplay) {
                         const eventStartHour = this.extractHourFromTimeDisplay(event.timeDisplay);
                         const eventEndHour = this.extractEndHourFromTimeDisplay(event.timeDisplay);
-                        
+
                         // Only add the event to its start hour
                         if (eventStartHour === hour) {
                             hourEvents.push(event);
@@ -1473,14 +1740,17 @@
             // Check if time format is set in settings
             const timeFormat = jsmEventCalendar.timeFormat || '24';
 
+            // Format minutes with leading zero if needed
+            const formattedMinutes = (minutes < 10 ? '0' : '') + minutes;
+
             if (timeFormat === '12') {
                 // 12-hour format
                 const ampm = hours >= 12 ? 'PM' : 'AM';
                 const h = hours % 12 || 12;
-                return h + ':' + this.pad(minutes) + ' ' + ampm;
+                return h + ':' + formattedMinutes + ' ' + ampm;
             } else {
                 // 24-hour format
-                return hours + ':' + this.pad(minutes);
+                return hours + ':' + formattedMinutes;
             }
         },
 
