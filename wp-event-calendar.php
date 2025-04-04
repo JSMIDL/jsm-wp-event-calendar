@@ -3,7 +3,7 @@
  * Plugin Name: JSM WP Event Calendar
  * Plugin URI: https://wordpress.org/plugins/jsm-wp-event-calendar
  * Description: Responsive event calendar with list view, category filtering, add-on support and customizable appearance.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Jan Smidl
  * Author URI: https://jansmidl.cz
  * Text Domain: jsm-wp-event-calendar

@@ -1685,7 +1685,6 @@
   background-color: var(--surface-color);
   border-right: 1px solid var(--border-color);
   flex-shrink: 0;
-  width: 4.5rem;
 }
 
 /* Highlight full hour time markers */
@@ -1836,7 +1835,6 @@
 
 /* Fixed time column for better scrolling */
 .jsm-weekly-time-column {
-  width: 4.5rem;
   flex-shrink: 0;
   border-right: 1px solid var(--border-color);
   position: sticky;
