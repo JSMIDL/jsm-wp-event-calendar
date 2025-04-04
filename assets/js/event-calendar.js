@@ -1876,58 +1876,7 @@ renderEventInMonthCell: function(event, index) {
             return dayEvents;
         },
 
-        /**
-         * Render event in calendar cell - minimalist design with data attributes
-         * Modified to ensure all necessary data is available for both desktop and mobile
-         */
-        renderEventInCell: function(event) {
-            if (!event || !event.id || !event.title) {
-                return '';
-            }
-
-            // Track custom events consistently
-            const isCustomEvent = event.custom === true || (typeof event.id === 'string' && event.id.startsWith('Courses-'));
-
-            // Store essential event data as data attributes
-            let html = '<div class="jsm-event-calendar-event" ' +
-                'data-event-id="' + event.id + '" ' +
-                (isCustomEvent ? 'data-custom="true"' : '') + ' ' +
-                'data-title="' + this.escapeAttr(event.title) + '" ' +
-                'data-date="' + this.escapeAttr(event.dateDisplay || event.startDate) + '" ';
-
-            // Add optional data attributes only if they exist
-            if (event.timeDisplay) {
-                html += 'data-time="' + this.escapeAttr(event.timeDisplay) + '" ';
-            }
-            if (event.allDay) {
-                html += 'data-all-day="true" ';
-            }
-            if (event.excerpt) {
-                // Base64 encode the HTML excerpt to preserve HTML formatting
-                const encodedExcerpt = btoa(encodeURIComponent(event.excerpt));
-                html += 'data-excerpt="' + encodedExcerpt + '" ';
-            }
-            if (event.customUrl || event.url) {
-                html += 'data-url="' + this.escapeAttr(event.customUrl || event.url) + '" ';
-            }
-            if (event.buttonText) {
-                html += 'data-button-text="' + this.escapeAttr(event.buttonText) + '" ';
-            }
-
-            // Close opening tag
-            html += '>';
-
-            // Event content
-            html += '<div class="jsm-event-calendar-event-title">' + event.title + '</div>';
-
-            if (event.timeDisplay && !event.allDay) {
-                html += '<div class="jsm-event-calendar-event-time">' + event.timeDisplay + '</div>';
-            }
-
-            html += '</div>';
-
-            return html;
-        },
+        // This function is no longer needed as it's replaced by renderEventInMonthCell
 
         /**
          * Helper function to escape attributes for HTML
@@ -2264,42 +2213,40 @@ renderEventInMonthCell: function(event, index) {
                     return;
                 }
 
-                //console.log('Rendering event:', event);
-
                 // Prepare date and time display
                 let dateDisplay = event.dateDisplay || event.startDate;
-                let timeDisplay = event.timeDisplay || (event.allDay ? 'Celý den' : '');
+                let timeDisplay = event.timeDisplay || (event.allDay ? jsmEventCalendar.i18n.allDay : '');
 
                 // Prepare HTML for modal
                 let modalHtml = `
-                                           <div class="jsm-event-detail">
-                                               <div class="jsm-event-detail-header">
-                                                   <h1 class="jsm-event-detail-title">${event.title || ''}</h1>
-                                                   <div class="jsm-event-detail-meta">
-                                                       <div class="jsm-event-detail-date">${dateDisplay}</div>
-                                                       <div class="jsm-event-detail-time">${timeDisplay}</div>
-                                                   </div>
-                                               </div>
-                                       `;
+                    <div class="jsm-event-detail">
+                        <div class="jsm-event-detail-header">
+                            <h1 class="jsm-event-detail-title">${event.title || ''}</h1>
+                            <div class="jsm-event-detail-meta">
+                                <div class="jsm-event-detail-date">${dateDisplay}</div>
+                                <div class="jsm-event-detail-time">${timeDisplay}</div>
+                            </div>
+                        </div>
+                `;
 
                 // Add excerpt if available
                 if (event.excerpt) {
                     modalHtml += `
-                                               <div class="jsm-event-detail-content">
-                                                   ${event.excerpt}
-                                               </div>
-                                           `;
+                        <div class="jsm-event-detail-content">
+                            ${event.excerpt}
+                        </div>
+                    `;
                 }
 
                 // Add custom URL button
                 if (event.customUrl || event.url) {
                     modalHtml += `
-                                               <div class="jsm-event-detail-footer">
-                                                   <a href="${event.customUrl || event.url}" class="jsm-event-button" target="_blank">
-                                                       ${event.buttonText || jsmEventCalendar.i18n.moreInformation}
-                                                   </a>
-                                               </div>
-                                           `;
+                        <div class="jsm-event-detail-footer">
+                            <a href="${event.customUrl || event.url}" class="jsm-event-button" target="_blank">
+                                ${event.buttonText || jsmEventCalendar.i18n.moreInformation}
+                            </a>
+                        </div>
+                    `;
                 }
 
                 modalHtml += '</div>';
