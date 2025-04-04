@@ -1438,7 +1438,7 @@
          * @param {Object} event - The event to render
          * @param {number} index - Index of the event in the cell (for stacking)
          */
-        renderEventInMonthCell: function(event, index) {
+renderEventInMonthCell: function(event, index) {
             if (!event || !event.id || !event.title) {
                 return '';
             }
@@ -1454,8 +1454,29 @@
                 'data-event-id="' + event.id + '" ' +
                 'data-title="' + this.escapeAttr(event.title) + '" ' +
                 'data-date="' + this.escapeAttr(event.dateDisplay || event.startDate) + '" ' +
-                'title="' + this.escapeAttr(tooltipText) + '" ' +
-                '>';
+                'title="' + this.escapeAttr(tooltipText) + '" ';
+
+            // Add additional data attributes
+            if (event.timeDisplay) {
+                html += 'data-time="' + this.escapeAttr(event.timeDisplay) + '" ';
+            }
+            if (event.allDay) {
+                html += 'data-all-day="true" ';
+            }
+            if (event.excerpt) {
+                // Base64 encode the HTML excerpt to preserve HTML formatting
+                const encodedExcerpt = btoa(encodeURIComponent(event.excerpt));
+                html += 'data-excerpt="' + encodedExcerpt + '" ';
+            }
+            if (event.customUrl || event.url) {
+                html += 'data-url="' + this.escapeAttr(event.customUrl || event.url) + '" ';
+            }
+            if (event.buttonText) {
+                html += 'data-button-text="' + this.escapeAttr(event.buttonText) + '" ';
+            }
+
+            // Close opening tag
+            html += '>';
 
             // Event content - show time + title
             if (event.timeDisplay && !event.allDay) {
