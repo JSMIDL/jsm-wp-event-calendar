@@ -4,7 +4,6 @@
 
 /* Variables for better color and value consistency */
 
-/* Použití !important pro přepsání stylů šablony */
 :root {
   /*
    * These default values will be overridden by values from plugin settings
@@ -34,38 +33,26 @@
 
 /* Main container - minimalist design 2025 - using theme font */
 .jsm-event-calendar-wrapper {
-  margin-bottom: 2.5rem !important;
+  margin-bottom: 2.5rem;
   /* Using font from theme without direct definition */
-  background-color: var(--background-color) !important;
-  border-radius: var(--border-radius-lg) !important;
-  box-shadow: var(--shadow-md) !important;
-  overflow: hidden !important;
-  color: var(--text-primary) !important;
-  max-width: 100% !important;
-  border: 1px solid var(--border-color) !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
-  line-height: 1.5 !important;
-  box-sizing: border-box !important;
-}
-
-/* Reset box-sizing pro všechny elementy uvnitř kalendáře */
-.jsm-event-calendar-wrapper *,
-.jsm-event-calendar-wrapper *::before,
-.jsm-event-calendar-wrapper *::after {
-  box-sizing: border-box !important;
+  background-color: var(--background-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  color: var(--text-primary);
+  max-width: 100%;
+  border: 1px solid var(--border-color);
 }
 
 /* Calendar navigation - minimalist design */
 .jsm-event-calendar-nav {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  padding: 1.5rem !important;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
-  color: white !important;
-  position: relative !important;
-  margin: 0 !important;
-  border: none !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  position: relative;
 }
 
 .jsm-event-calendar-nav::after {
@@ -194,53 +181,42 @@
 
 /* Calendar table - minimalist design with more space */
 .jsm-event-calendar-table-wrapper {
-  padding: 1.25rem !important;
-  margin: 0 !important;
-  background-color: var(--background-color) !important;
+  padding: 1.25rem;
 }
 
 .jsm-event-calendar-table {
-  width: 100% !important;
-  border-collapse: separate !important;
-  border-spacing: var(--calendar-spacing) !important;
-  table-layout: fixed !important;
-  border-width: 0px !important;
-  border: none !important;
-  margin: 0 !important;
-  background-color: transparent !important;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: var(--calendar-spacing);
+  table-layout: fixed;
+  border-width: 0px;
 }
 
 .jsm-event-calendar-table th {
-  font-weight: 600 !important;
-  text-align: center !important;
-  padding: 0.75rem 0.5rem !important;
-  font-size: 0.875rem !important;
-  color: var(--text-primary) !important;
-  border: none !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.025em !important;
-  background-color: var(--surface-color) !important;
-  margin: 0 !important;
-  height: auto !important;
-  line-height: 1.5 !important;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.75rem 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-primary:);
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  background-color: var(--text-secondary)
 }
 
 .jsm-event-calendar-table td {
-  border: none !important;
-  text-align: left !important;
-  padding: 0 !important;
-  position: relative !important;
-  height: auto !important;
-  vertical-align: top !important;
-  box-sizing: border-box !important;
-  background-color: transparent !important;
+  border: none;
+  text-align: left;
+  padding: 0;
+  position: relative;
+  height: auto;
+  vertical-align: top;
+  box-sizing: border-box;
 }
 
 /* Ensure table rows have correct vertical alignment */
 .jsm-event-calendar-table tr {
-  vertical-align: top !important;
-  border: none !important;
-  background-color: transparent !important;
+  vertical-align: top;
 }
 
 /* Dynamic cell height for calendar - airier design */
@@ -838,10 +814,8 @@
 
 /* Daily view styles */
 .jsm-daily-view .jsm-event-calendar-table-wrapper {
-  display: flex !important;
-  overflow-x: auto !important;
-  padding: 0 !important;
-  margin: 0 !important;
+  display: flex;
+  overflow-x: auto;
 }
 
 .jsm-daily-timeline {
@@ -948,9 +922,7 @@
 
 /* Weekly view styles */
 .jsm-weekly-view .jsm-event-calendar-table-wrapper {
-  overflow-x: auto !important;
-  padding: 0 !important;
-  margin: 0 !important;
+  overflow-x: auto;
 }
 
 /* Weekly view styles (continued) */
@@ -1702,19 +1674,16 @@
 .jsm-weekly-time-label {
   height: 22px !important;
   min-height: 22px !important;
-  padding: 0 4px 0 8px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  font-size: 0.75rem !important;
-  font-weight: 400 !important;
-  color: var(--text-secondary) !important;
-  background-color: var(--surface-color) !important;
-  border-right: 1px solid var(--border-color) !important;
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-  box-sizing: border-box !important;
-  line-height: 1.5 !important;
+  padding: 0 4px 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  background-color: var(--surface-color);
+  border-right: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 /* Highlight full hour time markers */
@@ -1787,28 +1756,23 @@
 .jsm-weekly-hour-cell {
   height: 22px !important;
   min-height: 22px !important;
-  padding: 0 2px !important;
-  position: relative !important;
-  border-right: 1px solid var(--border-color) !important;
-  margin: 0 !important;
-  box-sizing: border-box !important;
-  background-color: transparent !important;
+  padding: 0 2px;
+  position: relative;
+  border-right: 1px solid var(--border-color);
 }
 
 .jsm-weekly-hour-cell[data-minute="0"] {
   height: 24px !important;
   min-height: 24px !important;
-  border-top: 1px solid var(--border-color) !important;
+  border-top: 1px solid var(--border-color);
 }
 
 .jsm-weekly-day-column {
-  flex: 1 !important;
-  min-width: 8rem !important;
-  position: relative !important;
-  border-right: 1px solid var(--border-color) !important;
-  background-color: #fff !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  flex: 1;
+  min-width: 8rem;
+  position: relative;
+  border-right: 1px solid var(--border-color);
+  background-color: #fff;
 }
 
 .jsm-weekly-day-column:last-child {
@@ -1827,84 +1791,66 @@
 
 /* Daily timeline adjustments with improved borders */
 .jsm-daily-timeline {
-  display: flex !important;
-  flex-direction: column !important;
-  width: 100% !important;
-  border-left: 1px solid var(--border-color) !important;
-  background-color: #fff !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-left: 1px solid var(--border-color);
+  background-color: #fff;
 }
 
 .jsm-daily-time-slot {
-  display: flex !important;
-  border-bottom: 1px dotted var(--border-color) !important;
-  min-height: 22px !important;
-  position: relative !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  box-sizing: border-box !important;
+  display: flex;
+  border-bottom: 1px dotted var(--border-color);
+  min-height: 22px;
+  position: relative;
 }
 
 /* Weekly grid layout adjustments with scroll improvements */
 .jsm-weekly-grid {
-  display: flex !important;
-  flex-direction: column !important;
-  width: 100% !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: var(--border-radius-md) !important;
-  overflow: hidden !important;
-  background-color: #fff !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  background-color: #fff;
 }
 
 .jsm-weekly-header {
-  display: flex !important;
-  background-color: var(--surface-color) !important;
-  border-bottom: 1px solid var(--border-color) !important;
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 10 !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  display: flex;
+  background-color: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .jsm-weekly-body {
-  display: flex !important;
-  overflow-y: auto !important;
-  max-height: 80vh !important;
-  border-top: 1px solid var(--border-color) !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  display: flex;
+  overflow-y: auto;
+  max-height: 80vh;
+  border-top: 1px solid var(--border-color);
 }
 
 /* Fixed time column for better scrolling */
 .jsm-weekly-time-column {
-  flex-shrink: 0 !important;
-  border-right: 1px solid var(--border-color) !important;
-  position: sticky !important;
-  left: 0 !important;
-  z-index: 5 !important;
-  background-color: var(--surface-color) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 6rem !important;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-color);
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background-color: var(--surface-color);
 }
 
 /* Sticky headers for day columns */
 .jsm-weekly-day-header {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 6 !important;
-  background-color: var(--surface-color) !important;
-  padding: 8px 4px !important;
-  text-align: center !important;
-  border-right: 1px solid var(--border-color) !important;
-  margin: 0 !important;
-  flex: 1 !important;
-  min-width: 8rem !important;
-  box-sizing: border-box !important;
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background-color: var(--surface-color);
+  padding: 8px 4px;
+  text-align: center;
+  border-right: 1px solid var(--border-color);
 }
 
 /* Scrollbar styling for better usability */
@@ -1967,21 +1913,16 @@
 /* Time slots layout for events that span multiple slots */
 .jsm-daily-events-container,
 .jsm-weekly-hour-cell {
-  position: relative !important;
-  height: 100% !important;
-  min-height: inherit !important;
-  overflow: visible !important; /* Allow events to overflow */
-  margin: 0 !important;
-  padding: 0 !important;
-  box-sizing: border-box !important;
+  position: relative;
+  height: 100%;
+  min-height: inherit;
+  overflow: visible; /* Allow events to overflow */
 }
 
 /* Adjust position for event containers */
 .jsm-weekly-hour-cell,
 .jsm-daily-time-slot {
-  position: relative !important;
-  margin: 0 !important;
-  box-sizing: border-box !important;
+  position: relative;
 }
 /* Měsíční pohled - události pod sebou místo překrývání */
 .jsm-monthly-view .jsm-event-calendar-day {
