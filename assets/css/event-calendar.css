@@ -1017,7 +1017,6 @@
 .jsm-weekly-all-day-cell {
   min-height: 80px;
   border-bottom: 2px solid var(--border-color);
-  padding: 0.25rem;
   position: relative;
   background-color: rgba(37, 99, 235, 0.05);
 }
