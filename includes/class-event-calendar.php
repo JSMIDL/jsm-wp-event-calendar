@@ -342,10 +342,20 @@ class WP_Event_Calendar
 
         $month = isset($_GET["month"]) ? intval($_GET["month"]) : gmdate("m");
         $year = isset($_GET["year"]) ? intval($_GET["year"]) : gmdate("Y");
+        $day = isset($_GET["day"]) ? intval($_GET["day"]) : gmdate("d");
+        $view = isset($_GET["view"]) ? sanitize_text_field(wp_unslash($_GET["view"])) : 'monthly';
         $category = isset($_GET["category"]) ? sanitize_text_field(wp_unslash($_GET["category"])) : '';
 
-        $start_date = $year . "-" . $month . "-01";
-        $end_date = gmdate("Y-m-t", strtotime($start_date));
+        // Vždy upřednostňujeme parametry start_date a end_date, pokud jsou poslány
+        if (isset($_GET["start_date"]) && isset($_GET["end_date"]) && !empty($_GET["start_date"]) && !empty($_GET["end_date"])) {
+            $start_date = sanitize_text_field($_GET["start_date"]);
+            $end_date = sanitize_text_field($_GET["end_date"]);
+        } else {
+            // Výchozí výpočet pro měsíční pohled
+            $start_date = $year . "-" . str_pad($month, 2, '0', STR_PAD_LEFT) . "-01";
+            $end_date = gmdate("Y-m-t", strtotime($start_date));
+        }
+
         $today = gmdate("Y-m-d");
 
         // Získáme nastavení času
@@ -357,7 +367,6 @@ class WP_Event_Calendar
 
         // Determine if past navigation is allowed
         $allow_past_navigation = isset($options['allow_past_navigation']) ? $options['allow_past_navigation'] === 'yes' : true;
-
 
         $args = [
             "post_type" => "jsm_wp_event",
@@ -443,16 +452,16 @@ class WP_Event_Calendar
                 $query->the_post();
                 $post_id = get_the_ID();
 
-                $start_date = get_post_meta($post_id, "_event_start_date", true);
-                $end_date = get_post_meta($post_id, "_event_end_date", true);
+                $start_date_meta = get_post_meta($post_id, "_event_start_date", true);
+                $end_date_meta = get_post_meta($post_id, "_event_end_date", true);
                 $start_time = get_post_meta($post_id, "_event_start_time", true);
                 $end_time = get_post_meta($post_id, "_event_end_time", true);
                 $all_day = get_post_meta($post_id, "_event_all_day", true);
                 $url = get_post_meta($post_id, "_event_url", true);
                 $button_text = get_post_meta($post_id, "_event_button_text", true);
 
-                if (empty($end_date)) {
-                    $end_date = $start_date;
+                if (empty($end_date_meta)) {
+                    $end_date_meta = $start_date_meta;
                 }
 
                 $time_display = "";
@@ -467,9 +476,9 @@ class WP_Event_Calendar
                     $time_display = __("All Day", "jsm-wp-event-calendar");
                 }
 
-                $date_display = date_i18n(get_option("date_format"), strtotime($start_date));
-                if ($end_date !== $start_date) {
-                    $date_display .= " - " . date_i18n(get_option("date_format"), strtotime($end_date));
+                $date_display = date_i18n(get_option("date_format"), strtotime($start_date_meta));
+                if ($end_date_meta !== $start_date_meta) {
+                    $date_display .= " - " . date_i18n(get_option("date_format"), strtotime($end_date_meta));
                 }
 
                 // Get event categories
@@ -487,8 +496,8 @@ class WP_Event_Calendar
                 $events[] = [
                     "id" => $post_id,
                     "title" => get_the_title(),
-                    "startDate" => $start_date,
-                    "endDate" => $end_date,
+                    "startDate" => $start_date_meta,
+                    "endDate" => $end_date_meta,
                     "dateDisplay" => $date_display,
                     "timeDisplay" => $time_display,
                     "allDay" => "1" === $all_day,
@@ -509,7 +518,15 @@ class WP_Event_Calendar
                 if (!isset($external_event['title']) || !isset($external_event['startDate'])) {
                     continue;
                 }
-                $events[] = $external_event;
+
+                // Filter external events based on date range too
+                if (
+                    ($external_event['startDate'] >= $start_date && $external_event['startDate'] <= $end_date) ||
+                    (isset($external_event['endDate']) && $external_event['endDate'] >= $start_date && $external_event['endDate'] <= $end_date) ||
+                    ($external_event['startDate'] <= $start_date && isset($external_event['endDate']) && $external_event['endDate'] >= $end_date)
+                ) {
+                    $events[] = $external_event;
+                }
             }
         }
 

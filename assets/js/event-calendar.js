@@ -398,20 +398,58 @@
                     break;
             }
 
+            // Připravíme data pro AJAX podle typu pohledu
+            let ajaxData = {
+                action: 'get_events_for_calendar',
+                month: currentMonth,
+                year: currentYear,
+                day: currentDay,
+                view: view,
+                category: category,
+                nonce: jsmEventCalendar.nonce,
+                cache: false
+            };
+
+            // Výpočet rozsahu dat pro jednotlivé pohledy
+            if (view === 'weekly') {
+                // Dostaneme datum prvního dne týdne (pondělí)
+                const weekStartDate = new Date(currentYear, currentMonth - 1, currentDay);
+                const dayOfWeek = weekStartDate.getDay() || 7; // Convert 0 (Sunday) to 7
+                const mondayOffset = 1 - dayOfWeek; // Calculate days to Monday (1 - day of week)
+
+                const weekStart = new Date(weekStartDate);
+                weekStart.setDate(weekStartDate.getDate() + mondayOffset);
+
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+
+                // Přidáme do AJAX dat informace o rozsahu týdne
+                ajaxData.start_date = this.formatDate(weekStart);
+                ajaxData.end_date = this.formatDate(weekEnd);
+            }
+            // Pro denní pohled přidáme jen konkrétní datum
+            else if (view === 'daily') {
+                const selectedDate = new Date(currentYear, currentMonth - 1, currentDay);
+                ajaxData.start_date = this.formatDate(selectedDate);
+                ajaxData.end_date = this.formatDate(selectedDate);
+            }
+            // Pro měsíční pohled přidáme rozsah celého měsíce
+            else if (view === 'monthly') {
+                // První den v měsíci
+                const firstDay = new Date(currentYear, currentMonth - 1, 1);
+
+                // Poslední den v měsíci - přejdeme na další měsíc a vrátíme se o jeden den zpět
+                const lastDay = new Date(currentYear, currentMonth, 0);
+
+                ajaxData.start_date = this.formatDate(firstDay);
+                ajaxData.end_date = this.formatDate(lastDay);
+            }
+
             // 2. Načítáme data bez kompletní změny HTML struktury
             $.ajax({
                 url: jsmEventCalendar.ajaxurl,
                 type: 'GET',
-                data: {
-                    action: 'get_events_for_calendar',
-                    month: currentMonth,
-                    year: currentYear,
-                    day: currentDay,
-                    view: view,
-                    category: category,
-                    nonce: jsmEventCalendar.nonce,
-                    cache: false
-                },
+                data: ajaxData,
                 success: function(response) {
                     // Reset the flag
                     JSMEventCalendar.viewSwitchInProgress = false;
@@ -1183,20 +1221,58 @@
             // Show loading animation
             $calendarTable.html('<div class="jsm-event-loading"><div class="jsm-event-loading-spinner"></div><p>' + jsmEventCalendar.i18n.loadingText + '</p></div>');
 
+            // Připravíme data pro AJAX podle typu pohledu
+            let ajaxData = {
+                action: 'get_events_for_calendar',
+                month: month,
+                year: year,
+                day: day,
+                view: view,
+                category: category,
+                nonce: jsmEventCalendar.nonce,
+                cache: false // Force bypass browser cache
+            };
+
+            // Výpočet rozsahu dat pro jednotlivé pohledy
+            if (view === 'weekly') {
+                // Dostaneme datum prvního dne týdne (pondělí)
+                const weekStartDate = new Date(year, month - 1, day);
+                const dayOfWeek = weekStartDate.getDay() || 7; // Convert 0 (Sunday) to 7
+                const mondayOffset = 1 - dayOfWeek; // Calculate days to Monday (1 - day of week)
+
+                const weekStart = new Date(weekStartDate);
+                weekStart.setDate(weekStartDate.getDate() + mondayOffset);
+
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+
+                // Přidáme do AJAX dat informace o rozsahu týdne
+                ajaxData.start_date = this.formatDate(weekStart);
+                ajaxData.end_date = this.formatDate(weekEnd);
+            }
+            // Pro denní pohled přidáme jen konkrétní datum
+            else if (view === 'daily') {
+                const selectedDate = new Date(year, month - 1, day);
+                ajaxData.start_date = this.formatDate(selectedDate);
+                ajaxData.end_date = this.formatDate(selectedDate);
+            }
+            // Pro měsíční pohled přidáme rozsah celého měsíce
+            else if (view === 'monthly') {
+                // První den v měsíci
+                const firstDay = new Date(year, month - 1, 1);
+
+                // Poslední den v měsíci - přejdeme na další měsíc a vrátíme se o jeden den zpět
+                const lastDay = new Date(year, month, 0);
+
+                ajaxData.start_date = this.formatDate(firstDay);
+                ajaxData.end_date = this.formatDate(lastDay);
+            }
+
             // AJAX request to backend - optimized for faster loading
             $.ajax({
                 url: jsmEventCalendar.ajaxurl,
                 type: 'GET',
-                data: {
-                    action: 'get_events_for_calendar',
-                    month: month,
-                    year: year,
-                    day: day,
-                    view: view,
-                    category: category,
-                    nonce: jsmEventCalendar.nonce,
-                    cache: false // Force bypass browser cache
-                },
+                data: ajaxData,
                 success: function(response) {
                     if (response && response.success) {
                         const events = response.data;

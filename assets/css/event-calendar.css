@@ -1884,7 +1884,7 @@
 .jsm-daily-event,
 .jsm-event-calendar-event {
   position: absolute;
-  padding: 2px 4px;
+  padding: 0px;
   margin: 0;
   box-shadow: var(--shadow-sm);
   border-radius: var(--border-radius-sm);
