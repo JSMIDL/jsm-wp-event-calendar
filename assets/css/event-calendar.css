@@ -1660,7 +1660,6 @@
 }
 
 .jsm-time-slot-15min[data-minute="0"] {
-  border-top: 1px solid var(--border-color);
   height: 24px !important;
   min-height: 24px !important;
   background-color: rgba(248, 250, 252, 0.8);
@@ -1764,7 +1763,6 @@
 .jsm-weekly-hour-cell[data-minute="0"] {
   height: 24px !important;
   min-height: 24px !important;
-  border-top: 1px solid var(--border-color);
 }
 
 .jsm-weekly-day-column {
