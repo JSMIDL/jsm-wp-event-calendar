@@ -24,11 +24,19 @@ class WP_Event_Calendar
         // Ensure jQuery is loaded
         wp_enqueue_script("jquery");
 
+        // Nejprve načteme reset CSS pro přepsání stylů šablony
+        wp_enqueue_style(
+            "jsm-wp-event-calendar-reset",
+            WP_EVENT_CALENDAR_PLUGIN_URL . "assets/css/event-calendar-reset.css",
+            [],
+            WP_EVENT_CALENDAR_VERSION . "." . time()
+        );
+
         // Load CSS for calendar with version for cache busting
         wp_enqueue_style(
             "jsm-wp-event-calendar",
             WP_EVENT_CALENDAR_PLUGIN_URL . "assets/css/event-calendar.css",
-            [],
+            ["jsm-wp-event-calendar-reset"],
             WP_EVENT_CALENDAR_VERSION . "." . time()
         );
 
@@ -37,7 +45,7 @@ class WP_Event_Calendar
             "jsm-wp-event-calendar-mobile",
             WP_EVENT_CALENDAR_PLUGIN_URL .
                 "assets/css/event-calendar-mobile.css",
-            ["jsm-wp-event-calendar"],
+            ["jsm-wp-event-calendar", "jsm-wp-event-calendar-reset"],
             WP_EVENT_CALENDAR_VERSION . "." . time(),
             "only screen and (max-width: 768px)"
         );
