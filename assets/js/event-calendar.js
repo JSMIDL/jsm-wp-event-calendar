@@ -1295,7 +1295,12 @@
                         // Add timeout to ensure all images and content have loaded
                         setTimeout(function() {
                             JSMEventCalendar.equalizeCalendarCellHeights();
-                        }, 100);
+                            
+                            // Run a second time after a short delay to ensure all content is properly measured
+                            setTimeout(function() {
+                                JSMEventCalendar.equalizeAllCalendarCellHeights();
+                            }, 100);
+                        }, 50);
 
                         // Update event list if displayed
                         if (showList === 'yes') {
@@ -1468,7 +1473,14 @@
             $calendarTable.html(html);
 
             // Call function to equalize cell heights after rendering
-            this.equalizeCalendarCellHeights();
+            setTimeout(() => {
+                this.equalizeCalendarCellHeights();
+                
+                // Run a second time after a short delay to ensure all content is properly measured
+                setTimeout(() => {
+                    this.equalizeAllCalendarCellHeights();
+                }, 100);
+            }, 50);
         },
         /**
          * Render event in monthly calendar cell
@@ -1738,6 +1750,15 @@ renderEventInMonthCell: function(event, index) {
                 return;
             }
 
+            // First equalize widths of all cells
+            const $table = $('.jsm-event-calendar-table');
+            const tableWidth = $table.width();
+            const colCount = 7; // 7 days in a week
+            const cellWidth = Math.floor(tableWidth / colCount) - 1; // -1 for border
+            
+            // Apply equal width to all cells including headers
+            $('.jsm-event-calendar-table th, .jsm-event-calendar-table td').css('width', cellWidth + 'px');
+            
             // Equalize heights by row
             $('.jsm-event-calendar-table tbody tr').each(function() {
                 const $cells = $(this).find('.jsm-event-calendar-day');
@@ -1755,13 +1776,19 @@ renderEventInMonthCell: function(event, index) {
                     }
                 });
 
+                // Ensure minimum height
+                maxHeight = Math.max(maxHeight, 120); // Minimum 120px height
+                
                 // Apply same height to all cells in row
                 if (maxHeight > 0) {
                     $cells.css('height', maxHeight + 'px');
+                    
+                    // Also apply to empty cells in the same row
+                    $(this).find('.jsm-event-calendar-day.empty').css('height', maxHeight + 'px');
                 }
             });
 
-            //console.log('Calendar cell heights equalized');
+            //console.log('Calendar cell heights and widths equalized');
         },
 
         /**
@@ -1773,7 +1800,17 @@ renderEventInMonthCell: function(event, index) {
                 return;
             }
 
-            const $cells = $('.jsm-event-calendar-day:not(.empty)');
+            // First equalize widths of all cells
+            const $table = $('.jsm-event-calendar-table');
+            const tableWidth = $table.width();
+            const colCount = 7; // 7 days in a week
+            const cellWidth = Math.floor(tableWidth / colCount) - 1; // -1 for border
+            
+            // Apply equal width to all cells including headers
+            $('.jsm-event-calendar-table th, .jsm-event-calendar-table td').css('width', cellWidth + 'px');
+            
+            // Get all cells including empty ones
+            const $cells = $('.jsm-event-calendar-day');
             if ($cells.length === 0) return;
 
             // Reset height for accurate measurement
@@ -1788,12 +1825,15 @@ renderEventInMonthCell: function(event, index) {
                 }
             });
 
+            // Ensure minimum height
+            maxHeight = Math.max(maxHeight, 120); // Minimum 120px height
+            
             // Apply same height to all cells
             if (maxHeight > 0) {
                 $cells.css('height', maxHeight + 'px');
             }
 
-            //console.log('All calendar cell heights equalized to ' + maxHeight + 'px');
+            //console.log('All calendar cell heights and widths equalized to ' + maxHeight + 'px');
         },
 
         /**

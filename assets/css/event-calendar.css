@@ -210,6 +210,14 @@ html body .jsm-event-calendar-wrapper .jsm-event-calendar-table {
   border: none !important;
   margin: 0 !important;
   background-color: transparent !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure all table cells have equal width */
+html body .jsm-event-calendar-wrapper .jsm-event-calendar-table th,
+html body .jsm-event-calendar-wrapper .jsm-event-calendar-table td {
+  width: calc(100% / 7) !important;
+  box-sizing: border-box !important;
 }
 
 html body .jsm-event-calendar-wrapper .jsm-event-calendar-table th {
@@ -258,6 +266,7 @@ html body .jsm-event-calendar-wrapper .jsm-event-calendar-table tr {
   flex-direction: column;
   box-sizing: border-box;
   gap: 0.375rem; /* Gap between elements inside cell */
+  width: 100% !important; /* Ensure all cells have same width */
 }
 
 .jsm-event-calendar-day:hover {
@@ -271,6 +280,8 @@ html body .jsm-event-calendar-wrapper .jsm-event-calendar-table tr {
   border-color: transparent;
   cursor: default;
   min-height: 8rem; /* Maintain larger minimum height even for empty cells */
+  height: 100%; /* Ensure empty cells have same height as others */
+  width: 100% !important; /* Ensure empty cells have same width */
 }
 
 .jsm-event-calendar-day.empty:hover {
