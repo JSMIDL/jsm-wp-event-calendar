@@ -3,6 +3,8 @@
  */
 
 /* Variables for better color and value consistency */
+
+/* Použití !important pro přepsání stylů šablony */
 :root {
   /*
    * These default values will be overridden by values from plugin settings
@@ -31,7 +33,7 @@
 }
 
 /* Main container - minimalist design 2025 - using theme font */
-html body .jsm-event-calendar-wrapper {
+.jsm-event-calendar-wrapper {
   margin-bottom: 2.5rem !important;
   /* Using font from theme without direct definition */
   background-color: var(--background-color) !important;
@@ -44,12 +46,9 @@ html body .jsm-event-calendar-wrapper {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
   line-height: 1.5 !important;
   box-sizing: border-box !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
-/* Zajistíme správné box-sizing pro všechny elementy uvnitř kalendáře */
-.jsm-event-calendar-wrapper,
+/* Reset box-sizing pro všechny elementy uvnitř kalendáře */
 .jsm-event-calendar-wrapper *,
 .jsm-event-calendar-wrapper *::before,
 .jsm-event-calendar-wrapper *::after {
@@ -57,7 +56,7 @@ html body .jsm-event-calendar-wrapper {
 }
 
 /* Calendar navigation - minimalist design */
-html body .jsm-event-calendar-wrapper .jsm-event-calendar-nav {
+.jsm-event-calendar-nav {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
@@ -67,7 +66,6 @@ html body .jsm-event-calendar-wrapper .jsm-event-calendar-nav {
   position: relative !important;
   margin: 0 !important;
   border: none !important;
-  z-index: 2 !important;
 }
 
 .jsm-event-calendar-nav::after {
@@ -195,13 +193,13 @@ html body .jsm-event-calendar-wrapper .jsm-event-calendar-nav {
 }
 
 /* Calendar table - minimalist design with more space */
-html body .jsm-event-calendar-wrapper .jsm-event-calendar-table-wrapper {
+.jsm-event-calendar-table-wrapper {
   padding: 1.25rem !important;
   margin: 0 !important;
   background-color: var(--background-color) !important;
 }
 
-html body .jsm-event-calendar-wrapper .jsm-event-calendar-table {
+.jsm-event-calendar-table {
   width: 100% !important;
   border-collapse: separate !important;
   border-spacing: var(--calendar-spacing) !important;
@@ -212,7 +210,7 @@ html body .jsm-event-calendar-wrapper .jsm-event-calendar-table {
   background-color: transparent !important;
 }
 
-html body .jsm-event-calendar-wrapper .jsm-event-calendar-table th {
+.jsm-event-calendar-table th {
   font-weight: 600 !important;
   text-align: center !important;
   padding: 0.75rem 0.5rem !important;
@@ -227,7 +225,7 @@ html body .jsm-event-calendar-wrapper .jsm-event-calendar-table th {
   line-height: 1.5 !important;
 }
 
-html body .jsm-event-calendar-wrapper .jsm-event-calendar-table td {
+.jsm-event-calendar-table td {
   border: none !important;
   text-align: left !important;
   padding: 0 !important;
@@ -239,7 +237,7 @@ html body .jsm-event-calendar-wrapper .jsm-event-calendar-table td {
 }
 
 /* Ensure table rows have correct vertical alignment */
-html body .jsm-event-calendar-wrapper .jsm-event-calendar-table tr {
+.jsm-event-calendar-table tr {
   vertical-align: top !important;
   border: none !important;
   background-color: transparent !important;
@@ -1700,8 +1698,8 @@ html body .jsm-event-calendar-wrapper .jsm-event-calendar-table tr {
 }
 
 /* Time labels for 15-minute intervals */
-html body .jsm-event-calendar-wrapper .jsm-daily-time-label,
-html body .jsm-event-calendar-wrapper .jsm-weekly-time-label {
+.jsm-daily-time-label,
+.jsm-weekly-time-label {
   height: 22px !important;
   min-height: 22px !important;
   padding: 0 4px 0 8px !important;
@@ -1786,7 +1784,7 @@ html body .jsm-event-calendar-wrapper .jsm-weekly-time-label {
 }
 
 /* Weekly view layout improvements with border fixes */
-html body .jsm-event-calendar-wrapper .jsm-weekly-hour-cell {
+.jsm-weekly-hour-cell {
   height: 22px !important;
   min-height: 22px !important;
   padding: 0 2px !important;
@@ -1797,13 +1795,13 @@ html body .jsm-event-calendar-wrapper .jsm-weekly-hour-cell {
   background-color: transparent !important;
 }
 
-html body .jsm-event-calendar-wrapper .jsm-weekly-hour-cell[data-minute="0"] {
+.jsm-weekly-hour-cell[data-minute="0"] {
   height: 24px !important;
   min-height: 24px !important;
   border-top: 1px solid var(--border-color) !important;
 }
 
-html body .jsm-event-calendar-wrapper .jsm-weekly-day-column {
+.jsm-weekly-day-column {
   flex: 1 !important;
   min-width: 8rem !important;
   position: relative !important;
@@ -1828,7 +1826,7 @@ html body .jsm-event-calendar-wrapper .jsm-weekly-day-column {
 }
 
 /* Daily timeline adjustments with improved borders */
-html body .jsm-event-calendar-wrapper .jsm-daily-timeline {
+.jsm-daily-timeline {
   display: flex !important;
   flex-direction: column !important;
   width: 100% !important;
@@ -1838,7 +1836,7 @@ html body .jsm-event-calendar-wrapper .jsm-daily-timeline {
   padding: 0 !important;
 }
 
-html body .jsm-event-calendar-wrapper .jsm-daily-time-slot {
+.jsm-daily-time-slot {
   display: flex !important;
   border-bottom: 1px dotted var(--border-color) !important;
   min-height: 22px !important;
@@ -1849,7 +1847,7 @@ html body .jsm-event-calendar-wrapper .jsm-daily-time-slot {
 }
 
 /* Weekly grid layout adjustments with scroll improvements */
-html body .jsm-event-calendar-wrapper .jsm-weekly-grid {
+.jsm-weekly-grid {
   display: flex !important;
   flex-direction: column !important;
   width: 100% !important;
@@ -1861,7 +1859,7 @@ html body .jsm-event-calendar-wrapper .jsm-weekly-grid {
   padding: 0 !important;
 }
 
-html body .jsm-event-calendar-wrapper .jsm-weekly-header {
+.jsm-weekly-header {
   display: flex !important;
   background-color: var(--surface-color) !important;
   border-bottom: 1px solid var(--border-color) !important;
@@ -1872,7 +1870,7 @@ html body .jsm-event-calendar-wrapper .jsm-weekly-header {
   padding: 0 !important;
 }
 
-html body .jsm-event-calendar-wrapper .jsm-weekly-body {
+.jsm-weekly-body {
   display: flex !important;
   overflow-y: auto !important;
   max-height: 80vh !important;
@@ -1882,7 +1880,7 @@ html body .jsm-event-calendar-wrapper .jsm-weekly-body {
 }
 
 /* Fixed time column for better scrolling */
-html body .jsm-event-calendar-wrapper .jsm-weekly-time-column {
+.jsm-weekly-time-column {
   flex-shrink: 0 !important;
   border-right: 1px solid var(--border-color) !important;
   position: sticky !important;
@@ -1895,7 +1893,7 @@ html body .jsm-event-calendar-wrapper .jsm-weekly-time-column {
 }
 
 /* Sticky headers for day columns */
-html body .jsm-event-calendar-wrapper .jsm-weekly-day-header {
+.jsm-weekly-day-header {
   position: sticky !important;
   top: 0 !important;
   z-index: 6 !important;
@@ -1967,8 +1965,8 @@ html body .jsm-event-calendar-wrapper .jsm-weekly-day-header {
 }
 
 /* Time slots layout for events that span multiple slots */
-html body .jsm-event-calendar-wrapper .jsm-daily-events-container,
-html body .jsm-event-calendar-wrapper .jsm-weekly-hour-cell {
+.jsm-daily-events-container,
+.jsm-weekly-hour-cell {
   position: relative !important;
   height: 100% !important;
   min-height: inherit !important;
@@ -1979,8 +1977,8 @@ html body .jsm-event-calendar-wrapper .jsm-weekly-hour-cell {
 }
 
 /* Adjust position for event containers */
-html body .jsm-event-calendar-wrapper .jsm-weekly-hour-cell,
-html body .jsm-event-calendar-wrapper .jsm-daily-time-slot {
+.jsm-weekly-hour-cell,
+.jsm-daily-time-slot {
   position: relative !important;
   margin: 0 !important;
   box-sizing: border-box !important;
