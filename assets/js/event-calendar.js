@@ -579,28 +579,43 @@
                 // Sort all-day events
                 const sortedAllDayEvents = this.sortEventsByTime(allDayEvents);
 
-                // Calculate event positioning for side-by-side display
-                const totalEvents = sortedAllDayEvents.length;
-                // Calculate width based on number of events (with min width)
-                const eventWidth = Math.max(90 / totalEvents, 40); // Min 40% width for readability
-
-                for (let i = 0; i < sortedAllDayEvents.length; i++) {
-                    // Position events side by side
-                    const leftOffset = (i * (90 / totalEvents)) + '%';
-                    const widthValue = eventWidth - 2 + '%'; // 2% for gap
-
+                // If only one event, use full width
+                if (sortedAllDayEvents.length === 1) {
                     $allDayContainer.append(
                         this.renderEventInDailyCell(
-                            sortedAllDayEvents[i],
+                            sortedAllDayEvents[0],
                             true,
                             {
-                                left: leftOffset,
-                                width: widthValue,
+                                left: '0%',
+                                width: '98%', // 2% for gap
                                 position: 'absolute',
-                                zIndex: 5 + i
+                                zIndex: 5
                             }
                         )
                     );
+                } else {
+                    // Multiple events - calculate width based on number of events (with min width)
+                    const totalEvents = sortedAllDayEvents.length;
+                    const eventWidth = Math.max(90 / totalEvents, 40); // Min 40% width for readability
+
+                    for (let i = 0; i < sortedAllDayEvents.length; i++) {
+                        // Position events side by side
+                        const leftOffset = (i * (90 / totalEvents)) + '%';
+                        const widthValue = eventWidth - 2 + '%'; // 2% for gap
+
+                        $allDayContainer.append(
+                            this.renderEventInDailyCell(
+                                sortedAllDayEvents[i],
+                                true,
+                                {
+                                    left: leftOffset,
+                                    width: widthValue,
+                                    position: 'absolute',
+                                    zIndex: 5 + i
+                                }
+                            )
+                        );
+                    }
                 }
 
                 $allDaySlot.append($allDayContainer);
@@ -641,12 +656,31 @@
                 // Vykreslit každou událost do časového slotu, kde začíná
                 for (let i = 0; i < timeEvents.length; i++) {
                     const event = timeEvents[i];
-                    const column = eventColumns[i];
-                    const totalColumns = eventColumns.maxColumns || 1;
-
+                    const columnInfo = eventColumns[i];
+                        
+                    if (!columnInfo) continue;
+                        
+                    const column = columnInfo.column;
+                    const group = columnInfo.group;
+                        
+                    // Zjistit počet sloupců v této skupině
+                    const totalColumnsInGroup = (eventColumns.groupMaxColumns[group] || 0) + 1;
+                        
+                    // Pokud je událost sama ve skupině, použít plnou šířku
+                    const isAlone = eventColumns.groups[group].length === 1;
+                        
                     // Pro každou událost vypočítat pozici
-                    const leftOffset = (column * (100 / totalColumns)) + '%';
-                    const widthValue = (100 / totalColumns) - 2 + '%'; // 2% mezera
+                    let leftOffset, widthValue;
+                        
+                    if (isAlone) {
+                        // Událost je sama, použít plnou šířku
+                        leftOffset = '0%';
+                        widthValue = '98%'; // 2% mezera
+                    } else {
+                        // Událost se překrývá s jinými, rozdělit šířku
+                        leftOffset = (column * (100 / totalColumnsInGroup)) + '%';
+                        widthValue = (100 / totalColumnsInGroup) - 2 + '%'; // 2% mezera
+                    }
 
                     // Získat správný slot pro začátek události
                     const startSlotIndex = event._startTimeSlot;
@@ -692,7 +726,7 @@
         },
         /**
          * Vypočítá sloupce pro události, aby se nepřekrývaly
-         * Vrací pole index sloupce pro každou událost
+         * Vrací pole index sloupce pro každou událost a informace o překrývajících se skupinách
          */
         calculateEventColumns: function(events) {
             if (!events || events.length === 0) {
@@ -701,18 +735,20 @@
 
             // Příprava pole výsledků
             const columns = [];
-            let maxColumn = 0;
-
+            
+            // Vytvoříme skupiny překrývajících se událostí
+            const overlapGroups = [];
+            
             // Pro každou událost
             for (let i = 0; i < events.length; i++) {
                 const currentEvent = events[i];
-
+                
                 // Najít všechny události, které se překrývají s aktuální
                 const overlapping = [];
-
+                
                 for (let j = 0; j < i; j++) {
                     const previousEvent = events[j];
-
+                    
                     // Kontrola překrytí
                     if (
                         (currentEvent._startTimeSlot <= previousEvent._endTimeSlot) &&
@@ -721,34 +757,73 @@
                         overlapping.push(j);
                     }
                 }
-
-                // Najít první volný sloupec
-                let column = 0;
-                let columnTaken;
-
-                do {
-                    columnTaken = false;
-                    for (let j = 0; j < overlapping.length; j++) {
-                        if (columns[overlapping[j]] === column) {
-                            columnTaken = true;
-                            column++;
-                            break;
-                        }
+                
+                // Pokud nemá žádné překrytí, vytvoříme novou skupinu
+                if (overlapping.length === 0) {
+                    overlapGroups.push([i]);
+                    columns[i] = { column: 0, group: overlapGroups.length - 1 };
+                    continue;
+                }
+                
+                // Najít skupinu, do které patří
+                let foundGroup = false;
+                for (let g = 0; g < overlapGroups.length; g++) {
+                    const group = overlapGroups[g];
+                    
+                    // Kontrola, zda se překrývá s nějakou událostí v této skupině
+                    const hasOverlap = overlapping.some(idx => group.includes(idx));
+                    
+                    if (hasOverlap) {
+                        // Přidat do existující skupiny
+                        group.push(i);
+                        foundGroup = true;
+                        
+                        // Najít první volný sloupec v této skupině
+                        let column = 0;
+                        let columnTaken;
+                        
+                        do {
+                            columnTaken = false;
+                            for (let j = 0; j < overlapping.length; j++) {
+                                if (group.includes(overlapping[j]) && 
+                                    columns[overlapping[j]] && 
+                                    columns[overlapping[j]].column === column) {
+                                    columnTaken = true;
+                                    column++;
+                                    break;
+                                }
+                            }
+                        } while (columnTaken);
+                        
+                        columns[i] = { column: column, group: g };
+                        break;
                     }
-                } while (columnTaken);
-
-                // Uložit sloupec pro aktuální událost
-                columns[i] = column;
-
-                // Aktualizovat maximální sloupec
-                if (column > maxColumn) {
-                    maxColumn = column;
+                }
+                
+                // Pokud nenalezena žádná skupina, vytvoříme novou
+                if (!foundGroup) {
+                    overlapGroups.push([i]);
+                    columns[i] = { column: 0, group: overlapGroups.length - 1 };
                 }
             }
-
-            // Přidat informaci o maximálním počtu sloupců
-            columns.maxColumns = maxColumn + 1;
-
+            
+            // Vypočítat maximální počet sloupců pro každou skupinu
+            const groupMaxColumns = {};
+            for (let i = 0; i < events.length; i++) {
+                if (columns[i]) {
+                    const group = columns[i].group;
+                    const column = columns[i].column;
+                    
+                    if (!groupMaxColumns[group] || column > groupMaxColumns[group]) {
+                        groupMaxColumns[group] = column;
+                    }
+                }
+            }
+            
+            // Přidat informace o skupinách a maximálních sloupcích
+            columns.groups = overlapGroups;
+            columns.groupMaxColumns = groupMaxColumns;
+            
             return columns;
         },
         /**
@@ -1085,25 +1160,41 @@
                         $allDayCell.css('min-height', (80 + (sortedAllDayEvents.length - 1) * 25) + 'px');
                     }
 
-                    // Positioning for side-by-side display
-                    const eventWidth = Math.max(90 / sortedAllDayEvents.length, 40); // Min 40% width
-
-                    for (let i = 0; i < sortedAllDayEvents.length; i++) {
-                        const leftOffset = (i * (90 / sortedAllDayEvents.length)) + '%';
-                        const widthValue = eventWidth - 2 + '%'; // 2% gap
-
+                    // If only one event, use full width
+                    if (sortedAllDayEvents.length === 1) {
                         $allDayCell.append(
                             this.renderEventInDailyCell(
-                                sortedAllDayEvents[i],
+                                sortedAllDayEvents[0],
                                 true,
                                 {
-                                    left: leftOffset,
-                                    width: widthValue,
+                                    left: '0%',
+                                    width: '98%', // 2% for gap
                                     position: 'absolute',
-                                    zIndex: 5 + i
+                                    zIndex: 5
                                 }
                             )
                         );
+                    } else {
+                        // Multiple events - calculate width based on number of events
+                        const eventWidth = Math.max(90 / sortedAllDayEvents.length, 40); // Min 40% width
+
+                        for (let i = 0; i < sortedAllDayEvents.length; i++) {
+                            const leftOffset = (i * (90 / sortedAllDayEvents.length)) + '%';
+                            const widthValue = eventWidth - 2 + '%'; // 2% gap
+
+                            $allDayCell.append(
+                                this.renderEventInDailyCell(
+                                    sortedAllDayEvents[i],
+                                    true,
+                                    {
+                                        left: leftOffset,
+                                        width: widthValue,
+                                        position: 'absolute',
+                                        zIndex: 5 + i
+                                    }
+                                )
+                            );
+                        }
                     }
                 }
 
@@ -1137,12 +1228,31 @@
                     // Vykreslit každou událost
                     for (let i = 0; i < timeEvents.length; i++) {
                         const event = timeEvents[i];
-                        const column = eventColumns[i];
-                        const totalColumns = eventColumns.maxColumns || 1;
-
+                        const columnInfo = eventColumns[i];
+                        
+                        if (!columnInfo) continue;
+                        
+                        const column = columnInfo.column;
+                        const group = columnInfo.group;
+                        
+                        // Zjistit počet sloupců v této skupině
+                        const totalColumnsInGroup = (eventColumns.groupMaxColumns[group] || 0) + 1;
+                        
+                        // Pokud je událost sama ve skupině, použít plnou šířku
+                        const isAlone = eventColumns.groups[group].length === 1;
+                        
                         // Pro každou událost vypočítat pozici
-                        const leftOffset = (column * (100 / totalColumns)) + '%';
-                        const widthValue = (100 / totalColumns) - 2 + '%'; // 2% mezera
+                        let leftOffset, widthValue;
+                        
+                        if (isAlone) {
+                            // Událost je sama, použít plnou šířku
+                            leftOffset = '0%';
+                            widthValue = '98%'; // 2% mezera
+                        } else {
+                            // Událost se překrývá s jinými, rozdělit šířku
+                            leftOffset = (column * (100 / totalColumnsInGroup)) + '%';
+                            widthValue = (100 / totalColumnsInGroup) - 2 + '%'; // 2% mezera
+                        }
 
                         // Získat správný slot pro začátek události
                         const startSlotIndex = event._startTimeSlot;
