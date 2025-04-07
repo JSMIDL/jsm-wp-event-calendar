@@ -327,7 +327,7 @@
                 console.error('Calendar not found for view switch:', calendarId);
                 return;
             }
-            
+
             // Check if we're on mobile - if so, force monthly view
             if (window.innerWidth <= 768) {
                 view = 'monthly';
@@ -335,7 +335,17 @@
 
             const currentMonth = parseInt($calendar.data('month'));
             const currentYear = parseInt($calendar.data('year'));
-            const currentDay = parseInt($calendar.data('day') || new Date().getDate());
+
+            // Použijeme dnešní datum pokud přecházíme na denní nebo týdenní pohled
+            let currentDay;
+            if ((view === 'daily' || view === 'weekly') && $calendar.data('view') === 'monthly') {
+                // Při přechodu z měsíčního pohledu na denní nebo týdenní použijeme dnešní datum
+                currentDay = new Date().getDate();
+            } else {
+                // Jinak použijeme aktuální den z kalendáře nebo dnešní den
+                currentDay = parseInt($calendar.data('day') || new Date().getDate());
+            }
+
             const currentView = $calendar.data('view');
             const showList = $calendar.data('show-list');
             const category = $calendar.data('category');
@@ -468,7 +478,7 @@
 
                         // Re-setup event handlers
                         JSMEventCalendar.setupEventModals();
-                        
+
                         // Equalize all-day cell heights if in weekly view
                         if (view === 'weekly') {
                             setTimeout(() => {
@@ -1153,7 +1163,7 @@
         /**
          * Update calendar via AJAX - optimized for speed
          */
-        updateCalendar: function(calendarId, month, year, day = 1, view = null) {
+        updateCalendar: function(calendarId, month, year, day = new Date().getDate(), view = null) {
             const $calendar = $('#' + calendarId);
             if (!$calendar.length) {
                 console.error('Calendar not found for update:', calendarId);

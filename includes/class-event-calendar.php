@@ -668,7 +668,7 @@ class WP_Event_Calendar
             [
                 "month" => date("m"),
                 "year" => date("Y"),
-                "day" => date("d"),
+                "day" => date("d"), // Toto je důležité - zajistíme výchozí aktuální den
                 "show_list" => "yes",
                 "category" => "",
                 "view" => $options['default_view'], // Use default view from settings

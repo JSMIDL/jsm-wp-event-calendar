@@ -13,7 +13,7 @@ $current_day = date('d');
 $current_month = date('m');
 $current_year = date('Y');
 
-$day = absint($atts['day']);
+$day = !empty($atts['day']) ? absint($atts['day']) : $current_day;
 $month = absint($atts['month']);
 $year = absint($atts['year']);
 
