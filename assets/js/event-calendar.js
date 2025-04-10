@@ -1476,16 +1476,21 @@
                         }
 
                         // Render calendar based on the view
-                        switch(view) {
-                            case 'daily':
-                                JSMEventCalendar.renderDailyCalendarContent($calendarTable, year, month, day, events);
-                                break;
-                            case 'weekly':
-                                JSMEventCalendar.renderWeeklyCalendarContent($calendarTable, year, month, day, events);
-                                break;
-                            default: // monthly
-                                JSMEventCalendar.renderCalendar($calendarTable, month, year, events);
-                                break;
+                        // Check if we're on mobile - if so, force monthly view with list display
+                        if (window.innerWidth <= 768) {
+                            JSMEventCalendar.renderMobileCalendarView($calendarTable, month, year, events);
+                        } else {
+                            switch(view) {
+                                case 'daily':
+                                    JSMEventCalendar.renderDailyCalendarContent($calendarTable, year, month, day, events);
+                                    break;
+                                case 'weekly':
+                                    JSMEventCalendar.renderWeeklyCalendarContent($calendarTable, year, month, day, events);
+                                    break;
+                                default: // monthly
+                                    JSMEventCalendar.renderCalendar($calendarTable, month, year, events);
+                                    break;
+                            }
                         }
 
                         // Add timeout to ensure all images and content have loaded
@@ -1583,7 +1588,7 @@
 
             // If on mobile device, display day list instead of table
             if (window.innerWidth <= 768) {
-                // Použít speciální zobrazení pro mobilní zařízení
+                // Use special mobile view that only shows days with events
                 this.renderMobileCalendarView($calendarTable, month, year, events);
                 return;
             }
@@ -2012,24 +2017,7 @@ renderEventInMonthCell: function(event, index) {
             // Projít všechny dny v měsíci
             for (let i = 1; i <= daysInMonth; i++) {
                 // Získat události pro tento den - filtrujeme pouze pro aktuální měsíc a rok
-                const dayEvents = [];
-                const dateString = this.pad(year) + '-' + this.pad(month) + '-' + this.pad(i);
-
-                // Procházet všechny události a vybrat ty, které patří k tomuto dni
-                if (events && Array.isArray(events)) {
-                    for (let j = 0; j < events.length; j++) {
-                        const event = events[j];
-                        if (!event || !event.startDate) continue;
-
-                        const startDate = event.startDate;
-                        const endDate = event.endDate || event.startDate;
-
-                        // Kontrola, zda událost patří k tomuto dni
-                        if (dateString >= startDate && dateString <= endDate) {
-                            dayEvents.push(event);
-                        }
-                    }
-                }
+                const dayEvents = this.getEventsForDay(events, year, month, i);
 
                 // Přeskočit dny bez událostí
                 if (dayEvents.length === 0) {
@@ -2059,6 +2047,7 @@ renderEventInMonthCell: function(event, index) {
                 dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Převod na 0=Pondělí, ..., 6=Neděle
 
                 const dayName = jsmEventCalendar.i18n.weekdays[dayOfWeek];
+                const dateString = this.pad(year) + '-' + this.pad(month) + '-' + this.pad(i);
 
                 // Vytvořit buňku dne
                 html += '<div class="' + dayClasses + '" data-date="' + dateString + '">';
