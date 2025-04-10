@@ -40,7 +40,12 @@
                     //console.log('Loading initial calendar data:', calendarId, month, year);
                     // Add slight delay for proper DOM rendering
                     setTimeout(function() {
-                        JSMEventCalendar.updateCalendar(calendarId, month, year);
+                        // Force monthly view on mobile devices regardless of default setting
+                        if (window.innerWidth <= 768) {
+                            JSMEventCalendar.updateCalendar(calendarId, month, year, 1, 'monthly');
+                        } else {
+                            JSMEventCalendar.updateCalendar(calendarId, month, year);
+                        }
                     }, 50);
                 }
             });
@@ -1326,6 +1331,11 @@
             // If view is not specified, use the current view from the calendar
             if (view === null) {
                 view = $calendar.data('view') || 'monthly';
+            }
+            
+            // Always force monthly view on mobile devices
+            if (window.innerWidth <= 768) {
+                view = 'monthly';
             }
 
             // Show loading animation
@@ -2791,10 +2801,9 @@ renderEventInMonthCell: function(event, index) {
                     const calendarId = $(this).attr('id');
                     const month = parseInt($(this).data('month'));
                     const year = parseInt($(this).data('year'));
-                    const currentView = $(this).data('view');
-
-                    // Only update if not already in monthly view
-                    if (calendarId && month && year && currentView !== 'monthly') {
+                    
+                    // Always force monthly view on mobile, regardless of current view
+                    if (calendarId && month && year) {
                         $(this).data('view', 'monthly');
                         JSMEventCalendar.updateCalendar(calendarId, month, year, 1, 'monthly');
                     }
