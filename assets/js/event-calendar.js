@@ -14,6 +14,9 @@
 
             // Flag for view switching
             this.viewSwitchInProgress = false;
+            
+            // Store mobile state immediately
+            this.isMobile = window.innerWidth <= 768;
 
             // Set up navigation and modals
             this.setupCalendarNavigation();
@@ -37,11 +40,17 @@
                 const year = parseInt($(this).data('year'));
 
                 if (calendarId && month && year) {
-                    //console.log('Loading initial calendar data:', calendarId, month, year);
+                    // Force monthly view on mobile devices before any rendering
+                    if (JSMEventCalendar.isMobile) {
+                        $(this).data('view', 'monthly');
+                        $(this).attr('data-view', 'monthly');
+                        $(this).removeClass('jsm-weekly-view jsm-daily-view').addClass('jsm-monthly-view jsm-mobile-view');
+                    }
+                    
                     // Add slight delay for proper DOM rendering
                     setTimeout(function() {
                         // Force monthly view on mobile devices regardless of default setting
-                        if (window.innerWidth <= 768) {
+                        if (JSMEventCalendar.isMobile) {
                             JSMEventCalendar.updateCalendar(calendarId, month, year, 1, 'monthly');
                         } else {
                             JSMEventCalendar.updateCalendar(calendarId, month, year);
@@ -57,10 +66,18 @@
         handleResize: function() {
             clearTimeout(this.resizeTimer);
             this.resizeTimer = setTimeout(function() {
+                // Check if mobile state changed
+                const wasMobile = JSMEventCalendar.isMobile;
+                const isMobileNow = window.innerWidth <= 768;
+                
                 // Only detect mobile view if window width actually changed
                 if (JSMEventCalendar.lastWindowWidth !== window.innerWidth) {
                     JSMEventCalendar.lastWindowWidth = window.innerWidth;
-                    JSMEventCalendar.detectMobileView();
+                    
+                    // If mobile state changed, update it
+                    if (wasMobile !== isMobileNow) {
+                        JSMEventCalendar.detectMobileView();
+                    }
                 }
                 
                 // Equalize heights after resize
@@ -334,7 +351,7 @@
             }
 
             // Check if we're on mobile - if so, force monthly view
-            if (window.innerWidth <= 768) {
+            if (this.isMobile) {
                 view = 'monthly';
             }
 
@@ -1334,7 +1351,7 @@
             }
             
             // Always force monthly view on mobile devices
-            if (window.innerWidth <= 768) {
+            if (this.isMobile) {
                 view = 'monthly';
             }
 
@@ -1487,7 +1504,7 @@
 
                         // Render calendar based on the view
                         // Check if we're on mobile - if so, force monthly view with list display
-                        if (window.innerWidth <= 768) {
+                        if (JSMEventCalendar.isMobile) {
                             JSMEventCalendar.renderMobileCalendarView($calendarTable, month, year, events);
                         } else {
                             switch(view) {
@@ -1597,7 +1614,7 @@
             const todayYear = today.getFullYear();
 
             // If on mobile device, display day list instead of table
-            if (window.innerWidth <= 768) {
+            if (this.isMobile) {
                 // Use special mobile view that only shows days with events
                 this.renderMobileCalendarView($calendarTable, month, year, events);
                 return;
@@ -2788,12 +2805,13 @@ renderEventInMonthCell: function(event, index) {
          * Detect mobile view and switch to responsive layout
          */
         detectMobileView: function() {
-            const isMobile = window.innerWidth <= 768;
+            // Update global mobile state
+            this.isMobile = window.innerWidth <= 768;
 
-            $('.jsm-event-calendar-wrapper').toggleClass('jsm-mobile-view', isMobile);
+            $('.jsm-event-calendar-wrapper').toggleClass('jsm-mobile-view', this.isMobile);
 
             // On mobile, hide view switcher and force monthly view
-            if (isMobile) {
+            if (this.isMobile) {
                 $('.jsm-event-calendar-view-switcher').hide();
 
                 // Force monthly view for all calendars
@@ -2805,6 +2823,8 @@ renderEventInMonthCell: function(event, index) {
                     // Always force monthly view on mobile, regardless of current view
                     if (calendarId && month && year) {
                         $(this).data('view', 'monthly');
+                        $(this).attr('data-view', 'monthly');
+                        $(this).removeClass('jsm-weekly-view jsm-daily-view').addClass('jsm-monthly-view');
                         JSMEventCalendar.updateCalendar(calendarId, month, year, 1, 'monthly');
                     }
                 });
@@ -2840,11 +2860,17 @@ renderEventInMonthCell: function(event, index) {
     $(document).ready(function() {
         // Store initial window width to avoid unnecessary reloads
         JSMEventCalendar.lastWindowWidth = window.innerWidth;
+        JSMEventCalendar.isMobile = window.innerWidth <= 768;
+        
+        // Apply mobile classes immediately if needed
+        if (JSMEventCalendar.isMobile) {
+            $('.jsm-event-calendar-wrapper').addClass('jsm-mobile-view jsm-monthly-view');
+            $('.jsm-event-calendar-wrapper').data('view', 'monthly');
+            $('.jsm-event-calendar-wrapper').attr('data-view', 'monthly');
+            $('.jsm-event-calendar-view-switcher').hide();
+        }
         
         JSMEventCalendar.init();
-        
-        // Run detectMobileView immediately to handle initial state
-        JSMEventCalendar.detectMobileView();
         
         // Also run on orientation change for mobile devices
         window.addEventListener('orientationchange', function() {
