@@ -1567,7 +1567,6 @@
 
         /**
          * Render calendar - European format (Monday as first day)
-         * Upraveno pro zobrazení událostí pod sebou namísto překrývání
          */
         renderCalendar: function($calendarTable, month, year, events) {
             const daysInMonth = new Date(year, month, 0).getDate();
@@ -1584,10 +1583,12 @@
 
             // If on mobile device, display day list instead of table
             if (window.innerWidth <= 768) {
-                this.renderMobileCalendar($calendarTable, month, year, daysInMonth, firstDay, events, todayDate, todayMonth, todayYear);
+                // Použít speciální zobrazení pro mobilní zařízení
+                this.renderMobileCalendarView($calendarTable, month, year, events);
                 return;
             }
 
+            // Pokračovat se standardním zobrazením pro desktop
             let html = '<table class="jsm-event-calendar-table">';
             html += '<thead><tr>';
 
@@ -1634,14 +1635,14 @@
                 html += '<td>';
                 html += '<div class="' + dayClasses + '" data-date="' + dateStr + '">';
                 html += '<span class="jsm-event-calendar-day-number">' + i + '</span>';
-                html += '<div class="jsm-event-calendar-events-container">'; // Nový kontejner pro události
+                html += '<div class="jsm-event-calendar-events-container">'; // Kontejner pro události
 
                 // Get and sort events for this day
                 const dayEvents = this.getEventsForDay(events, year, month, i);
                 // Sort events - all-day events first, then by start time
                 const sortedDayEvents = this.sortEventsByTime(dayEvents);
 
-                // Render events as samostatné elementy
+                // Render events
                 for (let j = 0; j < sortedDayEvents.length; j++) {
                     html += this.renderEventInMonthCell(sortedDayEvents[j], j);
                 }
@@ -1991,10 +1992,153 @@ renderEventInMonthCell: function(event, index) {
 
             //console.log('All calendar cell heights equalized to ' + maxHeight + 'px');
         },
+        /**
+         * Kompletně přepracovaná funkce pro mobilní zobrazení
+         * Zobrazuje POUZE dny, které obsahují události
+         */
+        renderMobileCalendarView: function($calendarTable, month, year, events) {
+            // Aktuální datum pro porovnání
+            const today = new Date();
+            const todayDate = today.getDate();
+            const todayMonth = today.getMonth() + 1;
+            const todayYear = today.getFullYear();
+
+            // Počet dní v měsíci
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            let html = '<div class="jsm-event-calendar-list-view">';
+            let hasEvents = false;
+
+            // Projít všechny dny v měsíci
+            for (let i = 1; i <= daysInMonth; i++) {
+                // Získat události pro tento den - filtrujeme pouze pro aktuální měsíc a rok
+                const dayEvents = [];
+                const dateString = this.pad(year) + '-' + this.pad(month) + '-' + this.pad(i);
+
+                // Procházet všechny události a vybrat ty, které patří k tomuto dni
+                if (events && Array.isArray(events)) {
+                    for (let j = 0; j < events.length; j++) {
+                        const event = events[j];
+                        if (!event || !event.startDate) continue;
+
+                        const startDate = event.startDate;
+                        const endDate = event.endDate || event.startDate;
+
+                        // Kontrola, zda událost patří k tomuto dni
+                        if (dateString >= startDate && dateString <= endDate) {
+                            dayEvents.push(event);
+                        }
+                    }
+                }
+
+                // Přeskočit dny bez událostí
+                if (dayEvents.length === 0) {
+                    continue;
+                }
+
+                hasEvents = true;
+
+                // Třídy pro den
+                let dayClasses = 'jsm-event-calendar-day';
+
+                // Zkontrolovat, zda je den dnešní
+                if (i === todayDate && month === todayMonth && year === todayYear) {
+                    dayClasses += ' today';
+                }
+
+                // Zkontrolovat, zda je den v minulosti
+                if ((year === todayYear && month === todayMonth && i < todayDate) ||
+                    (year === todayYear && month < todayMonth) ||
+                    (year < todayYear)) {
+                    dayClasses += ' past-day';
+                }
+
+                // Vypočítat den v týdnu v evropském formátu
+                const dayDate = new Date(year, month - 1, i);
+                let dayOfWeek = dayDate.getDay(); // 0=Neděle, 1=Pondělí, ..., 6=Sobota
+                dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Převod na 0=Pondělí, ..., 6=Neděle
+
+                const dayName = jsmEventCalendar.i18n.weekdays[dayOfWeek];
+
+                // Vytvořit buňku dne
+                html += '<div class="' + dayClasses + '" data-date="' + dateString + '">';
+                html += '<div class="jsm-event-calendar-day-header">';
+                html += '<span class="jsm-event-calendar-day-number">' + i + '</span>';
+                html += '<span class="jsm-event-calendar-day-name">' + dayName + '</span>';
+                html += '</div>';
+
+                // Seřadit události
+                const sortedDayEvents = this.sortEventsByTime(dayEvents);
+
+                // Vykreslit všechny události pro tento den
+                for (let j = 0; j < sortedDayEvents.length; j++) {
+                    const event = sortedDayEvents[j];
+
+                    if (!event || !event.id || !event.title) {
+                        continue;
+                    }
+
+                    // Třídy pro událost
+                    const eventClass = event.allDay ? 'jsm-event-calendar-event jsm-all-day-event' : 'jsm-event-calendar-event';
+
+                    // Tooltip text
+                    const tooltipText = `${event.title} - ${event.dateDisplay || event.startDate} ${event.timeDisplay || ''}`;
+
+                    // Vykreslit událost
+                    html += '<div class="' + eventClass + '" ' +
+                        'data-event-id="' + event.id + '" ' +
+                        'data-title="' + this.escapeAttr(event.title) + '" ' +
+                        'data-date="' + this.escapeAttr(event.dateDisplay || event.startDate) + '" ' +
+                        'title="' + this.escapeAttr(tooltipText) + '" ';
+
+                    // Přidat volitelné atributy
+                    if (event.timeDisplay) {
+                        html += 'data-time="' + this.escapeAttr(event.timeDisplay) + '" ';
+                    }
+                    if (event.allDay) {
+                        html += 'data-all-day="true" ';
+                    }
+                    if (event.excerpt) {
+                        // Base64 kódování HTML výpisu pro zachování formátování
+                        const encodedExcerpt = btoa(encodeURIComponent(event.excerpt));
+                        html += 'data-excerpt="' + encodedExcerpt + '" ';
+                    }
+                    if (event.customUrl || event.url) {
+                        html += 'data-url="' + this.escapeAttr(event.customUrl || event.url) + '" ';
+                    }
+                    if (event.buttonText) {
+                        html += 'data-button-text="' + this.escapeAttr(event.buttonText) + '" ';
+                    }
+
+                    // Uzavřít otevírací tag
+                    html += '>';
+
+                    // Obsah události - zobrazit čas + název
+                    if (event.timeDisplay && !event.allDay) {
+                        html += '<span class="jsm-event-calendar-event-time">' + event.timeDisplay + '</span> ';
+                    }
+
+                    html += '<span class="jsm-event-calendar-event-title">' + event.title + '</span>';
+                    html += '</div>';
+                }
+
+                html += '</div>';
+            }
+
+            html += '</div>';
+
+            // Pokud nejsou žádné události, zobrazit zprávu
+            if (!hasEvents) {
+                html = '<div class="jsm-event-no-events">' + jsmEventCalendar.i18n.noEventsText + '</div>';
+            }
+
+            // Vložit HTML do tabulky
+            $calendarTable.html(html);
+        },
 
         /**
          * Render calendar for mobile devices - only days with events
-         * Modified to ensure consistent event data handling with desktop view
+         * Kompletně přepracované mobilní zobrazení - seznam dnů s událostmi
          */
         renderMobileCalendar: function($calendarTable, month, year, daysInMonth, firstDay, events, todayDate, todayMonth, todayYear) {
             let html = '<div class="jsm-event-calendar-list-view">';
@@ -2033,11 +2177,7 @@ renderEventInMonthCell: function(event, index) {
                 dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to 0=Monday, ..., 6=Sunday
 
                 const dayName = jsmEventCalendar.i18n.weekdays[dayOfWeek];
-                const formattedDate = dayDate.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long'
-                });
+                const formattedDate = i + '. ' + jsmEventCalendar.i18n.months[month - 1];
 
                 html += '<div class="' + dayClasses + '" data-date="' + year + '-' + this.pad(month) + '-' + this.pad(i) + '">';
                 html += '<div class="jsm-event-calendar-day-header">';
@@ -2048,9 +2188,51 @@ renderEventInMonthCell: function(event, index) {
                 // Sort events before rendering
                 const sortedDayEvents = this.sortEventsByTime(dayEvents);
 
-                // Events for this day - use the same rendering function for consistency
+                // Events for this day - custom formatting for mobile
                 for (let j = 0; j < sortedDayEvents.length; j++) {
-                    html += this.renderEventInCell(sortedDayEvents[j]);
+                    const event = sortedDayEvents[j];
+                    if (!event || !event.id || !event.title) {
+                        continue;
+                    }
+
+                    // Event class - all-day vs. timed events
+                    const eventClass = event.allDay ? 'jsm-event-calendar-event jsm-all-day-event' : 'jsm-event-calendar-event';
+
+                    // Create event HTML
+                    html += '<div class="' + eventClass + '" ' +
+                           'data-event-id="' + event.id + '" ' +
+                           'data-title="' + this.escapeAttr(event.title) + '" ' +
+                           'data-date="' + this.escapeAttr(event.dateDisplay || event.startDate) + '" ';
+
+                    // Add additional data attributes
+                    if (event.timeDisplay) {
+                        html += 'data-time="' + this.escapeAttr(event.timeDisplay) + '" ';
+                    }
+                    if (event.allDay) {
+                        html += 'data-all-day="true" ';
+                    }
+                    if (event.excerpt) {
+                        // Base64 encode the HTML excerpt to preserve HTML formatting
+                        const encodedExcerpt = btoa(encodeURIComponent(event.excerpt));
+                        html += 'data-excerpt="' + encodedExcerpt + '" ';
+                    }
+                    if (event.customUrl || event.url) {
+                        html += 'data-url="' + this.escapeAttr(event.customUrl || event.url) + '" ';
+                    }
+                    if (event.buttonText) {
+                        html += 'data-button-text="' + this.escapeAttr(event.buttonText) + '" ';
+                    }
+
+                    // Close opening tag
+                    html += '>';
+
+                    // Event content - show time + title
+                    if (event.timeDisplay && !event.allDay) {
+                        html += '<span class="jsm-event-calendar-event-time">' + event.timeDisplay + '</span> ';
+                    }
+
+                    html += '<span class="jsm-event-calendar-event-title">' + event.title + '</span>';
+                    html += '</div>';
                 }
 
                 html += '</div>';
@@ -2614,7 +2796,7 @@ renderEventInMonthCell: function(event, index) {
             // On mobile, hide view switcher and force monthly view
             if (isMobile) {
                 $('.jsm-event-calendar-view-switcher').hide();
-                
+
                 // Force monthly view for all calendars
                 $('.jsm-event-calendar-wrapper').each(function() {
                     const calendarId = $(this).attr('id');
@@ -2626,15 +2808,12 @@ renderEventInMonthCell: function(event, index) {
                     if (calendarId && month && year && currentView !== 'monthly') {
                         $(this).data('view', 'monthly');
                         JSMEventCalendar.updateCalendar(calendarId, month, year, 1, 'monthly');
-                    } else if (calendarId && month && year && $('.jsm-event-calendar-list-view').is(':visible')) {
-                        // If showing list view, update to table view
-                        JSMEventCalendar.updateCalendar(calendarId, month, year);
                     }
                 });
             } else {
                 // On desktop, show view switcher
                 $('.jsm-event-calendar-view-switcher').show();
-                
+
                 // If we're coming from mobile to desktop and showing list view, update to proper view
                 if ($('.jsm-event-calendar-list-view').is(':visible')) {
                     $('.jsm-event-calendar-wrapper').each(function() {
